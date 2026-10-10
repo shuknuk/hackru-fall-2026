@@ -1,7 +1,8 @@
 import { test, expect } from "@playwright/test";
-import { readFile } from "node:fs/promises";
+import type { Session } from "../../src/lib/motion/schema";
 
-test("sample sets persist, replay, compare, export, import and delete", async ({
+
+test("sample sets persist, replay, compare and delete without export or data controls", async ({
   page,
 }, testInfo) => {
   test.setTimeout(90000);
@@ -71,43 +72,15 @@ test("sample sets persist, replay, compare, export, import and delete", async ({
   await expect(
     page.getByRole("heading", { name: "3 completed reps", exact: true }),
   ).toBeVisible();
-  const downloaded = page.waitForEvent("download");
-  await page.getByRole("button", { name: "Export session" }).click();
-  const download = await downloaded;
-  const file = await download.path();
-  expect(file).not.toBeNull();
-  const data = await readFile(file!, "utf8");
-  expect(JSON.parse(data).source).toBe("sample-synthetic");
+  await expect(page.getByRole("button", { name: "Export session" })).toHaveCount(0);
   await page.goto("/history");
-  await expect(page.getByRole("status").first()).toContainText("2 of 20");
-  await page
-    .getByLabel("Import a session JSON file, up to 5 MiB")
-    .setInputFiles({
-      name: "sample.json",
-      mimeType: "application/json",
-      buffer: Buffer.from(data),
-    });
-  await expect(page.getByRole("status").first()).toContainText("3 of 20");
-  await page
-    .getByLabel("Import a session JSON file, up to 5 MiB")
-    .setInputFiles({
-      name: "bad.json",
-      mimeType: "application/json",
-      buffer: Buffer.from('{"schemaVersion":99}'),
-    });
-  await expect(page.getByRole("status").first()).not.toContainText("3 of 20");
+  await expect(page.getByRole("heading", { name: "Your data controls" })).toHaveCount(0);
+  await expect(page.getByRole("button", { name: "Export", exact: true })).toHaveCount(0);
   page.on("dialog", (d) => d.accept());
-  await page
-    .getByRole("button", { name: "Delete", exact: true })
-    .first()
-    .click();
-  await expect(page.getByRole("status").first()).toContainText("2 of 20");
-  await page
-    .getByRole("button", { name: "Delete all local movement data" })
-    .click();
-  await expect(page.getByRole("status").first()).toContainText(
-    "No saved sessions",
-  );
+  await page.getByRole("button", { name: "Delete", exact: true }).first().click();
+  await expect(page.getByRole("status").first()).toContainText("1 of 20");
+  await page.getByRole("button", { name: "Delete", exact: true }).click();
+  await expect(page.getByRole("status").first()).toContainText("No saved sessions");
   expect(requests.some((x) => x.includes("/mediapipe/"))).toBe(false);
   expect(errors).toEqual([]);
 });
@@ -187,7 +160,7 @@ test("storage failures preserve a readable recovery path", async ({ page }) => {
     "Local storage unavailable",
   );
   await expect(
-    page.getByLabel("Import a session JSON file, up to 5 MiB"),
+    page.getByRole("button", { name: "Open synthetic sample pair" }),
   ).toBeVisible();
 });
 
@@ -221,10 +194,16 @@ test("a checkpointed draft recovers only completed cycles and the library cap ne
     .getByRole("button", { name: "Open synthetic sample pair" })
     .click();
   await page.getByRole("link", { name: "Inspect this set" }).first().click();
-  const pending = page.waitForEvent("download");
-  await page.getByRole("button", { name: "Export session" }).click();
-  const exported = await pending;
-  const original = JSON.parse(await readFile((await exported.path())!, "utf8"));
+  const original = await page.evaluate(() => new Promise<Session>((resolve, reject) => {
+    const request = indexedDB.open("menhel-motion", 1);
+    request.onerror = () => reject(request.error);
+    request.onsuccess = () => {
+      const db = request.result;
+      const records = db.transaction("sessions").objectStore("sessions").getAll();
+      records.onsuccess = () => { resolve(records.result[0]); db.close(); };
+      records.onerror = () => { reject(records.error); db.close(); };
+    };
+  }));
   // Seed an authored fixture as a draft solely to verify the recovery transaction.
   await page.evaluate(async (s) => {
     await new Promise<void>((resolve, reject) => {
@@ -277,13 +256,7 @@ test("a checkpointed draft recovers only completed cycles and the library cap ne
   }, original);
   await page.reload();
   await expect(page.getByRole("status").first()).toContainText("20 of 20");
-  await page
-    .getByLabel("Import a session JSON file, up to 5 MiB")
-    .setInputFiles({
-      name: "overflow.json",
-      mimeType: "application/json",
-      buffer: Buffer.from(JSON.stringify(original)),
-    });
+  await page.getByRole("button", { name: "Open synthetic sample pair" }).click();
   await expect(page.getByRole("status").first()).toContainText(
     "Twenty sessions are already saved",
   );
