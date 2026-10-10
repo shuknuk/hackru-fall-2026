@@ -1,3 +1,11 @@
+## HackRU web rebuild
+
+Follow [Menhel Motion Master MVP](./MENHEL_MOTION_MASTER_MVP.md) for the Next.js + MediaPipe PWA scope, researched guidelines and AI skills, architecture, M0–M9 roadmap, and acceptance checks.
+
+The application documented below is the imported native baseline. The web MVP has not been implemented yet. The master document is authoritative for the web rebuild.
+
+---
+
 # ReboundAI - now Menhel
 
 A next-generation AI-powered fitness and recovery application built with React Native and Expo. ReboundAI combines real-time pose detection using MediaPipe with a sophisticated health tracking system to provide personalized recovery insights and workout analysis.
