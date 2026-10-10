@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import type { Session, Sample, Rep } from "@/lib/motion/schema";
+import { advanceSquatReplay, squatReplayTime } from "@/lib/motion/replay";
 import { sampleAt } from "@/lib/motion/compare";
 import { CONNECTIONS } from "@/lib/motion/analysis";
 import { jointVisible } from "@/lib/pose/types";
@@ -74,16 +75,18 @@ function Trace({
   start,
   end,
   time,
+  completedOnly,
 }: {
   session: Session;
   start: number;
   end: number;
   time: number;
+  completedOnly: boolean;
 }) {
   let path = "",
     prev = -Infinity;
   for (const s of session.samples) {
-    if (s.t < start || s.t > end || s.filtered === null || !s.valid) {
+    if (s.t < start || s.t > end || s.filtered === null || !s.valid || (completedOnly && !session.reps.some((rep) => s.t >= rep.start && s.t <= rep.end))) {
       prev = -Infinity;
       continue;
     }
@@ -117,10 +120,10 @@ export default function ReplayPlayer({ session }: { session: Session }) {
   const [selected, setSelected] = useState(-1);
   const [playing, setPlaying] = useState(false);
   const [speed, setSpeed] = useState(1);
-  const [time, setTime] = useState(0);
+  const [time, setTime] = useState(session.reps[0]?.start ?? 0);
   const rep: Rep | undefined = session.reps[selected];
-  const start = rep?.start ?? session.samples[0].t,
-    end = rep?.end ?? session.samples[session.samples.length - 1].t;
+  const start = rep?.start ?? session.reps[0]?.start ?? 0,
+    end = rep?.end ?? session.reps.at(-1)?.end ?? 0;
   const clock = useRef(time);
   useEffect(() => {
     clock.current = time;
@@ -131,7 +134,9 @@ export default function ReplayPlayer({ session }: { session: Session }) {
       last = performance.now(),
       lastRender = last;
     function tick(now: number) {
-      clock.current = Math.min(end, clock.current + (now - last) * speed);
+      clock.current = selected < 0
+        ? advanceSquatReplay(session.reps, clock.current, (now - last) * speed)
+        : Math.min(end, clock.current + (now - last) * speed);
       last = now;
       if (now - lastRender >= 50 || clock.current >= end) {
         setTime(clock.current);
@@ -152,13 +157,13 @@ export default function ReplayPlayer({ session }: { session: Session }) {
       cancelAnimationFrame(frame);
       document.removeEventListener("visibilitychange", hide);
     };
-  }, [playing, speed, end]);
+  }, [playing, speed, end, selected, session.reps]);
   function choose(index: number) {
     setSelected(index);
     setPlaying(false);
-    setTime(index < 0 ? session.samples[0].t : session.reps[index].start);
+    setTime(index < 0 ? session.reps[0]?.start ?? 0 : session.reps[index].start);
   }
-  const sample = sampleAt(session.samples, time);
+  const sample = session.reps.length ? sampleAt(session.samples, time) : null;
   return (
     <section className="panel" aria-labelledby="player-title">
       <h2 id="player-title">Movement replay</h2>
@@ -172,7 +177,7 @@ export default function ReplayPlayer({ session }: { session: Session }) {
           value={selected}
           onChange={(e) => choose(Number(e.target.value))}
         >
-          <option value={-1}>Whole set, including partial movement</option>
+          <option value={-1}>Whole set - completed squats only</option>
           {session.reps.map((r, i) => (
             <option key={r.id} value={i}>
               Rep {r.id}
@@ -190,6 +195,7 @@ export default function ReplayPlayer({ session }: { session: Session }) {
       <div className="actions">
         <button
           className="secondary-button"
+          disabled={!session.reps.length}
           onClick={() => {
             if (time >= end) setTime(start);
             setPlaying((p) => !p);
@@ -232,7 +238,7 @@ export default function ReplayPlayer({ session }: { session: Session }) {
           value={time}
           onChange={(e) => {
             setPlaying(false);
-            setTime(Number(e.target.value));
+            setTime(selected < 0 ? squatReplayTime(session.reps, Number(e.target.value)) : Number(e.target.value));
           }}
         />
       </label>
@@ -240,7 +246,7 @@ export default function ReplayPlayer({ session }: { session: Session }) {
         {(time / 1000).toFixed(2)} s of {(end / 1000).toFixed(2)} s ·{" "}
         {sample ? "Valid knee sample" : "Tracking unavailable"}
       </p>
-      <Trace session={session} start={start} end={end} time={time} />
+      <Trace session={session} start={start} end={end} time={time} completedOnly={selected < 0} />
       {rep ? (
         <p>
           Rep {rep.id} · peak estimated knee bend {rep.peak?.toFixed(0)}° ·
