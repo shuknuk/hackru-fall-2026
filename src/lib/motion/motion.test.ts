@@ -5,6 +5,7 @@ import {
   makeProfile,
   analyze,
   Signal,
+  SquatDetector,
   summary,
 } from "./analysis";
 import { fixtureSamples, syntheticJoints, samplePair } from "./fixtures";
@@ -38,6 +39,14 @@ describe("projected geometry", () => {
   });
 });
 describe("squat segmentation", () => {
+  it("counts the first squat after seeding the actual stable standing frames at set start", () => {
+    const detector = new SquatDetector(profile);
+    const samples = fixtureSamples([65]);
+    for (const sample of samples.filter((s) => s.t <= 300)) detector.push(sample);
+    expect(detector.phase).toBe("standing");
+    for (const sample of samples.filter((s) => s.t > 700)) detector.push({ ...sample, t: sample.t - 400 });
+    expect(detector.reps).toHaveLength(1);
+  });
   it("counts three analytical down/up cycles once and excludes partials", () => {
     expect(analyze(fixtureSamples(), profile)).toHaveLength(3);
     expect(analyze(fixtureSamples([10, 65, 12]), profile)).toHaveLength(1);
