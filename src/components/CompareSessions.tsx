@@ -96,7 +96,7 @@ export default function CompareSessions() {
         <p className="eyebrow">
           {a.source === "live" && b.source === "live"
             ? "PERSONAL ATTEMPTS"
-            : "SAMPLE COMPARISON · SOURCE LABELS PRESERVED"}
+            : "DEMO SQUAT COMPARISON"}
         </p>
         <label className="check">
           <input
