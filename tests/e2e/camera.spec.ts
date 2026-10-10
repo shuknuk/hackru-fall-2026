@@ -8,7 +8,7 @@ test("denied permission is recoverable without retaining a stream", async ({
       throw new DOMException("Test denial", "NotAllowedError");
     };
   });
-  await page.goto(`/session?verification=${Date.now()}`);
+  await page.goto(`/session/record?verification=${Date.now()}`);
   await page.getByRole("button", { name: "Start camera" }).click();
   await expect(page.locator(".camera-status")).toContainText(
     "Camera permission was denied",
@@ -41,7 +41,7 @@ test("Stop releases a late permission grant", async ({ page }) => {
           } as unknown as MediaStream);
       });
   });
-  await page.goto(`/session?verification=${Date.now()}`);
+  await page.goto(`/session/record?verification=${Date.now()}`);
   await page.getByRole("button", { name: "Start camera" }).click();
   await expect(page.locator(".camera-status")).toContainText(
     "Waiting for camera permission",
@@ -81,7 +81,7 @@ for (const engine of ["worker-cpu", "main-cpu", "main-gpu"]) {
         testInfo.project.name !== "chromium",
       "Requires explicitly configured prerecorded input; never physical-device evidence",
     );
-    await page.goto(`/session?verification=${Date.now()}`);
+    await page.goto(`/session/record?verification=${Date.now()}`);
     await page.getByText("Development diagnostics", { exact: true }).click();
     await page.getByLabel("Pose engine").selectOption(engine);
     await page.getByRole("button", { name: "Start camera" }).click();
