@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import type { Session } from "@/lib/motion/schema";
-import { getSession, saveSession, download } from "@/lib/motion/storage";
+import { getSession, saveSession } from "@/lib/motion/storage";
 import { pendingResult } from "@/lib/motion/result-handoff";
 import { summary } from "@/lib/motion/analysis";
 
@@ -19,7 +19,7 @@ export default function SetResults() {
       if (pending) {
         if (active) { setSession(pending.session); setMessage("Saving on this device…"); }
         const error = await pending.saving;
-        if (active) { setSaving(false); setSaved(error === null); setMessage(error ? `Not saved: ${error}. Export this result before leaving.` : "Saved on this device."); }
+        if (active) { setSaving(false); setSaved(error === null); setMessage(error ? `Not saved: ${error}. Keep this page open and retry saving.` : "Saved on this device."); }
       } else {
         const stored = await getSession(id);
         if (!stored) throw new Error("This set was not found on this device.");
@@ -51,7 +51,6 @@ export default function SetResults() {
           void saveSession(session).then(() => { setSaved(true); setMessage("Saved on this device."); }).catch((error) => setMessage(`Not saved: ${error.message}`)).finally(() => setSaving(false));
         }}>Retry saving</button>}
         {saved ? <a className="secondary-button" href={`/session?profile=${session.profile.id}`}>Record another set</a> : null}
-        <button className="secondary-button" onClick={() => download(session)}>Export session</button>
         <a className="secondary-button" href="/history">History and comparison</a>
       </div>
     </section>
