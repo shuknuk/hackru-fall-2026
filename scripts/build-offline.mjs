@@ -1,5 +1,12 @@
 import { spawnSync } from "node:child_process";
-import { readFile, writeFile, readdir, rm, mkdir } from "node:fs/promises";
+import {
+  readFile,
+  writeFile,
+  readdir,
+  rm,
+  mkdir,
+  access,
+} from "node:fs/promises";
 import path from "node:path";
 import { createHash, randomUUID } from "node:crypto";
 const version = randomUUID();
@@ -25,7 +32,27 @@ await mkdir(`public/offline-shell/${version}`, { recursive: true });
 for (const route of ["/", "/history", "/replay", "/compare"]) {
   const name = route === "/" ? "index" : route.slice(1);
   const file = `public/offline-shell/${version}/${name}.html`;
-  await writeFile(file, await readFile(`.next/server/app/${name}.html`));
+  const candidates = [
+    `.next/server/app/${name}.html`,
+    ...(route === "/"
+      ? [".next/server/app/page.html"]
+      : [`.next/server/app/${name}/page.html`]),
+  ];
+  let source;
+  for (const candidate of candidates) {
+    try {
+      await access(candidate);
+      source = candidate;
+      break;
+    } catch {
+      // Next.js may encode the root route as page.html in Vercel's build output.
+    }
+  }
+  if (!source)
+    throw new Error(
+      `No prerendered HTML found for ${route}; checked ${candidates.join(", ")}`,
+    );
+  await writeFile(file, await readFile(source));
   await add(`/offline-shell/${version}/${name}.html`, file, route);
 }
 async function scan(dir) {
