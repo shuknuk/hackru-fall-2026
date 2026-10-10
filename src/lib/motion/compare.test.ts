@@ -19,7 +19,7 @@ it("requires matching provenance and setup before deltas", () => {
       { ...b, profile: { ...b.profile, id: crypto.randomUUID() } },
       true,
     ).allowed,
-  ).toBe(false);
+  ).toBe(true);
   expect(compatibility(a, { ...b, reps: [] }, true).allowed).toBe(false);
 });
 it("aligns unequal phases without changing original durations", () => {
@@ -54,4 +54,13 @@ it("reports delta directions from median evidence and preserves vertical movemen
   const x = comparisonPose(a, first, ref)!,
     y = comparisonPose(a, moved, ref)!;
   expect(y.joints[12].y - x.joints[12].y).toBeGreaterThan(0.05);
+});
+
+it("permits confirmed separately calibrated left sets but keeps actual camera and side gates", () => {
+  const [a, b] = samplePair();
+  const recalibrated = { ...b, profile: { ...b.profile, id: crypto.randomUUID(), baseline: 2, range: 60, fingerprint: "new-calibration" } };
+  expect(compatibility(a, recalibrated, false).allowed).toBe(false);
+  expect(compatibility(a, recalibrated, true)).toMatchObject({ allowed: true, status: "Limited comparison" });
+  expect(compatibility(a, { ...recalibrated, capture: { ...b.capture, side: "right" } }, true).allowed).toBe(false);
+  expect(compatibility(a, { ...recalibrated, capture: { ...b.capture, facing: "user" } }, true).allowed).toBe(false);
 });

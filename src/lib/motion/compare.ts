@@ -13,16 +13,11 @@ export function compatibility(a: Session, b: Session, confirmed: boolean) {
     reasons.push("Live and sample sources cannot be mixed.");
   if (a.capture.side !== b.capture.side)
     reasons.push("Locked anatomical sides differ.");
-  if (
-    ["baseline", "range", "noise", "stand", "down", "qualify"].some(
-      (k) =>
-        a.profile[k as keyof typeof a.profile] !==
-        b.profile[k as keyof typeof b.profile],
-    ) ||
+  const calibrationDiffers =
     a.profile.id !== b.profile.id ||
-    a.profile.fingerprint !== b.profile.fingerprint
-  )
-    reasons.push("Calibration or camera setup differs.");
+    ["baseline", "range", "noise", "stand", "down", "qualify"].some(
+      (k) => a.profile[k as keyof typeof a.profile] !== b.profile[k as keyof typeof b.profile],
+    );
   if (
     a.capture.facing !== b.capture.facing ||
     a.capture.width / a.capture.height !== b.capture.width / b.capture.height
@@ -39,6 +34,14 @@ export function compatibility(a: Session, b: Session, confirmed: boolean) {
         "Confirm the same person and comparable camera placement before viewing numerical differences.",
       ],
       allowed: false,
+    };
+  if (calibrationDiffers)
+    return {
+      status: "Limited comparison",
+      reasons: [
+        "These sets were calibrated separately. You confirmed the same person and comparable camera placement. Completed squats can be compared, but calibration differences may affect which movements were counted.",
+      ],
+      allowed: true,
     };
   if (a.importedFrom || b.importedFrom)
     return {
