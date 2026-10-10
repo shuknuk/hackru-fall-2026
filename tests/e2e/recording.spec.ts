@@ -136,9 +136,9 @@ test("simulated camera landmarks complete calibration, recording and local repla
     s.mode = "setup";
     s.since = performance.now();
   });
-  await expect(
-    page.getByRole("button", { name: "Start set", exact: true }),
-  ).toBeEnabled({ timeout: 10000 });
+  await expect(page.getByRole("status").first()).toContainText("Calibration complete. Your set is starting in 3 seconds", { timeout: 10000 });
+  await expect(page.getByText("Calibration complete", { exact: true })).toBeVisible();
+  await page.getByRole("button", { name: "Cancel start" }).click();
   await page.evaluate(() => {
     (window as unknown as { motionFixture: { mode: string } }).motionFixture.mode = "lost";
   });
@@ -155,7 +155,7 @@ test("simulated camera landmarks complete calibration, recording and local repla
     (window as unknown as { motionFixture: { mode: string } }).motionFixture.mode = "stand";
   });
   await expect(page.getByRole("button", { name: "Finish set", exact: true })).toBeEnabled();
-  await expect(page.getByRole("status").first()).toContainText("Recording landmarks locally");
+  await expect(page.getByRole("status").first()).toContainText("Set started");
   await page.evaluate(() => {
     const s = (
       window as unknown as { motionFixture: { mode: string; since: number } }

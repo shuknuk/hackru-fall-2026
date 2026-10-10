@@ -5,6 +5,7 @@ import { jointVisible, type Joint } from "@/lib/pose/types";
 import {
   makeProfile,
   MAX_VALID_SAMPLE_INTERVAL_MS,
+  MAX_TRACKING_LOSS_MS,
   measure,
   median,
   mad,
@@ -37,6 +38,7 @@ type Calibration = {
   returnSince: number | null;
   signal: Signal;
   reuse: Profile | null;
+  lostSince: number | null;
 };
 type Recording = {
   id: string;
@@ -66,6 +68,9 @@ export default function CaptureSession() {
   const recording = useRef<Recording | null>(null);
   const pendingStart = useRef(false);
   const standingSince = useRef<number | null>(null);
+  const startNotBefore = useRef(0);
+  const standingFrames = useRef<{ joints: Joint[]; time: number }[]>([]);
+  const [calibrationStatus, setCalibrationStatus] = useState("Not calibrated");
   const clock = useRef(0);
   const lastUI = useRef(0);
   const poseTimes = useRef<number[]>([]);
@@ -157,6 +162,7 @@ export default function CaptureSession() {
   function onStopped(reason: string) {
     pendingStart.current = false;
     standingSince.current = null;
+    standingFrames.current = [];
     cal.current = null;
     if (recording.current) {
       void finish("interrupted");
@@ -180,8 +186,10 @@ export default function CaptureSession() {
       returnSince: null,
       signal: new Signal(),
       reuse: reuse ? profileRef.current : null,
+      lostSince: null,
     };
     setStage("calibrating");
+    setCalibrationStatus("Step 1 of 2: stand still for 1.5 seconds");
     setNotice("Stand comfortably and still for 1.5 seconds.");
   }
   function onReady(c: {
@@ -203,7 +211,10 @@ export default function CaptureSession() {
     width: number,
     height: number,
   ) {
-    if (time - clock.current > MAX_VALID_SAMPLE_INTERVAL_MS) standingSince.current = null;
+    if (time - clock.current > MAX_VALID_SAMPLE_INTERVAL_MS) {
+      standingSince.current = null;
+      standingFrames.current = [];
+    }
     clock.current = time;
     poseTimes.current.push(time);
     poseTimes.current = poseTimes.current.filter((t) => time - t <= 3000);
@@ -236,28 +247,34 @@ export default function CaptureSession() {
       const p = profileRef.current;
       if (!p || m.knee === null || m.knee > p.stand) {
         standingSince.current = null;
+        standingFrames.current = [];
         setNotice(m.knee === null
           ? `Waiting to start: keep your ${side} ${missing.join(", ")} visible. Recording has not started.`
           : "Waiting to start: return to comfortable standing. Recording has not started.");
       } else {
         standingSince.current ??= time;
-        if (time - standingSince.current >= 300) startSet(m.knee);
+        standingFrames.current.push({ joints, time });
+        standingFrames.current = standingFrames.current.filter((frame) => time - frame.time <= 400);
+        if (time >= startNotBefore.current && time - standingSince.current >= 300) startSet(m.knee);
       }
     }
     if (c) {
       const x = c.signal.next(m.knee, time);
       if (x === null) {
-        c.start = null;
-        c.values = [];
-        c.returnSince = null;
-        if (c.baseline !== null) {
+        c.lostSince ??= time;
+        if (time - c.lostSince > MAX_TRACKING_LOSS_MS) {
+          c.start = null;
+          c.values = [];
+          c.returnSince = null;
           c.baseline = null;
           c.peak = 0;
+          setCalibrationStatus("Step 1 of 2: waiting for stable leg tracking");
         }
         setNotice(
           `Calibration waiting: keep your ${side} ${missing.join(", ")} visible, then stand still for 1.5 seconds.`,
         );
       } else if (c.baseline === null) {
+        c.lostSince = null;
         c.start ??= time;
         c.values.push(x);
         if (c.values.length > 60) c.values.shift();
@@ -294,12 +311,14 @@ export default function CaptureSession() {
           } else {
             c.baseline = baseline;
             c.peak = baseline;
+            setCalibrationStatus("Step 2 of 2: do one setup squat, then stand");
             setNotice(
               "Now perform one comfortable setup squat and return to standing. It will not count toward your set.",
             );
           }
         }
       } else {
+        c.lostSince = null;
         c.peak = Math.max(c.peak, x);
         if (c.peak - c.baseline >= 20 && x <= c.baseline + 5) {
           c.returnSince ??= time;
@@ -314,9 +333,14 @@ export default function CaptureSession() {
             profileRef.current = p;
             setProfile(p);
             cal.current = null;
-            setStage("ready");
+            pendingStart.current = true;
+            standingSince.current = null;
+            standingFrames.current = [];
+            startNotBefore.current = time + 3000;
+            setCalibrationStatus("Calibration complete");
+            setStage("starting");
             setNotice(
-              "Setup complete. Stand comfortably, then start your set.",
+              "Calibration complete. Your set is starting in 3 seconds. Stay standing in view until Recording appears.",
             );
           }
         } else c.returnSince = null;
@@ -402,6 +426,8 @@ export default function CaptureSession() {
       if (p && capture && confirmed && stage === "ready") {
         pendingStart.current = true;
         standingSince.current = null;
+        standingFrames.current = [];
+        startNotBefore.current = clock.current;
         setStage("starting");
         setNotice("Waiting to start: stand comfortably in view. Recording begins automatically after stable tracking.");
       }
@@ -409,14 +435,21 @@ export default function CaptureSession() {
     }
     pendingStart.current = false;
     standingSince.current = null;
+    const frames = standingFrames.current;
+    const start = frames[0]?.time ?? clock.current;
+    const signal = new Signal();
+    const detector = new SquatDetector(p);
+    const samples = frames.map((frame) => prepareSample(frame.joints, capture, frame.time - start, signal));
+    for (const sample of samples) detector.push(sample);
+    standingFrames.current = [];
     recording.current = {
       id: crypto.randomUUID(),
       createdAt: new Date().toISOString(),
-      start: clock.current,
-      last: -Infinity,
-      samples: [],
-      signal: new Signal(),
-      detector: new SquatDetector(p),
+      start,
+      last: samples.at(-1)?.t ?? -Infinity,
+      samples,
+      signal,
+      detector,
       profile: p,
       capture: { ...capture },
       checkpointAt: 0,
@@ -427,7 +460,7 @@ export default function CaptureSession() {
     setSaved(false);
     setStage("recording");
     setNotice(
-      "Recording landmarks locally. Complete your comfortable down-and-up cycles.",
+      "Calibration complete. Set started — recording landmarks locally. Complete your comfortable down-and-up cycles.",
     );
   }
   const s = result ? summary(result.reps) : null;
@@ -444,6 +477,7 @@ export default function CaptureSession() {
               setSide(e.target.value as Side);
               profileRef.current = null;
               setProfile(null);
+              setCalibrationStatus("Not calibrated");
               setStage("positioning");
             }}
           >
@@ -498,6 +532,7 @@ export default function CaptureSession() {
             <button className="secondary-button" onClick={() => {
               pendingStart.current = false;
               standingSince.current = null;
+              standingFrames.current = [];
               setStage("ready");
               setNotice("Start cancelled. Recheck tracking before starting again.");
             }}>Cancel start</button>
@@ -510,6 +545,8 @@ export default function CaptureSession() {
             Finish set
           </button>
         </div>
+        <p><strong>Calibration:</strong> {calibrationStatus}</p>
+        <p><strong>Set status:</strong> {stage === "recording" ? "Recording — squats now count" : stage === "starting" ? "Starting — wait for Recording" : "Not recording"}</p>
         <p role="status" aria-live="polite">
           {notice}
         </p>
