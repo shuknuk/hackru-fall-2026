@@ -30,3 +30,21 @@ footer { margin-top: 50px; padding-top: 24px; border-top: 1px solid #d9dece; fon
 .setup-card { margin-top: 36px; max-width: 640px; }
 .setup-card ol { padding-left: 24px; color: var(--muted); line-height: 1.8; }
 @media (max-width: 640px) { .shell { padding: 24px; } .hero { padding: 64px 0 42px; } h1 { letter-spacing: -1.8px; } .features { grid-template-columns: 1fr; } .lede { font-size: 17px; } .button { width: 100%; } }
+.pose-spike { margin-top: 40px; max-width: 720px; }
+.pose-spike > p, .diagnostics p { color: var(--muted); line-height: 1.6; }
+.camera-controls { display: flex; flex-wrap: wrap; align-items: end; gap: 12px; }
+.camera-controls .button { margin: 0; border: 0; cursor: pointer; }
+button:disabled { opacity: .5; cursor: default; }
+label { display: flex; flex-direction: column; gap: 8px; font-size: 14px; }
+select { background: var(--paper); border: 1px solid #a1ad92; border-radius: 12px; color: var(--ink); min-height: 48px; padding: 10px; max-width: 100%; }
+.secondary-button { background: transparent; border: 1px solid var(--olive); color: var(--olive); border-radius: 30px; padding: 16px 22px; font: inherit; min-height: 48px; cursor: pointer; }
+.camera-status { min-height: 48px; font-size: 15px; line-height: 1.6; }
+.camera-view { position: relative; width: 100%; aspect-ratio: 4 / 3; background: #19211b; border-radius: 20px; overflow: hidden; }
+.camera-view video, .camera-view canvas { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; }
+.camera-placeholder { position: absolute; inset: 0; display: grid; place-items: center; color: #e7ecdf; }
+.diagnostics { margin: 24px 0; border: 1px solid #d9dece; border-radius: 16px; padding: 20px; font-size: 14px; }
+summary { cursor: pointer; min-height: 32px; }
+.diagnostics label { margin-top: 16px; }
+.diagnostics dl { display: grid; gap: 12px; }
+.diagnostics dl > div { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; border-bottom: 1px solid #d9dece; padding-bottom: 8px; }
+.diagnostics dd { margin: 0; font-variant-numeric: tabular-nums; font-weight: 600; }

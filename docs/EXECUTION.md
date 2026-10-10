@@ -28,9 +28,21 @@ Cloud desktop Chrome check passed: home rendered, Explore session setup navigate
 
 Pending evidence: automated browser suite, keyboard acceptance, mobile viewport and real-phone shell check. Skill references are active project guidance; upstream skill packages have not been installed. SDK/WASM/model checksums and live runtime belong to M2 and are still pending.
 
-## M2–M9
+## M2 camera spike — implemented; device acceptance pending
 
-Not started. This scaffold is not an installable/offline PWA or a live pose tracker yet.
+Prepared exact MediaPipe Tasks Vision 1.1.0 classic bundle and matched SIMD/module/non-SIMD WASM assets from the installed package. The official Lite float16 v1 model is 5,777,746 bytes with SHA-256 59929e1d1ee95287735ddd833b19cf4ac46d29bc7afddbbf6753c459690d574a. Every prepared asset is checked against docs/mediapipe-assets.json. Apache-2.0 license and official model-card attribution are recorded. Generated public assets are reproduced during predev/prebuild rather than committed.
+
+Explicit user-initiated Start/Stop, front/rear preference, video readiness, stream/engine/frame cleanup, late-permission cancellation, hidden-page stop and camera-disconnection errors are implemented. Fresh-frame scheduling permits one inference in flight. Confidence-gated torso/limb skeleton clears when results become stale. Missing confidence remains null; optional presence is gated only when supplied. No calibration, rep counting or invented measurements are shown.
+
+Worker CPU uses a same-origin classic worker to preserve the SDK importScripts loader, transferable ImageBitmap input and OffscreenCanvas. The worker exists as a standalone public script rather than a Next.js module worker; production-server integration checks exercise the deployed file structure. Main-thread CPU/GPU are explicit diagnostic alternatives, with no automatic fallback. Main-thread synchronous inference may block controls; physical-device evidence must determine whether it is usable.
+
+Asset preparation, strict typecheck, lint, production build, two meaningful unit tests (late permission cleanup and confidence adaptation), and all 47 archive provenance checks passed. A corrupt generated Turbopack cache was cleared before the successful build.
+
+Browser provisioning workaround: the Playwright CDN downloads failed previously, but npm-distributed @sparticuz/chromium 153.0.0 provided Chromium 153.0.8010.0 for automated checks. This is scratch-only test tooling, not an application dependency. Chromium desktop and iPhone-sized Chromium checks exercise shell navigation, denied permissions and late permission release; they do not represent Safari or a physical phone.
+
+Inference integration uses the official https://storage.googleapis.com/mediapipe-assets/pose.jpg (SHA-256 c8a830ed683c0276d713dd5aeda28f415f10cd6291972084a40d0d8b934ed62b), converted to a looping 640×428 prerecorded YUV webcam input. Tests invoke the actual SDK/model, require 33 detected landmarks and at least 12 frames, and check track release and Stop/restart. This static image is integration evidence only, not motion accuracy or live-camera proof. Software-rendered virtual-hardware latency is unsuitable for selecting the phone engine. Two initial frame-count polls exceeded five seconds; the tests now allow twenty seconds and run sequentially to reduce CPU contention.
+
+See DEVICE_CHECKLIST.md for live-person camera, phone/Safari, facing, orientation, visibility, performance and cleanup acceptance. M2 remains partial until those results are recorded. M3–M9 are not started; this is not yet an installable/offline PWA or a completed movement MVP.
 
 ## Version decisions
 
@@ -53,3 +65,5 @@ An initial request with omitted target was unexpectedly classified as production
 External skills remain reviewed references, with root AGENTS.md active. Installing complete upstream skill bundles remains open; do not claim that requirement passed. M1 is therefore partial, pending full browser/phone acceptance and selected skill installation where supported. M2 camera/model spike is next.
 
 Final selected-lockfile npm ci, lint, typecheck and provenance check were rerun after restoring Playwright 1.64.0 and passed. No unit tests exist yet; no movement or camera behavior is claimed as tested.
+
+M2 browser result: all six desktop Chromium tests passed in the sequential rerun, including actual worker CPU, main CPU and main GPU inference, denied permission, late permission cancellation and shell navigation. GPU integration required approximately 72 seconds including model initialization/restart; this is not a usability performance pass. The final mobile-sized Chromium rerun passed all three shell/denial/cancellation checks; three inference variants were deliberately skipped on that project. Total final browser evidence is nine passed, three intentional skips across sequential desktop/mobile runs. This is not iPhone/Safari evidence.

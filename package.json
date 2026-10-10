@@ -14,7 +14,10 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run --passWithNoTests",
     "test:e2e": "playwright test",
-    "verify:provenance": "node scripts/verify-provenance.mjs"
+    "verify:provenance": "node scripts/verify-provenance.mjs",
+    "assets:prepare": "node scripts/prepare-mediapipe.mjs",
+    "predev": "npm run assets:prepare",
+    "prebuild": "npm run assets:prepare"
   },
   "dependencies": {
     "@mediapipe/tasks-vision": "1.1.0",

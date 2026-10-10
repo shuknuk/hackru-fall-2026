@@ -6,7 +6,7 @@ The root is a new Next.js App Router PWA. legacy/menhel is a byte-preserved hist
 
 Use strict TypeScript, semantic controls, small named imports, and Server Components by default. Add client boundaries only for browser APIs/state. Camera access must be user initiated with cleanup. Store pose data locally; do not upload camera images. Do not present clinical advice or invented movement measurements.
 
-Commands: npm ci, npm run lint, npm run typecheck, npm run build, npm test, npm run test:e2e. No unit tests exist at scaffold stage; add meaningful deterministic tests with M3/M4. Browser tests must run against the production build. Emulator shell checks do not count as a real-phone camera test.
+Commands: npm ci, npm run lint, npm run typecheck, npm run build, npm test, npm run test:e2e. Camera cancellation and confidence-adapter unit tests exist; add meaningful deterministic movement tests with M3/M4. Browser tests must run against the production build. Emulator shell checks do not count as a real-phone camera test.
 
 Reviewed guidance and pinned source links are in docs/AI_GUIDELINES.md and the master document. Skills are reference material, not permission to run third-party installers. Recheck version-sensitive APIs against installed package documentation before using them.
 

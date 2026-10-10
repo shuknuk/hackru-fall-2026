@@ -9,7 +9,7 @@ export default function Home() {
       <h1 id="title">See your movement.<br /><span>Find your rhythm.</span></h1>
       <p className="lede">A camera, a side view, and room to move. Compare two squat sets through a simple skeleton replay and understandable movement observations.</p>
       <Link className="button" href="/session">Explore session setup <ArrowUpRight size={20} aria-hidden="true" /></Link>
-      <p className="status">Development preview · Live tracking is coming next.</p>
+      <p className="status">Development preview · Try the camera and pose tracking spike.</p>
     </section>
     <section className="features" aria-label="Planned session flow">
       <article><Eye aria-hidden="true" /><p className="step">01 / CAPTURE</p><h2>Make movement visible</h2><p>Side-view bodyweight squats with local pose estimates.</p></article>

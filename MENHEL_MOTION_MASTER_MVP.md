@@ -769,10 +769,10 @@ Exit evidence is a clean install, typecheck/lint/build pass, exact version ledge
 
 Depends on M1. This is the first technical go/no-go milestone.
 
-- [ ] Prepare matched local WASM and the official Lite model with checksums.
-- [ ] Implement explicit camera start, video readiness and full cleanup.
-- [ ] Produce a minimal live skeleton from the exact selected package.
-- [ ] Prototype worker image transfer and initialization in the production bundler.
+- [x] Prepare matched local WASM and the official Lite model with checksums.
+- [x] Implement explicit camera start, video readiness and full cleanup.
+- [x] Produce a minimal live skeleton from the exact selected package.
+- [x] Prototype worker image transfer and initialization in the production bundler.
 - [ ] Measure a usable GPU/CPU engine on the actual iPhone/Safari and desktop Chrome.
 - [ ] Test front/rear selection, denied permissions, stop/restart and phone orientation.
 - [ ] Choose the smallest tested engine/fallback set and record the rationale.
@@ -1098,7 +1098,8 @@ Additional evaluated community sources
 | Research applicable AI skills | Passed | Inspected source files, revisions, applicability and prerequisite checks |
 | Write this master MVP | Complete planning artifact | This document |
 | M0 constraints and organizer resolution | Constraints recorded; partial | Schedule/team limit verified; reuse policy, actual team and devices unresolved; see docs/EXECUTION.md |
-| M1 clean web scaffold | Built/deployed; acceptance partial | Install/lint/typecheck/build/provenance and HTTPS responses passed; desktop navigation verified; automated browser suite, keyboard/mobile/physical-phone and upstream skill installation evidence pending; see docs/EXECUTION.md |
-| M2–M9 implementation and release | Not started | No live pose runtime has been verified |
+| M1 clean web scaffold | Built/deployed; acceptance partial | Install/lint/typecheck/build/provenance and HTTPS responses passed; desktop navigation verified; automated desktop/mobile-sized Chromium suite passed; keyboard/physical-phone and upstream skill installation evidence pending; see docs/EXECUTION.md |
+| M2 camera spike | Implemented; acceptance partial | Real SDK inference verified with prerecorded browser input; physical-camera/device performance pending; see docs/EXECUTION.md |
+| M3–M9 implementation and release | Not started | No recording, repetition counting, comparison or offline installation yet |
 
-The current implementation is M1. Real-device MediaPipe work follows the scaffold checks. Organizer/device evidence remains open in M0. Do not skip directly to polished dashboards.
+The current implementation is the M2 camera spike. Checked implementation tasks do not establish the real-device exit gate. Organizer/device evidence remains open in M0. Do not skip directly to polished dashboards.

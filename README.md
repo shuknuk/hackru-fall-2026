@@ -1,6 +1,6 @@
 # Menhel Motion
 
-A new Next.js + MediaPipe PWA for comparing two side-view squat sets with local pose data. The web implementation is in its scaffold milestone. Live tracking, recording, comparison and offline replay are not implemented yet.
+A new Next.js + MediaPipe PWA for comparing two side-view squat sets with local pose data. The M2 camera spike now provides explicit Start/Stop controls and a local MediaPipe skeleton, with worker CPU and main-thread CPU/GPU diagnostics. Recording, rep counting, comparison, installation and offline replay remain unimplemented. Physical-device performance is not yet verified.
 
 ## Build contract
 
@@ -16,6 +16,8 @@ npm run dev
 ```
 
 Verification uses `npm run lint`, `npm run typecheck`, `npm run build`, and `npm run test:e2e`. Browser binaries can be prepared with `npx playwright install chromium`.
+
+See [the phone test checklist](docs/DEVICE_CHECKLIST.md) before claiming camera compatibility. The build prepares checksum-verified model/WASM assets; the initial build needs access to the official model download.
 
 ## Provenance
 
