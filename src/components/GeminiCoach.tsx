@@ -71,7 +71,7 @@ export default function GeminiCoach({
 
   return (
     <section className="coach" aria-labelledby="coach-title">
-      <p className="eyebrow">OPTIONAL · GEMINI</p>
+      <p className="eyebrow">GEMINI</p>
       <h3 id="coach-title">Measurement coach</h3>
       <p>
         Compare these squat sets with Gemini. Only the measurement summary shown above
