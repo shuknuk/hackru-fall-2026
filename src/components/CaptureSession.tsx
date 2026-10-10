@@ -142,7 +142,7 @@ export default function CaptureSession() {
       router.push(`/results?id=${encodeURIComponent(session.id)}`);
     } catch (e) {
       setNotice(
-        `Set is not saved: ${e instanceof Error ? e.message : "Local storage error"}. Export the available result before leaving.`,
+        `Set is not saved: ${e instanceof Error ? e.message : "Local storage error"}. Restart the camera and try another set.`,
       );
     } finally {
       setStage("results");
