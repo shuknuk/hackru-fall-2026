@@ -37,6 +37,9 @@ export const CONNECTIONS = [
 // shorter loss tolerance below.
 export const MAX_VALID_SAMPLE_INTERVAL_MS = 400;
 export const MAX_TRACKING_LOSS_MS = 150;
+// Two observed standing samples confirm the return; do not require an extra
+// quarter-second hold after a completed down-and-up movement.
+export const RETURN_TO_STANDING_MS = 80;
 export function median(values: number[]): number | null {
   if (!values.length) return null;
   const a = [...values].sort((x, y) => x - y);
@@ -254,7 +257,7 @@ export class SquatDetector {
     if (this.phase === "ascending") {
       if (x <= p.stand) {
         this.standingSince ??= s.t;
-        if (s.t - this.standingSince >= 250) {
+        if (s.t - this.standingSince >= RETURN_TO_STANDING_MS) {
           const duration = s.t - c.start,
             coverage = Math.min(1, c.validMs / duration);
           let rep: Rep | null = null;
