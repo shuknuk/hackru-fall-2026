@@ -1,0 +1,12 @@
+{
+    "name": "mediapipe-pose",
+    "platforms": [
+        "ios"
+    ],
+    "ios": {
+        "modules": [
+            "MediapipePoseModule",
+            "HandTrackerModule"
+        ]
+    }
+}

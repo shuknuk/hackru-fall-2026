@@ -1,0 +1,472 @@
+/**
+ * Recover Screen - Workouts & Rehab
+ * Grid layout with video popups leading to Smart Mirror
+ */
+
+import React, { useState } from 'react';
+import { StyleSheet, View, Text, ScrollView, TouchableOpacity, Image, Modal, SafeAreaView, TextInput } from 'react-native';
+import Animated, { FadeIn, FadeInDown, SlideInUp } from 'react-native-reanimated';
+import { ChevronRight, Play, Search, BookOpen, HeartPulse, X } from 'lucide-react-native';
+import { BlurView } from 'expo-blur';
+import { Typography, Spacing, BorderRadius } from '../../constants/theme';
+import { useTheme } from '../../hooks/useTheme';
+import { useRouter } from 'expo-router';
+import { Workout } from '../../types/health';
+
+// Mock Workout Data
+const WORKOUTS = [
+    { id: '1', title: 'ACL Rehab', duration: '15 min', level: 'Beginner', tags: ['injured', 'knee'], image: 'https://images.unsplash.com/photo-1574680096145-d05b474e2155?q=80&w=600&auto=format&fit=crop' },
+    { id: '2', title: 'Lower Back', duration: '20 min', level: 'Intermediate', tags: ['recovery', 'back'], image: 'https://images.unsplash.com/photo-1544367563-12123d8965cd?q=80&w=600&auto=format&fit=crop' },
+    { id: '3', title: 'Shoulder Mobility', duration: '12 min', level: 'All Levels', tags: ['mobility', 'shoulder'], image: 'https://images.unsplash.com/photo-1599058945522-28d584b6f0ff?q=80&w=600&auto=format&fit=crop' },
+    { id: '4', title: 'Knee Strength', duration: '18 min', level: 'Beginner', tags: ['strength', 'knee', 'squat'], image: 'https://images.unsplash.com/photo-1598289431512-b97b0917affc?q=80&w=600&auto=format&fit=crop' },
+    { id: '5', title: 'Hip Flexor Flow', duration: '25 min', level: 'Advanced', tags: ['mobility', 'yoga'], image: 'https://images.unsplash.com/photo-1518310383802-640c2de311b2?q=80&w=600&auto=format&fit=crop' },
+    { id: '6', title: 'Ankle Stability', duration: '10 min', level: 'Beginner', tags: ['recovery', 'ankle'], image: 'https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?q=80&w=600&auto=format&fit=crop' },
+];
+
+export default function RecoverScreen() {
+    const { theme, isDark } = useTheme();
+    const router = useRouter();
+    const [selectedWorkout, setSelectedWorkout] = useState<Workout | null>(null);
+    const [searchQuery, setSearchQuery] = useState('');
+
+    const filteredWorkouts = WORKOUTS.filter(workout =>
+        workout.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        workout.tags.some(tag => tag.toLowerCase().includes(searchQuery.toLowerCase()))
+    );
+
+    const dynamicStyles = StyleSheet.create({
+        container: {
+            backgroundColor: theme.background.primary,
+        },
+        headerTitle: {
+            color: theme.accent.secondary,
+        },
+        headerSubtitle: {
+            color: theme.text.muted,
+        },
+        searchBar: {
+            backgroundColor: theme.background.secondary,
+            borderColor: theme.accent.tertiary,
+        },
+        searchInput: {
+            color: theme.text.primary,
+        },
+        insightLabel: {
+            color: theme.accent.secondary,
+        },
+        insightTitle: {
+            color: theme.accent.secondary,
+        },
+        insightBlur: {
+            borderColor: theme.accent.tertiary,
+        },
+        cardContainer: {
+            backgroundColor: theme.background.tertiary,
+            borderColor: theme.accent.tertiary,
+        },
+        cardMeta: {
+            color: 'rgba(255, 255, 255, 0.9)',
+        },
+        modalContent: {
+            backgroundColor: theme.background.secondary,
+            borderColor: theme.accent.tertiary,
+        },
+        modalTitle: {
+            color: theme.accent.secondary,
+        },
+        modalDescription: {
+            color: theme.text.secondary,
+        },
+        tag: {
+            backgroundColor: theme.background.tertiary,
+        },
+        tagText: {
+            color: theme.text.secondary,
+        },
+        closeButtonBlur: {
+            backgroundColor: isDark ? 'rgba(0, 0, 0, 0.5)' : 'rgba(255, 255, 255, 0.8)',
+        },
+    });
+
+    const handleOpenModal = (workout: Workout) => {
+        setSelectedWorkout(workout);
+    };
+
+    const handleCloseModal = () => {
+        setSelectedWorkout(null);
+    };
+
+    const handleStartSession = () => {
+        if (!selectedWorkout) return;
+        const exercise = selectedWorkout.title;
+        handleCloseModal();
+        router.push({
+            pathname: '/(tabs)/body',
+            params: { exercise }
+        });
+    };
+
+    return (
+        <SafeAreaView style={[styles.container, dynamicStyles.container]}>
+            <ScrollView
+                style={styles.content}
+                contentContainerStyle={styles.scrollContent}
+                showsVerticalScrollIndicator={false}
+            >
+                <Animated.View entering={FadeIn.duration(600)}>
+                    <Text style={[styles.headerTitle, dynamicStyles.headerTitle]}>Recovery</Text>
+                    <Text style={[styles.headerSubtitle, dynamicStyles.headerSubtitle]}>Smart Exercises & Rehabilitation</Text>
+                </Animated.View>
+
+                {/* Search Bar */}
+                <View style={[styles.searchBar, dynamicStyles.searchBar]}>
+                    <Search size={20} color={theme.text.muted} />
+                    <TextInput
+                        placeholder="Search exercises, injuries..."
+                        placeholderTextColor={theme.text.muted}
+                        style={[styles.searchInput, dynamicStyles.searchInput]}
+                        value={searchQuery}
+                        onChangeText={setSearchQuery}
+                        autoCapitalize="none"
+                    />
+                    {searchQuery.length > 0 && (
+                        <TouchableOpacity onPress={() => setSearchQuery('')}>
+                            <X size={18} color={theme.text.muted} />
+                        </TouchableOpacity>
+                    )}
+                </View>
+
+                {/* Journal Insight Card */}
+                <Animated.View entering={FadeInDown.delay(200)} style={styles.insightCard}>
+                    <BlurView intensity={30} style={[styles.insightBlur, dynamicStyles.insightBlur]}>
+                        <View style={styles.insightHeader}>
+                            <BookOpen size={20} color={theme.accent.secondary} />
+                            <Text style={[styles.insightLabel, dynamicStyles.insightLabel]}>AI JOURNAL INSIGHT</Text>
+                        </View>
+                        <Text style={[styles.insightTitle, dynamicStyles.insightTitle]}>Recovery focus: Knee Health</Text>
+                        <Text style={[styles.insightDesc, { color: isDark ? 'rgba(255,255,255,0.7)' : theme.text.secondary }]}>
+                            Based on your recent logs about "left knee stiffness," we've prioritized mobility sessions.
+                        </Text>
+                        <TouchableOpacity style={[styles.insightAction, { backgroundColor: theme.accent.secondary }]}>
+                            <Text style={styles.insightActionText}>Start Suggested Routine</Text>
+                            <ChevronRight size={16} color={theme.text.inverse} />
+                        </TouchableOpacity>
+                    </BlurView>
+                </Animated.View>
+
+                <View style={styles.grid}>
+                    {filteredWorkouts.length > 0 ? (
+                        filteredWorkouts.map((workout, index) => (
+                            <Animated.View
+                                key={workout.id}
+                                entering={FadeInDown.delay(index * 100).duration(500)}
+                                style={styles.gridItem}
+                            >
+                                <TouchableOpacity onPress={() => handleOpenModal(workout)} activeOpacity={0.9}>
+                                    <View style={[styles.cardContainer, dynamicStyles.cardContainer]}>
+                                        <Image source={{ uri: workout.image }} style={styles.cardImage} />
+                                        <View style={styles.cardOverlay} />
+                                        <View style={styles.cardContent}>
+                                            <View style={styles.playIcon}>
+                                                <Play size={16} color="white" fill="white" />
+                                            </View>
+                                            <View>
+                                                <Text style={[styles.cardTitle, { color: '#fff' }]}>{workout.title}</Text>
+                                                <Text style={[styles.cardMeta, dynamicStyles.cardMeta]}>{workout.duration} • {workout.level}</Text>
+                                            </View>
+                                        </View>
+                                    </View>
+                                </TouchableOpacity>
+                            </Animated.View>
+                        ))
+                    ) : (
+                        <Animated.View entering={FadeIn} style={styles.emptyState}>
+                            <HeartPulse size={48} color={theme.text.muted} opacity={0.5} />
+                            <Text style={[styles.emptyStateText, { color: theme.text.muted }]}>
+                                No exercises found for "{searchQuery}"
+                            </Text>
+                            <TouchableOpacity onPress={() => setSearchQuery('')}>
+                                <Text style={{ color: theme.accent.primary, marginTop: Spacing.sm, fontWeight: '600' }}>
+                                    Clear Search
+                                </Text>
+                            </TouchableOpacity>
+                        </Animated.View>
+                    )}
+                </View>
+            </ScrollView>
+
+            {/* Workout Detail Modal */}
+            <Modal
+                visible={!!selectedWorkout}
+                transparent
+                animationType="fade"
+                onRequestClose={handleCloseModal}
+            >
+                <View style={styles.modalContainer}>
+                    <BlurView intensity={20} style={StyleSheet.absoluteFill} tint="dark" />
+
+                    <Animated.View
+                        entering={SlideInUp.springify()}
+                        style={[styles.modalContent, dynamicStyles.modalContent]}
+                    >
+                        {selectedWorkout && (
+                            <>
+                                <Image source={{ uri: selectedWorkout.image }} style={styles.modalImage} />
+                                <TouchableOpacity style={styles.closeButton} onPress={handleCloseModal}>
+                                    <View style={[styles.closeButtonBlur, dynamicStyles.closeButtonBlur]}>
+                                        <X color={theme.text.primary} size={20} />
+                                    </View>
+                                </TouchableOpacity>
+
+                                <View style={styles.modalBody}>
+                                    <Text style={[styles.modalTitle, dynamicStyles.modalTitle]}>{selectedWorkout.title}</Text>
+                                    <View style={styles.tagContainer}>
+                                        <View style={[styles.tag, dynamicStyles.tag]}>
+                                            <Text style={[styles.tagText, dynamicStyles.tagText]}>{selectedWorkout.level}</Text>
+                                        </View>
+                                        <View style={[styles.tag, dynamicStyles.tag]}>
+                                            <Text style={[styles.tagText, dynamicStyles.tagText]}>{selectedWorkout.duration}</Text>
+                                        </View>
+                                        {selectedWorkout.tags?.map((tag: string) => (
+                                            <View key={tag} style={[styles.tag, dynamicStyles.tag, { backgroundColor: theme.accent.primary + '20' }]}>
+                                                <Text style={[styles.tagText, dynamicStyles.tagText, { color: theme.accent.primary }]}>#{tag}</Text>
+                                            </View>
+                                        ))}
+                                    </View>
+
+                                    <Text style={[styles.modalDescription, dynamicStyles.modalDescription]}>
+                                        This guided session focuses on {selectedWorkout.title.toLowerCase()}.
+                                        The smart camera will track your form in real-time to ensure safety and effectiveness.
+                                    </Text>
+
+                                    <TouchableOpacity
+                                        style={[styles.startButton, { backgroundColor: theme.accent.primary, shadowColor: theme.accent.primary }]}
+                                        onPress={handleStartSession}
+                                        activeOpacity={0.8}
+                                    >
+                                        <Text style={[styles.startButtonText, { color: theme.text.inverse }]}>Start Session</Text>
+                                        <Play size={20} color={theme.text.inverse} fill={theme.text.inverse} />
+                                    </TouchableOpacity>
+                                </View>
+                            </>
+                        )}
+                    </Animated.View>
+                </View>
+            </Modal>
+        </SafeAreaView>
+    );
+}
+
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+    },
+    content: {
+        padding: Spacing.lg,
+    },
+    scrollContent: {
+        paddingBottom: 120,
+    },
+    headerTitle: {
+        ...Typography.h1,
+        marginBottom: Spacing.sm,
+    },
+    headerSubtitle: {
+        ...Typography.body,
+        marginBottom: Spacing.lg,
+    },
+    searchBar: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        padding: Spacing.md,
+        borderRadius: BorderRadius.lg,
+        borderWidth: 1,
+        marginBottom: Spacing.xl,
+        gap: Spacing.sm,
+    },
+    searchInput: {
+        flex: 1,
+        ...Typography.body,
+    },
+    grid: {
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        justifyContent: 'space-between',
+    },
+    gridItem: {
+        width: '48%',
+        marginBottom: Spacing.md,
+    },
+    cardContainer: {
+        height: 200,
+        borderRadius: BorderRadius.lg,
+        overflow: 'hidden',
+        borderWidth: 1,
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.1,
+        shadowRadius: 8,
+        elevation: 5,
+    },
+    cardImage: {
+        width: '100%',
+        height: '100%',
+    },
+    cardOverlay: {
+        ...StyleSheet.absoluteFillObject,
+        backgroundColor: 'rgba(0,0,0,0.4)',
+    },
+    cardContent: {
+        position: 'absolute',
+        bottom: 0,
+        left: 0,
+        right: 0,
+        padding: Spacing.md,
+        justifyContent: 'space-between',
+        height: '100%',
+    },
+    playIcon: {
+        width: 32,
+        height: 32,
+        borderRadius: 16,
+        backgroundColor: 'rgba(255,255,255,0.3)',
+        alignItems: 'center',
+        justifyContent: 'center',
+        alignSelf: 'flex-end',
+    },
+    cardTitle: {
+        ...Typography.h3,
+        fontSize: 16,
+        marginBottom: 4,
+    },
+    cardMeta: {
+        ...Typography.small,
+    },
+    modalContainer: {
+        flex: 1,
+        justifyContent: 'center',
+        alignItems: 'center',
+        padding: Spacing.lg,
+    },
+    modalContent: {
+        width: '100%',
+        borderRadius: BorderRadius.xl,
+        overflow: 'hidden',
+        borderWidth: 1,
+        shadowColor: "#000",
+        shadowOffset: { width: 0, height: 10 },
+        shadowOpacity: 0.2,
+        shadowRadius: 20,
+        elevation: 10,
+    },
+    modalImage: {
+        width: '100%',
+        height: 250,
+    },
+    modalBody: {
+        padding: Spacing.lg,
+    },
+    closeButton: {
+        position: 'absolute',
+        top: Spacing.md,
+        right: Spacing.md,
+        zIndex: 10,
+    },
+    closeButtonBlur: {
+        width: 36,
+        height: 36,
+        borderRadius: 18,
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    modalTitle: {
+        ...Typography.h2,
+        marginBottom: Spacing.sm,
+    },
+    tagContainer: {
+        flexDirection: 'row',
+        gap: Spacing.sm,
+        marginBottom: Spacing.md,
+        flexWrap: 'wrap',
+    },
+    tag: {
+        paddingHorizontal: Spacing.sm,
+        paddingVertical: 4,
+        borderRadius: BorderRadius.sm,
+    },
+    tagText: {
+        ...Typography.small,
+        fontWeight: '600',
+    },
+    modalDescription: {
+        ...Typography.body,
+        marginBottom: Spacing.xl,
+    },
+    startButton: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        padding: Spacing.md,
+        borderRadius: BorderRadius.round,
+        gap: Spacing.sm,
+        shadowOffset: { width: 0, height: 4 },
+        shadowOpacity: 0.3,
+        shadowRadius: 10,
+        justifyContent: 'center',
+    },
+    startButtonText: {
+        ...Typography.h3,
+        fontSize: 16,
+    },
+    insightCard: {
+        borderRadius: BorderRadius.xl,
+        overflow: 'hidden',
+        marginBottom: Spacing.xl,
+    },
+    insightBlur: {
+        padding: Spacing.lg,
+        borderWidth: 1,
+        borderRadius: BorderRadius.xl,
+    },
+    insightHeader: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: Spacing.xs,
+        marginBottom: Spacing.sm,
+    },
+    insightLabel: {
+        ...Typography.small,
+        fontWeight: '700',
+        letterSpacing: 1,
+    },
+    insightTitle: {
+        ...Typography.h3,
+        marginBottom: Spacing.xs,
+    },
+    insightDesc: {
+        ...Typography.body,
+        lineHeight: 22,
+        marginBottom: Spacing.lg,
+    },
+    insightAction: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'center',
+        paddingVertical: 12,
+        borderRadius: BorderRadius.round,
+    },
+    insightActionText: {
+        ...Typography.body,
+        color: 'white',
+        fontWeight: '600',
+    },
+    emptyState: {
+        width: '100%',
+        alignItems: 'center',
+        paddingVertical: Spacing.xl * 2,
+        gap: Spacing.md,
+    },
+    emptyStateText: {
+        ...Typography.body,
+        fontSize: 16,
+    },
+});
