@@ -216,13 +216,31 @@ export default function PwaControls() {
             { once: true },
           );
         });
-      const status = await workerMessage(
+      let status = await workerMessage(
         navigator.serviceWorker.controller!,
         "STATUS",
       );
+      if (status.version !== VERSION)
+        throw new Error(
+          "The active worker belongs to another app build. Refresh online and retry.",
+        );
+      if (!status.ready) {
+        const repaired = await workerMessage(
+          navigator.serviceWorker.controller!,
+          "PREPARE",
+        );
+        if (!repaired.ready || repaired.version !== VERSION)
+          throw new Error(
+            repaired.error ?? "Offline files could not be verified. Retry online.",
+          );
+        status = await workerMessage(
+          navigator.serviceWorker.controller!,
+          "STATUS",
+        );
+      }
       if (!status.ready || status.version !== VERSION)
         throw new Error(
-          "The current app inventory is incomplete or belongs to another build",
+          "The current app inventory is still incomplete after verification",
         );
       setReady(true);
       setMessage(

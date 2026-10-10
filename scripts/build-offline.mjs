@@ -77,6 +77,24 @@ for (const route of ["/", "/history", "/replay", "/compare"]) {
   await writeFile(file, Buffer.from(await response.arrayBuffer()));
   await add(`/offline-shell/${version}/${name}.html`, file, route);
 }
+const manifestResponse = await fetch(
+  `http://127.0.0.1:${port}/manifest.webmanifest`,
+);
+if (
+  !manifestResponse.ok ||
+  !manifestResponse.headers
+    .get("content-type")
+    ?.includes("application/manifest+json")
+)
+  throw new Error(
+    `Could not capture the app manifest: HTTP ${manifestResponse.status}`,
+  );
+const manifestFile = `public/offline-shell/${version}/manifest.webmanifest`;
+await writeFile(
+  manifestFile,
+  Buffer.from(await manifestResponse.arrayBuffer()),
+);
+await add("/manifest.webmanifest", manifestFile);
 } finally {
   await stopServer();
 }
@@ -100,10 +118,6 @@ for (const name of [
   "apple-touch-icon.png",
 ])
   await add(`/icons/${name}`, `public/icons/${name}`);
-await add(
-  "/manifest.webmanifest",
-  ".next/server/app/manifest.webmanifest.body",
-);
 const inventory = {
   version,
   routes: ["/", "/history", "/replay", "/compare"],
