@@ -39,6 +39,23 @@ describe("projected geometry", () => {
   });
 });
 describe("squat segmentation", () => {
+  it("counts a confirmed standing return before subsequent tracking loss without an extra hold", () => {
+    const detector = new SquatDetector(profile);
+    const values = [0, 0, 0, 0, 35, 50, 70, 80, 70, 55, 30, 8, 6];
+    const template = fixtureSamples()[0];
+    values.forEach((filtered, i) => detector.push({ ...template, t: i * 100, filtered, knee: filtered, valid: true }));
+    expect(detector.reps).toHaveLength(1);
+    for (let t = 1300; t <= 2000; t += 100) detector.push({ ...template, t, filtered: null, valid: false });
+    expect(detector.reps).toHaveLength(1);
+  });
+  it("does not count an ascent that loses tracking before an observed standing return", () => {
+    const detector = new SquatDetector(profile);
+    const values = [0, 0, 0, 0, 35, 50, 70, 80, 70, 55, 30];
+    const template = fixtureSamples()[0];
+    values.forEach((filtered, i) => detector.push({ ...template, t: i * 100, filtered, knee: filtered, valid: true }));
+    for (let t = 1100; t <= 2000; t += 100) detector.push({ ...template, t, filtered: null, valid: false });
+    expect(detector.reps).toHaveLength(0);
+  });
   it("counts the first squat after seeding the actual stable standing frames at set start", () => {
     const detector = new SquatDetector(profile);
     const samples = fixtureSamples([65]);
