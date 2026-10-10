@@ -1,18 +1,16 @@
 "use client";
 import { useEffect, useState } from "react";
 import type { Session } from "@/lib/motion/schema";
-import { MAX_BYTES } from "@/lib/motion/schema";
+
 import {
   listSessions,
   saveSession,
   deleteSession,
-  deleteAll,
-  download,
   listDrafts,
   recoverDraft,
   deleteDraft,
 } from "@/lib/motion/storage";
-import { parseSession } from "@/lib/motion/session";
+
 import { samplePair } from "@/lib/motion/fixtures";
 export default function History() {
   const [sessions, setSessions] = useState<Session[]>([]);
@@ -134,16 +132,13 @@ export default function History() {
               <a className="secondary-button" href={`/replay?id=${s.id}`}>
                 Replay
               </a>
-              <button className="secondary-button" onClick={() => download(s)}>
-                Export
-              </button>
-              <button
+<button
                 className="secondary-button"
                 disabled={busy}
                 onClick={() => {
                   if (
                     confirm(
-                      "Delete this saved session? Export it first if you want to keep a copy.",
+                      "Delete this saved session? This cannot be undone.",
                     )
                   )
                     void action(() => deleteSession(s.id));
@@ -190,71 +185,6 @@ export default function History() {
           ))}
         </section>
       ) : null}
-      <section className="panel">
-        <h2>Your data controls</h2>
-        <label>
-          Import a session JSON file, up to 5 MiB
-          <input
-            type="file"
-            accept="application/json,.json"
-            disabled={busy}
-            onChange={(e) => {
-              const file = e.target.files?.[0];
-              if (!file) return;
-              void action(async () => {
-                if (file.size > MAX_BYTES)
-                  throw new Error("Import exceeds 5 MiB");
-                const imported = parseSession(await file.text());
-                imported.importedFrom = imported.importedFrom ?? imported.id;
-                imported.id = crypto.randomUUID();
-                await saveSession(imported);
-              });
-              e.target.value = "";
-            }}
-          />
-        </label>
-        <p>
-          Imports keep the declared original source. Measurements are recomputed
-          from landmarks; source declarations are not proof of camera
-          provenance.
-        </p>
-        <div className="actions">
-          <button
-            className="secondary-button"
-            onClick={() => {
-              void navigator.storage
-                ?.persist?.()
-                .then((granted) =>
-                  setMessage(
-                    granted
-                      ? "Browser granted persistent storage. Keep exports as a backup."
-                      : "Persistence was not granted. Data can still be evicted; keep exports as a backup.",
-                  ),
-                );
-            }}
-          >
-            Request persistent storage
-          </button>
-          <button
-            className="secondary-button"
-            disabled={busy}
-            onClick={() => {
-              if (
-                confirm(
-                  "Delete all sessions, calibration profiles and drafts on this device? This cannot be undone.",
-                )
-              )
-                void action(deleteAll);
-            }}
-          >
-            Delete all local movement data
-          </button>
-        </div>
-        <p>
-          No account or cloud backup. Clearing browser data may remove your
-          sessions.
-        </p>
-      </section>
     </>
   );
 }
