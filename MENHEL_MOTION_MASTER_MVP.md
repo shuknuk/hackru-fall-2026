@@ -742,11 +742,11 @@ No performance number in the submission should be fabricated. Report results for
 
 Tasks
 
-- [ ] Read the import commit, current instructions and this plan.
+- [x] Read the import commit, current instructions and this plan.
 - [ ] Record actual remaining hacking time and team size.
 - [ ] Resolve organizer rules relevant to submission and code reuse.
 - [ ] Record available physical phones/browsers and a stable demo device.
-- [ ] Keep the imported source snapshot and baseline hash in the repository.
+- [x] Keep the imported source snapshot and baseline hash in the repository.
 
 Exit evidence is a completed constraints entry. Unresolved event rules remain visible and block eligibility claims, not the writing of this plan.
 
@@ -754,14 +754,14 @@ Exit evidence is a completed constraints entry. Unresolved event rules remain vi
 
 Depends on M0 for submitted-work choices.
 
-- [ ] Move imported files into the historical archive as described in section 5.
-- [ ] Scaffold a stable Next.js App Router project with TypeScript and Tailwind.
+- [x] Move imported files into the historical archive as described in section 5.
+- [x] Scaffold a stable Next.js App Router project with TypeScript and Tailwind.
 - [ ] Resolve and pin dependencies through section 3.2.
-- [ ] Add root agent instructions and correct obsolete native-project guidance.
+- [x] Add root agent instructions and correct obsolete native-project guidance.
 - [ ] Add the selected, reviewed coding skills where the agent supports them.
-- [ ] Add scripts for dev, build, start, lint, typecheck, unit tests and browser tests.
-- [ ] Add a basic accessible home page and placeholder session shell.
-- [ ] Obtain a private-to-the-team preview URL for HTTPS device testing through the available deployment workflow.
+- [x] Add scripts for dev, build, start, lint, typecheck, unit tests and browser tests.
+- [x] Add a basic accessible home page and placeholder session shell.
+- [x] Obtain an authentication-protected HTTPS staging URL for device testing through the available deployment workflow. See docs/EXECUTION.md.
 
 Exit evidence is a clean install, typecheck/lint/build pass, exact version ledger and a real phone loading the shell. The repository must not build Expo as part of the web package.
 
@@ -1098,7 +1098,7 @@ Additional evaluated community sources
 | Research applicable AI skills | Passed | Inspected source files, revisions, applicability and prerequisite checks |
 | Write this master MVP | Complete planning artifact | This document |
 | M0 constraints and organizer resolution | Constraints recorded; partial | Schedule/team limit verified; reuse policy, actual team and devices unresolved; see docs/EXECUTION.md |
-| M1 clean web scaffold | In progress | New web shell and archived source; verification evidence in docs/EXECUTION.md |
+| M1 clean web scaffold | Built/deployed; acceptance partial | Install/lint/typecheck/build/provenance and HTTPS responses passed; desktop navigation verified; automated browser suite, keyboard/mobile/physical-phone and upstream skill installation evidence pending; see docs/EXECUTION.md |
 | M2–M9 implementation and release | Not started | No live pose runtime has been verified |
 
 The current implementation is M1. Real-device MediaPipe work follows the scaffold checks. Organizer/device evidence remains open in M0. Do not skip directly to polished dashboards.
