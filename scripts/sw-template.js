@@ -1,7 +1,7 @@
 /* global self, caches */
 const VERSION = __BUILD_VERSION__;
 const CACHE = `menhel-shell-${VERSION}`;
-const ROUTES = ["/", "/history", "/replay", "/compare"];
+const ROUTES = ["/", "/history", "/replay", "/compare", "/results"];
 const MARKER = "/__menhel_ready__";
 async function digest(bytes) {
   return [...new Uint8Array(await crypto.subtle.digest("SHA-256", bytes))]

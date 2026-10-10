@@ -1,5 +1,7 @@
 "use client";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { useRouter } from "next/navigation";
+import { handoffResult } from "@/lib/motion/result-handoff";
 import PoseSpike from "./PoseSpike";
 import { jointVisible, type Joint } from "@/lib/pose/types";
 import {
@@ -27,9 +29,7 @@ import {
   checkpoint,
   getProfile,
   saveSession,
-  download,
 } from "@/lib/motion/storage";
-import { summary } from "@/lib/motion/analysis";
 type Calibration = {
   start: number | null;
   baseline: number | null;
@@ -55,6 +55,7 @@ type Recording = {
   storageError: string | null;
 };
 export default function CaptureSession() {
+  const router = useRouter();
   const [side, setSide] = useState<Side>("left");
   const [confirmed, setConfirmed] = useState(false);
   const [stage, setStage] = useState("positioning");
@@ -85,8 +86,6 @@ export default function CaptureSession() {
   });
   const cameraControl = useRef<{ stop: () => void } | null>(null);
   const [cameraReady, setCameraReady] = useState(false);
-  const [result, setResult] = useState<Session | null>(null);
-  const [saved, setSaved] = useState(false);
   useEffect(() => {
     const id = new URLSearchParams(location.search).get("profile");
     if (id)
@@ -114,14 +113,7 @@ export default function CaptureSession() {
       window.dispatchEvent(new Event("menhel-recording"));
     };
   }, [stage]);
-  useEffect(() => {
-    if (stage !== "recording") return;
-    const timer = setTimeout(() => {
-      void finish();
-    }, 90000);
-    return () => clearTimeout(timer);
-  }, [stage]);
-  async function finish(status: Session["status"] = "complete") {
+  const finish = useCallback(async (status: Session["status"] = "complete") => {
     const r = recording.current;
     if (!r) return;
     recording.current = null;
@@ -143,14 +135,10 @@ export default function CaptureSession() {
         r.id,
       );
       session.createdAt = r.createdAt;
-      setResult(session);
-      setSaved(false);
-      await r.queue;
-      await saveSession(session);
-      setSaved(true);
-      setNotice(
-        "Set saved on this device. Open its replay or record another set with the same setup.",
-      );
+      const saving = r.queue.then(() => saveSession(session)).then(() => null)
+        .catch((error: unknown) => error instanceof Error ? error.message : "Local storage error");
+      handoffResult(session, saving);
+      router.push(`/results?id=${encodeURIComponent(session.id)}`);
     } catch (e) {
       setNotice(
         `Set is not saved: ${e instanceof Error ? e.message : "Local storage error"}. Export the available result before leaving.`,
@@ -158,7 +146,12 @@ export default function CaptureSession() {
     } finally {
       setStage("results");
     }
-  }
+  }, [router]);
+  useEffect(() => {
+    if (stage !== "recording") return;
+    const timer = setTimeout(() => { void finish(); }, 90000);
+    return () => clearTimeout(timer);
+  }, [stage, finish]);
   function onStopped(reason: string) {
     pendingStart.current = false;
     standingSince.current = null;
@@ -456,14 +449,11 @@ export default function CaptureSession() {
       queue: Promise.resolve(),
       storageError: null,
     };
-    setResult(null);
-    setSaved(false);
     setStage("recording");
     setNotice(
       "Calibration complete. Set started — recording landmarks locally. Complete your comfortable down-and-up cycles.",
     );
   }
-  const s = result ? summary(result.reps) : null;
   return (
     <>
       <section className="panel" aria-labelledby="calibration-title">
@@ -556,43 +546,13 @@ export default function CaptureSession() {
             <dd>{telemetry.count}</dd>
           </div>
           <div>
-            <dt>Estimated knee flexion</dt>
-            <dd>
-              {telemetry.knee === null
-                ? "Unavailable"
-                : `${Math.round(telemetry.knee)}°`}
-            </dd>
-          </div>
-          <div>
-            <dt>Estimated hip flexion</dt>
-            <dd>
-              {telemetry.hip === null
-                ? "Unavailable"
-                : `${Math.round(telemetry.hip)}°`}
-            </dd>
-          </div>
-          <div>
             <dt>Set elapsed</dt>
             <dd>{telemetry.seconds.toFixed(1)} s</dd>
           </div>
-          <div>
-            <dt>Movement phase</dt>
-            <dd>{telemetry.phase}</dd>
-          </div>
-          <div>
-            <dt>Processed pose rate</dt>
-            <dd>{telemetry.poseRate ? `${telemetry.poseRate.toFixed(1)} fps` : "—"}</dd>
-          </div>
-          <div>
-            <dt>Tracking state</dt>
-            <dd>{telemetry.tracking}</dd>
-          </div>
         </dl>
         <p className="status">
-          Ten completed reps or 90 seconds maximum. A low pose rate remains
-          valid when each processed sample contains the selected leg. Lost-pose
-          samples invalidate incomplete movement. Stop camera ends a set as
-          interrupted.
+          Complete your comfortable down-and-up cycles. Sets end after ten
+          completed reps or 90 seconds. Finish set opens your results.
         </p>
       </section>
       <PoseSpike
@@ -601,69 +561,6 @@ export default function CaptureSession() {
         onStopped={onStopped}
         ref={cameraControl}
       />
-      {result && s ? (
-        <section className="panel">
-          <h2>Set results</h2>
-          <p>
-            {s.count} completed reps · {result.status} ·{" "}
-            {saved ? "Saved on this device" : "Not saved"}
-          </p>
-          {!s.count ? (
-            <p>
-              No completed reps. Partial movement and unreliable tracking are
-              excluded.
-            </p>
-          ) : (
-            <p>
-              Median estimated knee bend {s.peak?.toFixed(0)}° · Median ascent{" "}
-              {((s.ascent ?? 0) / 1000).toFixed(1)} s
-            </p>
-          )}
-          <p>
-            Tracking available during{" "}
-            {(result.summary.trackingCoverage * 100).toFixed(0)}% of recorded
-            time.
-          </p>
-          <div className="actions">
-            {saved ? (
-              <>
-                <a className="button" href={`/replay?id=${result.id}`}>
-                  Replay set
-                </a>
-                <a
-                  className="secondary-button"
-                  href={`/session?profile=${result.profile.id}`}
-                >
-                  Record another set
-                </a>
-              </>
-            ) : (
-              <button
-                className="secondary-button"
-                onClick={() =>
-                  void saveSession(result)
-                    .then(() => {
-                      setSaved(true);
-                      setNotice("Set saved on this device.");
-                    })
-                    .catch((e) => setNotice(e.message))
-                }
-              >
-                Retry saving
-              </button>
-            )}
-            <button
-              className="secondary-button"
-              onClick={() => download(result)}
-            >
-              Export session
-            </button>
-            <a className="secondary-button" href="/history">
-              History
-            </a>
-          </div>
-        </section>
-      ) : null}
     </>
   );
 }
