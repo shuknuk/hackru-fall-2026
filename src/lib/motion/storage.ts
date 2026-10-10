@@ -62,7 +62,7 @@ export async function saveSession(session: Session) {
       tx.abort();
       await tx.done.catch(() => {});
       throw new Error(
-        "Twenty sessions are already saved. Export or delete a session before saving another.",
+        "Twenty sessions are already saved. Delete a session before saving another.",
       );
     }
     await store.put(checked);
@@ -184,15 +184,4 @@ export async function deleteAll() {
   } finally {
     db.close();
   }
-}
-export function download(session: Session) {
-  const data = JSON.stringify(session);
-  const url = URL.createObjectURL(
-    new Blob([data], { type: "application/json" }),
-  );
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = `menhel-${session.source}-${session.id}.json`;
-  a.click();
-  setTimeout(() => URL.revokeObjectURL(url), 1000);
 }
