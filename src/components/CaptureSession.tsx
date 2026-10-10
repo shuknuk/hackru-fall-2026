@@ -75,6 +75,7 @@ export default function CaptureSession() {
   const clock = useRef(0);
   const lastUI = useRef(0);
   const poseTimes = useRef<number[]>([]);
+  const recordingLossSince = useRef<number | null>(null);
   const [telemetry, setTelemetry] = useState({
     count: 0,
     knee: null as number | null,
@@ -356,6 +357,15 @@ export default function CaptureSession() {
         r.samples.push(sample);
         const rep = r.detector.push(sample);
         if (rep) setNotice(`Rep ${rep.id} completed.`);
+        if (!sample.valid) {
+          recordingLossSince.current ??= time;
+          if (time - recordingLossSince.current >= 400) {
+            setNotice(`Keep your ${side} hip, knee and ankle in view so this movement can count. Completed reps are kept; return to standing to continue.`);
+          }
+        } else if (recordingLossSince.current !== null) {
+          recordingLossSince.current = null;
+          setNotice("Recording — complete each squat by returning to standing.");
+        }
         if (t - r.checkpointAt >= 2000) {
           r.checkpointAt = t;
           const snapshot = {
@@ -450,6 +460,7 @@ export default function CaptureSession() {
       storageError: null,
     };
     setStage("recording");
+    recordingLossSince.current = null;
     setNotice(
       "Calibration complete. Set started — recording landmarks locally. Complete your comfortable down-and-up cycles.",
     );
