@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import type { Session } from "@/lib/motion/schema";
-import { getSession, download } from "@/lib/motion/storage";
+import { getSession } from "@/lib/motion/storage";
 import { summary } from "@/lib/motion/analysis";
 import ReplayPlayer from "./ReplayPlayer";
 export default function SessionReplay() {
@@ -61,13 +61,7 @@ export default function SessionReplay() {
           time. Missing intervals do not contribute to repetitions.
         </p>
         <div className="actions">
-          <button
-            className="secondary-button"
-            onClick={() => download(session)}
-          >
-            Export session
-          </button>
-          {session.source === "live" ? (
+{session.source === "live" ? (
             <a
               className="secondary-button"
               href={`/session?profile=${session.profile.id}`}
