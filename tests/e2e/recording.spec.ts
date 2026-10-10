@@ -84,7 +84,7 @@ test("simulated camera landmarks complete calibration, recording and local repla
                 type: "result",
                 generation: message.generation,
                 frameId: message.frameId,
-                joints: joints(flex),
+                joints: state.mode === "lost" ? [] : joints(flex),
                 inferenceMs: 5,
               },
             });
@@ -139,7 +139,23 @@ test("simulated camera landmarks complete calibration, recording and local repla
   await expect(
     page.getByRole("button", { name: "Start set", exact: true }),
   ).toBeEnabled({ timeout: 10000 });
+  await page.evaluate(() => {
+    (window as unknown as { motionFixture: { mode: string } }).motionFixture.mode = "lost";
+  });
+  await expect(page.locator(".metric-grid > div").filter({ hasText: "Tracking state" }).locator("dd")).toHaveText("Pose lost");
   await page.getByRole("button", { name: "Start set", exact: true }).click();
+  await expect(page.getByRole("button", { name: "Cancel start" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Finish set", exact: true })).toBeDisabled();
+  await expect(page.getByRole("status").first()).toContainText("Recording has not started");
+  await page.getByRole("button", { name: "Cancel start" }).click();
+  await expect(page.getByRole("button", { name: "Start set", exact: true })).toBeEnabled();
+  await page.getByRole("button", { name: "Start set", exact: true }).click();
+  await expect(page.getByRole("button", { name: "Cancel start" })).toBeVisible();
+  await page.evaluate(() => {
+    (window as unknown as { motionFixture: { mode: string } }).motionFixture.mode = "stand";
+  });
+  await expect(page.getByRole("button", { name: "Finish set", exact: true })).toBeEnabled();
+  await expect(page.getByRole("status").first()).toContainText("Recording landmarks locally");
   await page.evaluate(() => {
     const s = (
       window as unknown as { motionFixture: { mode: string; since: number } }
