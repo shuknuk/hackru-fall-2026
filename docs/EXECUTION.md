@@ -67,3 +67,11 @@ External skills remain reviewed references, with root AGENTS.md active. Installi
 Final selected-lockfile npm ci, lint, typecheck and provenance check were rerun after restoring Playwright 1.64.0 and passed. No unit tests exist yet; no movement or camera behavior is claimed as tested.
 
 M2 browser result: all six desktop Chromium tests passed in the sequential rerun, including actual worker CPU, main CPU and main GPU inference, denied permission, late permission cancellation and shell navigation. GPU integration required approximately 72 seconds including model initialization/restart; this is not a usability performance pass. The final mobile-sized Chromium rerun passed all three shell/denial/cancellation checks; three inference variants were deliberately skipped on that project. Total final browser evidence is nine passed, three intentional skips across sequential desktop/mobile runs. This is not iPhone/Safari evidence.
+
+## M2 HTTPS staging evidence
+
+Code commit b04947b7b0665d7667d07a59763ea36504600e7e. Deployment dpl_5pYEbHvRmbSKtQjFUgRZcqu4yDF1 is READY on target staging, Node 24.x, Next.js; build took approximately 44 seconds. URL: https://menhel-motion-dpwwdzia9-kinshukgoels-projects.vercel.app/session . Authentication protection remains enabled. Authenticated fetches of /session, /pose-worker.js and /mediapipe/asset-manifest.json returned 200, with expected Start camera content and pinned model checksum. This establishes delivery, not physical-camera behavior.
+
+The build reported five high npm audit findings through the development-only eslint-config-next → @next/eslint-plugin-next → fast-glob → micromatch → braces chain, rooted in GHSA-vfj7-8cjw-p6xm (deeply nested glob-pattern stack exhaustion). Audit suggests a breaking downgrade to eslint-config-next 14.2.35; it was not applied to the Next 16 setup. Record and resolve the tooling advisory before final release; do not claim a clean full-dependency audit.
+
+Production-only audit (`npm audit --omit=dev --json`) returned zero vulnerabilities. This does not erase the development tooling findings.
