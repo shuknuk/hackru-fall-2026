@@ -68,7 +68,7 @@ try {
     await delay(250);
   }
   if (!ready) throw new Error("Production server did not become ready");
-for (const route of ["/", "/history", "/replay", "/compare"]) {
+for (const route of ["/", "/history", "/replay", "/compare", "/results"]) {
   const name = route === "/" ? "index" : route.slice(1);
   const file = `public/offline-shell/${version}/${name}.html`;
   const response = await fetch(`http://127.0.0.1:${port}${route}`);
@@ -120,7 +120,7 @@ for (const name of [
   await add(`/icons/${name}`, `public/icons/${name}`);
 const inventory = {
   version,
-  routes: ["/", "/history", "/replay", "/compare"],
+  routes: ["/", "/history", "/replay", "/compare", "/results"],
   assets,
 };
 await writeFile("public/offline-inventory.json", JSON.stringify(inventory));
