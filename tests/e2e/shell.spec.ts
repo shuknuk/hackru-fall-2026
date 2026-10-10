@@ -19,7 +19,7 @@ test("home leads to honest session setup without requesting camera access", asyn
   await page.getByRole("link", { name: "Explore session setup" }).click();
   await expect(page).toHaveURL(/\/session$/);
   await expect(
-    page.getByRole("heading", { name: "Room to move." }),
+    page.getByRole("heading", { name: "Get ready for your squats." }),
   ).toBeVisible();
   await expect(
     page.getByRole("heading", { name: "One comfortable down-and-up cycle" }),
@@ -27,10 +27,10 @@ test("home leads to honest session setup without requesting camera access", asyn
   await expect(page.getByText("RepDB (repdb.co)")).toBeVisible();
   await expect(
     page.getByRole("button", { name: "Start camera" }),
-  ).toBeEnabled();
+  ).toHaveCount(0);
   await expect(
     page.getByRole("button", { name: "Stop camera" }),
-  ).toBeDisabled();
+  ).toHaveCount(0);
   await expect(page.locator("body")).toBeVisible();
   expect(
     await page.evaluate(
