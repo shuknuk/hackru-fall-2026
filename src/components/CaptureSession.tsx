@@ -380,7 +380,7 @@ export default function CaptureSession() {
             .catch((e) => {
               r.storageError = e.message;
               setNotice(
-                `Draft checkpoint unavailable: ${e.message}. Keep this page open and export if saving fails.`,
+                `Draft checkpoint unavailable: ${e.message}. Keep this page open and retry saving from results if needed.`,
               );
             });
         }
@@ -467,8 +467,15 @@ export default function CaptureSession() {
   }
   return (
     <>
+      <PoseSpike
+        onFrame={onFrame}
+        onReady={onReady}
+        onStopped={onStopped}
+        ref={cameraControl}
+      />
       <section className="panel" aria-labelledby="calibration-title">
-        <h2 id="calibration-title">Your setup, your range</h2>
+        <h2 id="calibration-title">Your setup</h2>
+        <p>Once the camera is on: choose the side facing it, confirm the checkbox, then calibrate. Stand still first; when prompted, do one comfortable squat and stand again.</p>
         <label>
           Visible body side
           <select
@@ -482,8 +489,8 @@ export default function CaptureSession() {
               setStage("positioning");
             }}
           >
-            <option value="left">Anatomical left</option>
-            <option value="right">Anatomical right</option>
+            <option value="left">Left side facing camera</option>
+            <option value="right">Right side facing camera</option>
           </select>
         </label>
         <label className="check">
@@ -566,12 +573,7 @@ export default function CaptureSession() {
           completed reps or 90 seconds. Finish set opens your results.
         </p>
       </section>
-      <PoseSpike
-        onFrame={onFrame}
-        onReady={onReady}
-        onStopped={onStopped}
-        ref={cameraControl}
-      />
+
     </>
   );
 }

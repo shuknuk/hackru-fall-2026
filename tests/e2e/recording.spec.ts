@@ -115,7 +115,7 @@ test("simulated camera landmarks complete calibration, recording and local repla
       return stream;
     };
   });
-  await page.goto(`/session?verification=${Date.now()}`);
+  await page.goto(`/session/record?verification=${Date.now()}`);
   await page.getByRole("button", { name: "Start camera", exact: true }).click();
   await expect(page.locator(".camera-view")).toHaveAttribute(
     "data-state",
@@ -125,7 +125,7 @@ test("simulated camera landmarks complete calibration, recording and local repla
   await page
     .getByRole("button", { name: "Calibrate comfortable range" })
     .click();
-  await expect(page.getByRole("status").first()).toContainText(
+  await expect(page.locator('[aria-labelledby="calibration-title"]').getByRole("status").first()).toContainText(
     "Now perform one comfortable setup squat",
     { timeout: 10000 },
   );
@@ -136,7 +136,7 @@ test("simulated camera landmarks complete calibration, recording and local repla
     s.mode = "setup";
     s.since = performance.now();
   });
-  await expect(page.getByRole("status").first()).toContainText("Calibration complete. Your set is starting in 3 seconds", { timeout: 10000 });
+  await expect(page.locator('[aria-labelledby="calibration-title"]').getByRole("status").first()).toContainText("Calibration complete. Your set is starting in 3 seconds", { timeout: 10000 });
   await expect(page.getByText("Calibration complete", { exact: true })).toBeVisible();
   await page.getByRole("button", { name: "Cancel start" }).click();
   await page.evaluate(() => {
@@ -145,7 +145,7 @@ test("simulated camera landmarks complete calibration, recording and local repla
   await page.getByRole("button", { name: "Start set", exact: true }).click();
   await expect(page.getByRole("button", { name: "Cancel start" })).toBeVisible();
   await expect(page.getByRole("button", { name: "Finish set", exact: true })).toBeDisabled();
-  await expect(page.getByRole("status").first()).toContainText("Recording has not started");
+  await expect(page.locator('[aria-labelledby="calibration-title"]').getByRole("status").first()).toContainText("Recording has not started");
   await page.getByRole("button", { name: "Cancel start" }).click();
   await expect(page.getByRole("button", { name: "Start set", exact: true })).toBeEnabled();
   await page.getByRole("button", { name: "Start set", exact: true }).click();
@@ -154,7 +154,7 @@ test("simulated camera landmarks complete calibration, recording and local repla
     (window as unknown as { motionFixture: { mode: string } }).motionFixture.mode = "stand";
   });
   await expect(page.getByRole("button", { name: "Finish set", exact: true })).toBeEnabled();
-  await expect(page.getByRole("status").first()).toContainText("Set started");
+  await expect(page.locator('[aria-labelledby="calibration-title"]').getByRole("status").first()).toContainText("Set started");
   await page.evaluate(() => {
     const s = (
       window as unknown as { motionFixture: { mode: string; since: number } }

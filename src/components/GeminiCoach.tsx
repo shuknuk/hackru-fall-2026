@@ -59,11 +59,11 @@ export default function GeminiCoach({
       const value = await response.json();
       if (!response.ok)
         throw new Error(
-          typeof value?.error === "string" ? value.error : "Coach unavailable.",
+          typeof value?.error === "string" ? value.error : "Gemini could not respond. Please try again.",
         );
       setResult(coachResponseSchema.parse(value));
     } catch (cause) {
-      setError(cause instanceof Error ? cause.message : "Coach unavailable.");
+      setError(cause instanceof Error ? cause.message : "Gemini could not respond. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -71,12 +71,11 @@ export default function GeminiCoach({
 
   return (
     <section className="coach" aria-labelledby="coach-title">
-      <p className="eyebrow">OPTIONAL · GEMINI</p>
-      <h3 id="coach-title">Plain-language measurement coach</h3>
+      <p className="eyebrow">GEMINI</p>
+      <h3 id="coach-title">Measurement coach</h3>
       <p>
-        If you opt in, Menhel sends only the aggregate values and measurement
-        statements shown above to Google Gemini. Camera frames, landmarks,
-        session identifiers, and saved sets are not sent.
+        Compare these squat sets with Gemini. Only the measurement summary shown above
+        is sent to Google Gemini. Your video and body landmarks stay on this device.
       </p>
       <label className="check">
         <input
@@ -91,17 +90,17 @@ export default function GeminiCoach({
         disabled={!consented || loading}
         onClick={() => void requestCoach()}
       >
-        {loading ? "Explaining measurements…" : "Ask Gemini to explain"}
+        {loading ? "Gemini is comparing your sets..." : error ? "Try Gemini again" : "Ask Gemini to explain"}
       </button>
       <div aria-live="polite">
-        {error ? <p>{error}</p> : null}
+        {error ? <p role="alert">{error}</p> : null}
         {result ? (
           <div className="coach-result">
             <h4>{result.headline}</h4>
             <ul>
               {result.explanations.map((item) => (
                 <li key={item.metricId}>
-                  {item.text} <small>Evidence: {item.metricId}</small>
+                  {item.text}
                 </li>
               ))}
             </ul>

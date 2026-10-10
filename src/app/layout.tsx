@@ -1,4 +1,3 @@
-import PwaControls from "@/components/PwaControls";
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 
@@ -21,9 +20,6 @@ export default function RootLayout({
           Skip to content
         </a>
         {children}
-        <div className="shell">
-          <PwaControls />
-        </div>
       </body>
     </html>
   );

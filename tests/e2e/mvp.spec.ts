@@ -1,6 +1,20 @@
-import { test, expect } from "@playwright/test";
+import { test, expect, type Page } from "@playwright/test";
 import type { Session } from "../../src/lib/motion/schema";
 
+
+// Verify the retained worker directly now that the offline controls are removed.
+async function prepareOffline(page: Page) {
+  return page.evaluate(async () => {
+    await navigator.serviceWorker.register("/sw.js");
+    const registration = await navigator.serviceWorker.ready;
+    return await new Promise<{ ready?: boolean; error?: string }>((resolve, reject) => {
+      const channel = new MessageChannel();
+      const timer = setTimeout(() => reject(new Error("Offline preparation timed out")), 70000);
+      channel.port1.onmessage = (event) => { clearTimeout(timer); channel.port1.close(); resolve(event.data); };
+      registration.active!.postMessage({ type: "PREPARE" }, [channel.port2]);
+    });
+  });
+}
 
 test("sample sets persist, replay, compare and delete without export or data controls", async ({
   page,
@@ -12,7 +26,7 @@ test("sample sets persist, replay, compare and delete without export or data con
   page.on("request", (r) => requests.push(r.url()));
   await page.goto("/history");
   await page
-    .getByRole("button", { name: "Open synthetic sample pair" })
+    .getByRole("button", { name: "Open squat sample pair" })
     .click();
   await expect(page).toHaveURL(/\/compare\?/);
   await expect(
@@ -22,9 +36,9 @@ test("sample sets persist, replay, compare and delete without export or data con
   await expect(
     page.getByRole("heading", { name: "Comparable", exact: true }),
   ).toBeVisible();
-  await page.getByRole("slider", { name: "Movement phase" }).fill("50");
+  await page.getByRole("slider", { name: "Squat replay progress" }).fill("50");
   await expect(
-    page.getByText("50% · Ascent · Bottom at 50%", { exact: true }),
+    page.getByText("50% · Bottom of squat", { exact: true }),
   ).toBeVisible();
   await expect(
     page.getByText(/Set B showed about .* more estimated knee flexion/),
@@ -44,7 +58,7 @@ test("sample sets persist, replay, compare and delete without export or data con
   expect(Object.keys(posted).sort()).toEqual(["evidence", "setA", "setB"]);
   expect(JSON.stringify(posted)).not.toMatch(/landmarks|joints|sessionId|samples/);
   await expect(
-    page.getByText("The optional Gemini coach is not configured."),
+    page.getByText("Gemini is not configured. Please contact the app owner."),
   ).toBeVisible();
   await expect(
     page.getByText(/Set B showed about .* more estimated knee flexion/),
@@ -92,30 +106,18 @@ test("prepared history, replay and comparison survive hard offline reloads", asy
   test.setTimeout(120000);
   await page.goto("/history");
   await page
-    .getByRole("button", { name: "Open synthetic sample pair" })
+    .getByRole("button", { name: "Open squat sample pair" })
     .click();
   await expect(page).toHaveURL(/\/compare\?/);
   const compare = page.url();
-  await page
-    .getByRole("button", { name: "Prepare offline replay", exact: true })
-    .click();
-  await expect(page.getByRole("status").last()).toContainText(
-    "Offline replay ready",
-    { timeout: 70000 },
-  );
+  expect((await prepareOffline(page)).ready).toBe(true);
   // A missing cached shell must be repairable without a different worker script.
   await page.evaluate(async () => {
     for (const name of await caches.keys())
       if (name.startsWith("menhel-shell-") && !name.endsWith("-pending"))
         await (await caches.open(name)).delete("/replay");
   });
-  await page
-    .getByRole("button", { name: "Verify offline preparation", exact: true })
-    .click();
-  await expect(page.getByRole("status").last()).toContainText(
-    "Offline replay ready",
-    { timeout: 70000 },
-  );
+  expect((await prepareOffline(page)).ready).toBe(true);
   await context.setOffline(true);
   await page.reload();
   await expect(
@@ -160,29 +162,24 @@ test("storage failures preserve a readable recovery path", async ({ page }) => {
     "Local storage unavailable",
   );
   await expect(
-    page.getByRole("button", { name: "Open synthetic sample pair" }),
+    page.getByRole("button", { name: "Open squat sample pair" }),
   ).toBeVisible();
 });
 
-test("incomplete offline preparation never reports ready", async ({
-  page,
-  context,
-}) => {
-  test.setTimeout(90000);
-  await context.route("**/offline-inventory.json", (route) =>
-    route.fulfill({ status: 503, body: "Test unavailable" }),
-  );
+test("the removed offline controls do not appear in the library", async ({ page }) => {
   await page.goto("/history");
-  await page
-    .getByRole("button", { name: "Prepare offline replay", exact: true })
-    .click();
-  await expect(page.getByRole("status").last()).toContainText(
-    /failed verification|timed out|unavailable/,
-    { timeout: 70000 },
-  );
-  await expect(page.getByRole("status").last()).not.toContainText(
-    "Offline replay ready",
-  );
+  await expect(page.getByRole("heading", { name: "Keep replay close" })).toHaveCount(0);
+  await expect(page.getByRole("button", { name: "Prepare offline replay" })).toHaveCount(0);
+});
+
+test("recording starts with a guide and continues to a separate camera page", async ({ page }) => {
+  await page.goto("/session?profile=test-profile");
+  await expect(page.getByRole("heading", { name: "Side-view squat setup" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Start camera" })).toHaveCount(0);
+  await page.getByRole("link", { name: "Continue to camera setup" }).click();
+  await expect(page).toHaveURL(/session\/record\?profile=test-profile/);
+  await expect(page.getByRole("button", { name: "Start camera" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Your setup", exact: true })).toBeVisible();
 });
 
 test("a checkpointed draft recovers only completed cycles and the library cap never erases sessions", async ({
@@ -191,7 +188,7 @@ test("a checkpointed draft recovers only completed cycles and the library cap ne
   test.setTimeout(90000);
   await page.goto("/history");
   await page
-    .getByRole("button", { name: "Open synthetic sample pair" })
+    .getByRole("button", { name: "Open squat sample pair" })
     .click();
   await page.getByRole("link", { name: "Inspect this set" }).first().click();
   const original = await page.evaluate(() => new Promise<Session>((resolve, reject) => {
@@ -256,7 +253,7 @@ test("a checkpointed draft recovers only completed cycles and the library cap ne
   }, original);
   await page.reload();
   await expect(page.getByRole("status").first()).toContainText("20 of 20");
-  await page.getByRole("button", { name: "Open synthetic sample pair" }).click();
+  await page.getByRole("button", { name: "Open squat sample pair" }).click();
   await expect(page.getByRole("status").first()).toContainText(
     "Twenty sessions are already saved",
   );

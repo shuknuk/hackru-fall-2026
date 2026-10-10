@@ -54,10 +54,10 @@ export default function History() {
     <>
       <p role="status">{message}</p>
       <section className="panel">
-        <h2>Try a sample</h2>
+        <h2>Try two demo squat sets</h2>
         <p>
-          These are authored synthetic joint sequences. They demonstrate replay
-          and comparison, not a recorded person or model accuracy.
+          See two demo sets of three bodyweight squats. Explore their skeleton replays
+          and compare squat depth and timing. These artificial examples are not recordings of a person.
         </p>
         <button
           className="secondary-button"
@@ -74,7 +74,7 @@ export default function History() {
             })
           }
         >
-          Open synthetic sample pair
+          Open squat sample pair
         </button>
       </section>
       <section className="panel">

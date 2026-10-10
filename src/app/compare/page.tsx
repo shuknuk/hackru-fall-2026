@@ -5,7 +5,7 @@ export default function Page() {
     <main id="main" className="shell">
       <PageHeader
         title="What changed?"
-        description="Compare two attempts with recorded evidence and phase-aligned movement."
+        description="Compare squat depth and timing, then watch the two sets side by side."
       />
       <CompareSessions />
     </main>

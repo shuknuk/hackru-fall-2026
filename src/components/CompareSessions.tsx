@@ -96,7 +96,7 @@ export default function CompareSessions() {
         <p className="eyebrow">
           {a.source === "live" && b.source === "live"
             ? "PERSONAL ATTEMPTS"
-            : "SAMPLE COMPARISON · SOURCE LABELS PRESERVED"}
+            : "DEMO SQUAT COMPARISON"}
         </p>
         <label className="check">
           <input
@@ -108,7 +108,7 @@ export default function CompareSessions() {
             }}
           />
           {a.source === "sample-synthetic"
-            ? "I understand these are synthetic samples with a shared authored setup."
+            ? "I understand these are artificial demo squat sets."
             : "These sets are from the same person with comparable camera placement."}
         </label>
         <h2>{check.status}</h2>
@@ -142,11 +142,10 @@ export default function CompareSessions() {
       {check.allowed && ra && rb ? (
         <>
           <section className="panel">
-            <h2>Aligned by movement phase</h2>
+            <h2>Compare your squats side by side</h2>
             <p>
-              Start, bottom and return to standing align. Original durations
-              remain in the table. Skeletons use one fixed scale and standing
-              hip reference per set; no per-frame recentering.
+              Choose one squat from each set, then press Play. Both replays reach the bottom
+              together so you can compare the same part of each squat. The table below shows how long each squat actually took.
             </p>
             <div className="compare-grid">
               {sets.map((s, i) => (
@@ -207,7 +206,7 @@ export default function CompareSessions() {
               </label>
             </div>
             <label>
-              Movement phase
+              Squat replay progress
               <input
                 type="range"
                 min={0}
@@ -220,12 +219,13 @@ export default function CompareSessions() {
                 }}
               />
             </label>
-            <p>
+            <div className="replay-milestones" aria-hidden="true"><span>Standing</span><span>Bottom</span><span>Standing</span></div>
+            <p role="status">
               {Math.round(progress * 100)}% ·{" "}
-              {progress < 0.5 ? "Descent" : "Ascent"} · Bottom at 50%
+              {progress === 0 ? "Standing start" : progress === 1 ? "Back to standing" : progress === 0.5 ? "Bottom of squat" : progress < 0.5 ? "Lowering down" : "Standing back up"}
             </p>
             <table>
-              <caption>Actual timing for selected repetitions</caption>
+              <caption>How long each selected squat took</caption>
               <thead>
                 <tr>
                   <th>Measurement</th>
@@ -235,17 +235,17 @@ export default function CompareSessions() {
               </thead>
               <tbody>
                 <tr>
-                  <th>Descent</th>
+                  <th>Lowering down</th>
                   <td>{(ra.descent / 1000).toFixed(2)} s</td>
                   <td>{(rb.descent / 1000).toFixed(2)} s</td>
                 </tr>
                 <tr>
-                  <th>Ascent</th>
+                  <th>Standing back up</th>
                   <td>{(ra.ascent / 1000).toFixed(2)} s</td>
                   <td>{(rb.ascent / 1000).toFixed(2)} s</td>
                 </tr>
                 <tr>
-                  <th>Valid coverage</th>
+                  <th>Tracked movement</th>
                   <td>{(ra.coverage * 100).toFixed(0)}%</td>
                   <td>{(rb.coverage * 100).toFixed(0)}%</td>
                 </tr>

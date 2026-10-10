@@ -1,19 +1,20 @@
 import Link from "next/link";
 import Image from "next/image";
 import { ArrowLeft, Camera } from "lucide-react";
-import CaptureSession from "@/components/CaptureSession";
 
-export default function SessionSetup() {
+export default async function SessionSetup({ searchParams }: { searchParams: Promise<{ profile?: string }> }) {
+  const { profile } = await searchParams;
+  const next = profile ? `/session/record?profile=${encodeURIComponent(profile)}` : "/session/record";
   return (
     <main id="main" className="shell session-shell">
       <Link className="back-link" href="/">
         <ArrowLeft size={18} aria-hidden="true" /> Back to Menhel
       </Link>
-      <p className="eyebrow">SIDE-VIEW BODYWEIGHT SQUATS</p>
-      <h1>Room to move.</h1>
+      <p className="eyebrow">STEP 1 OF 2 - SQUAT GUIDE</p>
+      <h1>Get ready for your squats.</h1>
       <p className="lede">
-        Start a local camera preview and check that the skeleton follows your
-        body. Keep one person in view, with room to move.
+        Set up your space, then continue to the camera. You will calibrate your
+        comfortable squat range on the next page.
       </p>
       <section className="setup-card" aria-labelledby="setup-title">
         <Camera size={36} aria-hidden="true" />
@@ -65,7 +66,7 @@ export default function SessionSetup() {
           .
         </p>
       </section>
-      <CaptureSession />
+      <div className="actions"><Link className="button" href={next}>Continue to camera setup</Link></div>
     </main>
   );
 }

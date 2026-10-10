@@ -492,3 +492,5 @@ button {
     scroll-behavior: auto;
   }
 }
+
+.replay-milestones { display: flex; justify-content: space-between; gap: 1rem; color: var(--muted, #5d6558); font-size: 0.9rem; }
