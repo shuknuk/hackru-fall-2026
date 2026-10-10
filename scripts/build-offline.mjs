@@ -1,14 +1,10 @@
 import { spawnSync } from "node:child_process";
-import {
-  readFile,
-  writeFile,
-  readdir,
-  rm,
-  mkdir,
-  access,
-} from "node:fs/promises";
+import { readFile, writeFile, readdir, rm, mkdir } from "node:fs/promises";
 import path from "node:path";
 import { createHash, randomUUID } from "node:crypto";
+import { spawn } from "node:child_process";
+import net from "node:net";
+import { setTimeout as delay } from "node:timers/promises";
 const version = randomUUID();
 await rm(".next", { recursive: true, force: true });
 const built = spawnSync(
@@ -29,31 +25,60 @@ async function add(url, file, key) {
 }
 await rm("public/offline-shell", { recursive: true, force: true });
 await mkdir(`public/offline-shell/${version}`, { recursive: true });
+const portServer = net.createServer();
+await new Promise((resolve, reject) => {
+  portServer.once("error", reject);
+  portServer.listen(0, "127.0.0.1", resolve);
+});
+const address = portServer.address();
+if (!address || typeof address === "string")
+  throw new Error("Could not reserve a local port for the production server");
+const port = address.port;
+await new Promise((resolve, reject) => portServer.close((error) => error ? reject(error) : resolve()));
+const server = spawn(
+  process.execPath,
+  ["node_modules/next/dist/bin/next", "start", "--hostname", "127.0.0.1", "--port", String(port)],
+  { stdio: "ignore", env: { ...process.env, NEXT_TELEMETRY_DISABLED: "1" } },
+);
+const serverExit = new Promise((resolve) => server.once("exit", resolve));
+async function stopServer() {
+  if (server.exitCode !== null || server.signalCode !== null) return;
+  server.kill("SIGTERM");
+  const exited = await Promise.race([
+    serverExit.then(() => true),
+    delay(3000).then(() => false),
+  ]);
+  if (!exited) server.kill("SIGKILL");
+}
+try {
+  let ready = false;
+  for (let attempt = 0; attempt < 80; attempt++) {
+    if (server.exitCode !== null)
+      throw new Error(`Production server exited with ${server.exitCode}`);
+    try {
+      const response = await fetch(`http://127.0.0.1:${port}/`);
+      if (response.ok) {
+        await response.arrayBuffer();
+        ready = true;
+        break;
+      }
+    } catch {
+      // Wait for the just-built production server to start accepting requests.
+    }
+    await delay(250);
+  }
+  if (!ready) throw new Error("Production server did not become ready");
 for (const route of ["/", "/history", "/replay", "/compare"]) {
   const name = route === "/" ? "index" : route.slice(1);
   const file = `public/offline-shell/${version}/${name}.html`;
-  const candidates = [
-    `.next/server/app/${name}.html`,
-    ...(route === "/"
-      ? [".next/server/app/page.html"]
-      : [`.next/server/app/${name}/page.html`]),
-  ];
-  let source;
-  for (const candidate of candidates) {
-    try {
-      await access(candidate);
-      source = candidate;
-      break;
-    } catch {
-      // Next.js may encode the root route as page.html in Vercel's build output.
-    }
-  }
-  if (!source)
-    throw new Error(
-      `No prerendered HTML found for ${route}; checked ${candidates.join(", ")}`,
-    );
-  await writeFile(file, await readFile(source));
+  const response = await fetch(`http://127.0.0.1:${port}${route}`);
+  if (!response.ok || !response.headers.get("content-type")?.includes("text/html"))
+    throw new Error(`Could not capture offline shell for ${route}: HTTP ${response.status}`);
+  await writeFile(file, Buffer.from(await response.arrayBuffer()));
   await add(`/offline-shell/${version}/${name}.html`, file, route);
+}
+} finally {
+  await stopServer();
 }
 async function scan(dir) {
   for (const item of await readdir(dir, { withFileTypes: true })) {
