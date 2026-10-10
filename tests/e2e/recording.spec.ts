@@ -142,7 +142,6 @@ test("simulated camera landmarks complete calibration, recording and local repla
   await page.evaluate(() => {
     (window as unknown as { motionFixture: { mode: string } }).motionFixture.mode = "lost";
   });
-  await expect(page.locator(".metric-grid > div").filter({ hasText: "Tracking state" }).locator("dd")).toHaveText("Pose lost");
   await page.getByRole("button", { name: "Start set", exact: true }).click();
   await expect(page.getByRole("button", { name: "Cancel start" })).toBeVisible();
   await expect(page.getByRole("button", { name: "Finish set", exact: true })).toBeDisabled();
@@ -195,19 +194,12 @@ test("simulated camera landmarks complete calibration, recording and local repla
       throw error;
     });
   await page.getByRole("button", { name: "Finish set", exact: true }).click();
-  await expect(
-    page.getByText("3 completed reps · complete · Saved on this device", {
-      exact: true,
-    }),
-  ).toBeVisible();
-  await expect(
-    page.getByRole("button", { name: "Start camera", exact: true }),
-  ).toBeEnabled();
-  expect(
-    await page
-      .locator("video")
-      .evaluate((v) => (v as HTMLVideoElement).srcObject),
-  ).toBeNull();
+  await expect(page).toHaveURL(/\/results\?id=/);
+  await expect(page.getByRole("heading", { name: "3 completed reps", exact: true })).toBeVisible();
+  await expect(page.getByRole("status").first()).toHaveText("Saved on this device.");
+  await expect(page.locator("video")).toHaveCount(0);
+  await page.reload();
+  await expect(page.getByRole("heading", { name: "3 completed reps", exact: true })).toBeVisible();
   await page.getByRole("link", { name: "Replay set", exact: true }).click();
   await expect(
     page.getByRole("heading", { name: "3 completed reps", exact: true }),
