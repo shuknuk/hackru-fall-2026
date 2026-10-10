@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import PoseSpike from "./PoseSpike";
-import type { Joint } from "@/lib/pose/types";
+import { jointVisible, type Joint } from "@/lib/pose/types";
 import {
   makeProfile,
   MAX_VALID_SAMPLE_INTERVAL_MS,
@@ -10,6 +10,7 @@ import {
   mad,
   Signal,
   SquatDetector,
+  INDICES,
 } from "@/lib/motion/analysis";
 import {
   MAX_SAMPLES,
@@ -63,6 +64,8 @@ export default function CaptureSession() {
   const meta = useRef<Capture | null>(null);
   const cal = useRef<Calibration | null>(null);
   const recording = useRef<Recording | null>(null);
+  const pendingStart = useRef(false);
+  const standingSince = useRef<number | null>(null);
   const clock = useRef(0);
   const lastUI = useRef(0);
   const poseTimes = useRef<number[]>([]);
@@ -152,6 +155,8 @@ export default function CaptureSession() {
     }
   }
   function onStopped(reason: string) {
+    pendingStart.current = false;
+    standingSince.current = null;
     cal.current = null;
     if (recording.current) {
       void finish("interrupted");
@@ -198,6 +203,7 @@ export default function CaptureSession() {
     width: number,
     height: number,
   ) {
+    if (time - clock.current > MAX_VALID_SAMPLE_INTERVAL_MS) standingSince.current = null;
     clock.current = time;
     poseTimes.current.push(time);
     poseTimes.current = poseTimes.current.filter((t) => time - t <= 3000);
@@ -222,6 +228,22 @@ export default function CaptureSession() {
     capture.side = side;
     const m = measure(joints, side, width, height),
       c = cal.current;
+    const missing = INDICES[side]
+      .slice(1)
+      .map((index, i) => jointVisible(joints[index]) ? null : ["hip", "knee", "ankle"][i])
+      .filter(Boolean);
+    if (pendingStart.current) {
+      const p = profileRef.current;
+      if (!p || m.knee === null || m.knee > p.stand) {
+        standingSince.current = null;
+        setNotice(m.knee === null
+          ? `Waiting to start: keep your ${side} ${missing.join(", ")} visible. Recording has not started.`
+          : "Waiting to start: return to comfortable standing. Recording has not started.");
+      } else {
+        standingSince.current ??= time;
+        if (time - standingSince.current >= 300) startSet(m.knee);
+      }
+    }
     if (c) {
       const x = c.signal.next(m.knee, time);
       if (x === null) {
@@ -233,7 +255,7 @@ export default function CaptureSession() {
           c.peak = 0;
         }
         setNotice(
-          "Tracking lost. Keep the selected hip, knee and ankle visible, then stand still again.",
+          `Calibration waiting: keep your ${side} ${missing.join(", ")} visible, then stand still for 1.5 seconds.`,
         );
       } else if (c.baseline === null) {
         c.start ??= time;
@@ -353,7 +375,7 @@ export default function CaptureSession() {
           ? r.detector.phase[0].toUpperCase() + r.detector.phase.slice(1)
           : stage === "calibrating"
             ? "Setup"
-            : "Waiting",
+            : stage === "starting" ? "Waiting to start" : "Waiting",
         poseRate,
         tracking:
           m.knee === null
@@ -364,22 +386,29 @@ export default function CaptureSession() {
       });
     }
   }
-  function startSet() {
+  function startSet(standingKnee?: number) {
     if (recording.current) return;
     const p = profileRef.current,
       capture = meta.current;
     if (
       !p ||
       !capture ||
-      stage !== "ready" ||
+      (stage !== "ready" && !pendingStart.current) ||
       !confirmed ||
       performance.now() - clock.current > MAX_VALID_SAMPLE_INTERVAL_MS ||
-      telemetry.knee === null ||
-      telemetry.knee > p.stand
+      standingKnee === undefined ||
+      standingKnee > p.stand
     ) {
-      setNotice("Stand still in view before starting your set.");
+      if (p && capture && confirmed && stage === "ready") {
+        pendingStart.current = true;
+        standingSince.current = null;
+        setStage("starting");
+        setNotice("Waiting to start: stand comfortably in view. Recording begins automatically after stable tracking.");
+      }
       return;
     }
+    pendingStart.current = false;
+    standingSince.current = null;
     recording.current = {
       id: crypto.randomUUID(),
       createdAt: new Date().toISOString(),
@@ -410,7 +439,7 @@ export default function CaptureSession() {
           Visible body side
           <select
             value={side}
-            disabled={stage === "calibrating" || stage === "recording"}
+            disabled={stage === "calibrating" || stage === "recording" || stage === "starting"}
             onChange={(e) => {
               setSide(e.target.value as Side);
               profileRef.current = null;
@@ -426,7 +455,7 @@ export default function CaptureSession() {
           <input
             type="checkbox"
             checked={confirmed}
-            disabled={stage === "recording"}
+            disabled={stage === "recording" || stage === "starting"}
             onChange={(e) => setConfirmed(e.target.checked)}
           />
           I am side-on, my full body is visible, and the camera is stable.
@@ -438,7 +467,7 @@ export default function CaptureSession() {
               !confirmed ||
               !cameraReady ||
               stage === "recording" ||
-              stage === "calibrating"
+              stage === "calibrating" || stage === "starting"
             }
             onClick={() => beginCalibration(false)}
           >
@@ -451,7 +480,7 @@ export default function CaptureSession() {
                 !confirmed ||
                 !cameraReady ||
                 stage === "recording" ||
-                stage === "calibrating"
+              stage === "calibrating" || stage === "starting"
               }
               onClick={() => beginCalibration(true)}
             >
@@ -461,10 +490,18 @@ export default function CaptureSession() {
           <button
             className="button"
             disabled={stage !== "ready" || !confirmed}
-            onClick={startSet}
+            onClick={() => startSet()}
           >
             Start set
           </button>
+          {stage === "starting" ? (
+            <button className="secondary-button" onClick={() => {
+              pendingStart.current = false;
+              standingSince.current = null;
+              setStage("ready");
+              setNotice("Start cancelled. Recheck tracking before starting again.");
+            }}>Cancel start</button>
+          ) : null}
           <button
             className="secondary-button"
             disabled={stage !== "recording"}
