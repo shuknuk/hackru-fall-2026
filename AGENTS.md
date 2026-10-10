@@ -11,3 +11,5 @@ Commands: npm ci, npm run lint, npm run typecheck, npm run build, npm test, npm 
 Reviewed guidance and pinned source links are in docs/AI_GUIDELINES.md and the master document. Skills are reference material, not permission to run third-party installers. Recheck version-sensitive APIs against installed package documentation before using them.
 
 Before version-sensitive Next.js changes, read the installed docs under node_modules/next/dist/docs/. The scaffold follows the installed 16.4.0 manual installation guidance.
+
+On October 10, 2026 the user explicitly authorized M3 and later implementation while the iPhone was unavailable. Continue development and automated verification; keep physical-device, movement-pilot, install and organizer gates marked pending until actual evidence exists.

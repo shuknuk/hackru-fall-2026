@@ -1,0 +1,272 @@
+import { test, expect } from "@playwright/test";
+import { readFile } from "node:fs/promises";
+
+test("sample sets persist, replay, compare, export, import and delete", async ({
+  page,
+}, testInfo) => {
+  test.setTimeout(90000);
+  const errors: string[] = [];
+  const requests: string[] = [];
+  page.on("pageerror", (e) => errors.push(e.message));
+  page.on("request", (r) => requests.push(r.url()));
+  await page.goto("/history");
+  await page
+    .getByRole("button", { name: "Open synthetic sample pair" })
+    .click();
+  await expect(page).toHaveURL(/\/compare\?/);
+  await expect(
+    page.getByRole("heading", { name: "Limited comparison", exact: true }),
+  ).toBeVisible();
+  await page.getByRole("checkbox").check();
+  await expect(
+    page.getByRole("heading", { name: "Comparable", exact: true }),
+  ).toBeVisible();
+  await page.getByRole("slider", { name: "Movement phase" }).fill("50");
+  await expect(
+    page.getByText("50% · Ascent · Bottom at 50%", { exact: true }),
+  ).toBeVisible();
+  await expect(
+    page.getByText(/Set B showed about .* more estimated knee flexion/),
+  ).toBeVisible();
+  expect(
+    await page.evaluate(
+      () => document.documentElement.scrollWidth <= innerWidth,
+    ),
+  ).toBe(true);
+  await page.screenshot({
+    path: testInfo.outputPath("comparison.png"),
+    fullPage: true,
+  });
+  await page.getByRole("link", { name: "Inspect this set" }).first().click();
+  await expect(
+    page.getByRole("heading", { name: "3 completed reps", exact: true }),
+  ).toBeVisible();
+  await page.getByLabel("Replay interval").selectOption("0");
+  await page.getByRole("button", { name: "Play", exact: true }).click();
+  await expect(
+    page.getByRole("button", { name: "Pause", exact: true }),
+  ).toBeVisible();
+  await page.getByRole("button", { name: "Pause", exact: true }).click();
+  await page.reload();
+  await expect(
+    page.getByRole("heading", { name: "3 completed reps", exact: true }),
+  ).toBeVisible();
+  const downloaded = page.waitForEvent("download");
+  await page.getByRole("button", { name: "Export session" }).click();
+  const download = await downloaded;
+  const file = await download.path();
+  expect(file).not.toBeNull();
+  const data = await readFile(file!, "utf8");
+  expect(JSON.parse(data).source).toBe("sample-synthetic");
+  await page.goto("/history");
+  await expect(page.getByRole("status").first()).toContainText("2 of 20");
+  await page
+    .getByLabel("Import a session JSON file, up to 5 MiB")
+    .setInputFiles({
+      name: "sample.json",
+      mimeType: "application/json",
+      buffer: Buffer.from(data),
+    });
+  await expect(page.getByRole("status").first()).toContainText("3 of 20");
+  await page
+    .getByLabel("Import a session JSON file, up to 5 MiB")
+    .setInputFiles({
+      name: "bad.json",
+      mimeType: "application/json",
+      buffer: Buffer.from('{"schemaVersion":99}'),
+    });
+  await expect(page.getByRole("status").first()).not.toContainText("3 of 20");
+  page.on("dialog", (d) => d.accept());
+  await page
+    .getByRole("button", { name: "Delete", exact: true })
+    .first()
+    .click();
+  await expect(page.getByRole("status").first()).toContainText("2 of 20");
+  await page
+    .getByRole("button", { name: "Delete all local movement data" })
+    .click();
+  await expect(page.getByRole("status").first()).toContainText(
+    "No saved sessions",
+  );
+  expect(requests.some((x) => x.includes("/mediapipe/"))).toBe(false);
+  expect(errors).toEqual([]);
+});
+
+test("prepared history, replay and comparison survive hard offline reloads", async ({
+  page,
+  context,
+}, testInfo) => {
+  test.setTimeout(120000);
+  await page.goto("/history");
+  await page
+    .getByRole("button", { name: "Open synthetic sample pair" })
+    .click();
+  await expect(page).toHaveURL(/\/compare\?/);
+  const compare = page.url();
+  await page
+    .getByRole("button", { name: "Prepare offline replay", exact: true })
+    .click();
+  await expect(page.getByRole("status").last()).toContainText(
+    "Offline replay ready",
+    { timeout: 70000 },
+  );
+  // A missing cached shell must be repairable without a different worker script.
+  await page.evaluate(async () => {
+    for (const name of await caches.keys())
+      if (name.startsWith("menhel-shell-") && !name.endsWith("-pending"))
+        await (await caches.open(name)).delete("/replay");
+  });
+  await page
+    .getByRole("button", { name: "Verify offline preparation", exact: true })
+    .click();
+  await expect(page.getByRole("status").last()).toContainText(
+    "Offline replay ready",
+    { timeout: 70000 },
+  );
+  await context.setOffline(true);
+  await page.reload();
+  await expect(
+    page.getByRole("heading", { name: "Limited comparison", exact: true }),
+  ).toBeVisible();
+  await page.getByRole("checkbox").check();
+  await expect(
+    page.getByRole("heading", { name: "Comparable", exact: true }),
+  ).toBeVisible();
+  await page.goto("/history");
+  await expect(page.getByRole("status").first()).toContainText("2 of 20");
+  await page.getByRole("link", { name: "Replay", exact: true }).first().click();
+  await expect(
+    page.getByRole("heading", { name: "3 completed reps", exact: true }),
+  ).toBeVisible();
+  await page.reload();
+  await expect(
+    page.getByRole("heading", { name: "Movement replay", exact: true }),
+  ).toBeVisible();
+  await page.getByRole("button", { name: "Play", exact: true }).click();
+  await expect(
+    page.getByRole("button", { name: "Pause", exact: true }),
+  ).toBeVisible();
+  await page.goto(compare);
+  await expect(
+    page.getByRole("heading", { name: "Limited comparison", exact: true }),
+  ).toBeVisible();
+  await page.screenshot({
+    path: testInfo.outputPath("offline.png"),
+    fullPage: true,
+  });
+});
+
+test("storage failures preserve a readable recovery path", async ({ page }) => {
+  await page.addInitScript(() => {
+    indexedDB.open = () => {
+      throw new DOMException("Test storage unavailable", "QuotaExceededError");
+    };
+  });
+  await page.goto("/history");
+  await expect(page.getByRole("status").first()).toContainText(
+    "Local storage unavailable",
+  );
+  await expect(
+    page.getByLabel("Import a session JSON file, up to 5 MiB"),
+  ).toBeVisible();
+});
+
+test("incomplete offline preparation never reports ready", async ({
+  page,
+  context,
+}) => {
+  test.setTimeout(90000);
+  await context.route("**/offline-inventory.json", (route) =>
+    route.fulfill({ status: 503, body: "Test unavailable" }),
+  );
+  await page.goto("/history");
+  await page
+    .getByRole("button", { name: "Prepare offline replay", exact: true })
+    .click();
+  await expect(page.getByRole("status").last()).toContainText(
+    /failed verification|timed out|unavailable/,
+    { timeout: 70000 },
+  );
+  await expect(page.getByRole("status").last()).not.toContainText(
+    "Offline replay ready",
+  );
+});
+
+test("a checkpointed draft recovers only completed cycles and the library cap never erases sessions", async ({
+  page,
+}) => {
+  test.setTimeout(90000);
+  await page.goto("/history");
+  await page
+    .getByRole("button", { name: "Open synthetic sample pair" })
+    .click();
+  await page.getByRole("link", { name: "Inspect this set" }).first().click();
+  const pending = page.waitForEvent("download");
+  await page.getByRole("button", { name: "Export session" }).click();
+  const exported = await pending;
+  const original = JSON.parse(await readFile((await exported.path())!, "utf8"));
+  // Seed an authored fixture as a draft solely to verify the recovery transaction.
+  await page.evaluate(async (s) => {
+    await new Promise<void>((resolve, reject) => {
+      const r = indexedDB.open("menhel-motion", 1);
+      r.onerror = () => reject(r.error);
+      r.onsuccess = () => {
+        const db = r.result,
+          tx = db.transaction("drafts", "readwrite");
+        tx.objectStore("drafts").put({
+          id: crypto.randomUUID(),
+          createdAt: s.createdAt,
+          profile: s.profile,
+          capture: s.capture,
+          samples: s.samples,
+        });
+        tx.oncomplete = () => {
+          db.close();
+          resolve();
+        };
+        tx.onerror = () => reject(tx.error);
+      };
+    });
+  }, original);
+  await page.goto("/history");
+  await page
+    .getByRole("button", { name: "Recover draft", exact: true })
+    .click();
+  await expect(page.getByRole("status").first()).toContainText("3 of 20");
+  await expect(page.getByText(/· interrupted/)).toBeVisible();
+  await expect(
+    page.getByRole("heading", { name: "Interrupted drafts", exact: true }),
+  ).toHaveCount(0);
+  await page.evaluate(async (s) => {
+    await new Promise<void>((resolve, reject) => {
+      const r = indexedDB.open("menhel-motion", 1);
+      r.onsuccess = () => {
+        const db = r.result,
+          tx = db.transaction("sessions", "readwrite"),
+          store = tx.objectStore("sessions");
+        store.clear();
+        for (let i = 0; i < 20; i++)
+          store.put({ ...s, id: crypto.randomUUID() });
+        tx.oncomplete = () => {
+          db.close();
+          resolve();
+        };
+        tx.onerror = () => reject(tx.error);
+      };
+    });
+  }, original);
+  await page.reload();
+  await expect(page.getByRole("status").first()).toContainText("20 of 20");
+  await page
+    .getByLabel("Import a session JSON file, up to 5 MiB")
+    .setInputFiles({
+      name: "overflow.json",
+      mimeType: "application/json",
+      buffer: Buffer.from(JSON.stringify(original)),
+    });
+  await expect(page.getByRole("status").first()).toContainText(
+    "Twenty sessions are already saved",
+  );
+  await page.reload();
+  await expect(page.getByRole("status").first()).toContainText("20 of 20");
+});

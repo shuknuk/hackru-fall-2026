@@ -1,10 +1,10 @@
 # Menhel Motion
 
-A new Next.js + MediaPipe PWA for comparing two side-view squat sets with local pose data. The M2 camera spike now provides explicit Start/Stop controls and a local MediaPipe skeleton, with worker CPU and main-thread CPU/GPU diagnostics. Recording, rep counting, comparison, installation and offline replay remain unimplemented. Physical-device performance is not yet verified.
+A Next.js + MediaPipe application for short side-view bodyweight squat sets, local landmark recording, skeleton replay and phase-aligned attempt comparison. The implementation now includes the M3–M8 feature flow. Physical camera accuracy, iPhone installation and device performance remain unverified. This is an observation tool, not a medical assessment.
 
 ## Build contract
 
-Read [the master MVP and roadmap](MENHEL_MOTION_MASTER_MVP.md), [execution evidence](docs/EXECUTION.md), and [agent instructions](AGENTS.md).
+Read [the master MVP and roadmap](MENHEL_MOTION_MASTER_MVP.md), [execution evidence](docs/EXECUTION.md), and [agent instructions](AGENTS.md). The user authorized continuing implementation before phone testing; deferred acceptance checks remain open.
 
 ## Run
 
@@ -15,9 +15,32 @@ npm ci
 npm run dev
 ```
 
-Verification uses `npm run lint`, `npm run typecheck`, `npm run build`, and `npm run test:e2e`. Browser binaries can be prepared with `npx playwright install chromium`.
+For a production/PWA check:
 
-See [the phone test checklist](docs/DEVICE_CHECKLIST.md) before claiming camera compatibility. The build prepares checksum-verified model/WASM assets; the initial build needs access to the official model download.
+```sh
+npm run lint
+npm run typecheck
+npm test
+npm run build
+npm run start
+npm run test:e2e
+```
+
+The initial build needs access to Google's pinned model download. Prebuild verifies exact model/SDK/WASM hashes. The production build creates versioned static offline shells, an asset inventory and a service worker. Offline preparation is explicitly user-triggered. Use production mode for offline tests.
+
+## Use
+
+Start at `/session`, choose the visible anatomical side and confirm a stable side view. Calibrate standing and one comfortable setup cycle, then record a set. Finish stops the camera and saves body landmarks locally. Record Another Set reuses calibration after a standing recheck. Sets are limited to ten completed reps or 90 seconds.
+
+`/history` provides labelled synthetic samples, local history, draft recovery, import/export/delete and set selection. `/replay?id=...` provides play/pause, scrubbing, rep selection, angle traces and gap-aware skeletons. `/compare?a=...&b=...` checks source/setup compatibility before numerical observations and aligns start, bottom and end while retaining real durations.
+
+Synthetic samples demonstrate software behavior, not a recorded person or pose accuracy. Imported sources are declared provenance; imports are labelled and metrics are recomputed. Twenty session slots and a 5 MiB import/export limit apply. Storage can fail or be evicted; keep exports of important data. Local history belongs to the browser origin and does not automatically move between deployment URLs or installed-app storage contexts.
+
+## Verification
+
+Browser tests run against the production build on a dedicated fresh port. Install the standard test browser with `npx playwright install chromium`. A nonstandard executable can be specified using `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH`. `PLAYWRIGHT_FAKE_VIDEO` enables explicit prerecorded webcam input for real SDK integration; it is test tooling only. The calibration/recording integration test replaces browser camera/worker APIs with explicitly simulated landmark sequences and a deterministic capture clock. Neither is physical-camera acceptance.
+
+See [the device checklist](docs/DEVICE_CHECKLIST.md) before claiming phone compatibility. Installation/offline readiness and movement heuristics require real-device checks. The five development-tool audit findings remain documented; the production-only audit returned zero findings.
 
 ## Provenance
 

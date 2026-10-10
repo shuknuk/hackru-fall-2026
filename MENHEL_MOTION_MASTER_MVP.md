@@ -2,7 +2,7 @@
 
 ## 0. What this document controls
 
-Version 1.0. Research checked on October 10, 2026. Implementation has not started.
+Version 1.1. Research checked on October 10, 2026. M3–M8 feature implementation is present; final browser verification and physical-device acceptance are recorded separately.
 
 Quick navigation
 
@@ -51,7 +51,7 @@ Do not turn a starting heuristic into a claim of clinical accuracy. Do not turn 
 | Imported application | React Native, Expo, TypeScript, custom Swift modules, now archived |
 | Native pose implementation | Apple Vision through `VNDetectHumanBodyPoseRequest` |
 | Current repetition signal | Hip movement rather than the new angle-based algorithm |
-| Web MVP | Clean web scaffold at M1; live tracking not implemented |
+| Web MVP | Camera, calibrated capture, replay, comparison and offline preparation implemented; device acceptance pending |
 
 The inherited README and `CLAUDE.md` describe some functionality more broadly than the code supports and describe the native tracking as MediaPipe. They are historical documentation. The Swift implementation is the authoritative evidence for the imported native tracker.
 
@@ -184,12 +184,12 @@ Before implementation milestone M1 passes
 
 | Item to freeze | Current status |
 | --- | --- |
-| Node and npm for implementation/deployment | Local Node 24.19.0/npm 11.9.0 verified; deployment pending |
+| Node and npm for implementation/deployment | Local Node 24.19.0/npm 11.9.0 verified; Node 24.x staging builds passed |
 | Next.js, React, React DOM | 16.4.0 / 19.3.0 / 19.3.0, build passed |
 | TypeScript, lint and styling packages | TS 5.9.3, ESLint 9.39.5/config 16.4.0, Tailwind/PostCSS plugin 4.3.3; checks passed |
-| MediaPipe SDK, WASM and model checksum | Pending asset preparation and device spike |
+| MediaPipe SDK, WASM and model checksum | SDK/model/WASM checksums prepared and browser inference verified; physical-device performance pending |
 | `idb`, Zod and Lucide | 8.0.4 / 4.6.5 / 1.55.0, pinned; features pending |
-| Vitest, Vite and Playwright | 5.0.3 / 8.3.4 / 1.64.0; browser binary download blocked |
+| Vitest, Vite and Playwright | 5.0.3 / 8.3.4 / 1.64.0; Chromium 153 browser provisioning workaround verified |
 
 See [the execution ledger](docs/EXECUTION.md) for the actual selected versions and clean build evidence. MediaPipe assets, phone/browser runtime and deployment evidence remain separate gates.
 
@@ -699,7 +699,7 @@ Cache strategy is a build decision
 | Versioned build chunks | Cache first within the active build cache |
 | Required static shell documents | Network first, exact compatible cached document when offline |
 | Manifest and worker script | Revalidate; serve worker with update-friendly headers |
-| Versioned model/WASM | Cache after complete successful retrieval and verification |
+| Versioned model/WASM | Same-origin delivery with build-time checksum verification; excluded from required offline replay cache |
 | Personal movement data | IndexedDB only, not service-worker HTTP cache |
 | Optional AI endpoint | Network only, never needed by offline replay |
 | Unknown requests | Pass through; no wildcard cache-everything rule |
@@ -756,7 +756,7 @@ Depends on M0 for submitted-work choices.
 
 - [x] Move imported files into the historical archive as described in section 5.
 - [x] Scaffold a stable Next.js App Router project with TypeScript and Tailwind.
-- [ ] Resolve and pin dependencies through section 3.2.
+- [x] Resolve and pin dependencies through section 3.2.
 - [x] Add root agent instructions and correct obsolete native-project guidance.
 - [ ] Add the selected, reviewed coding skills where the agent supports them.
 - [x] Add scripts for dev, build, start, lint, typecheck, unit tests and browser tests.
@@ -783,11 +783,11 @@ Exit evidence is real landmarks from live camera input and measured performance 
 
 Depends on the SDK adapter shape from M2.
 
-- [ ] Define versioned pose, profile, session, rep and worker schemas.
-- [ ] Implement an engine adapter and a fixture adapter behind the same interface.
-- [ ] Create labelled synthetic sequences for complete reps, partials, pauses, jitter, gaps, side loss and repeated timestamps.
+- [x] Define versioned pose, profile, session, rep and worker schemas.
+- [x] Implement an engine adapter and a fixture adapter behind the same interface.
+- [x] Create labelled synthetic sequences for complete reps, partials, pauses, jitter, gaps, side loss and repeated timestamps.
 - [ ] Create a consented real-motion landmark fixture if feasible; record its provenance separately.
-- [ ] Add bounded recorder buffers and a validated session builder.
+- [x] Add bounded recorder buffers and a validated session builder.
 
 Exit evidence is schema rejection of malformed data and a complete fixture-driven session. Fixtures test downstream behavior. They are never advertised as live inference accuracy.
 
@@ -795,26 +795,28 @@ Exit evidence is schema rejection of malformed data and a complete fixture-drive
 
 Depends on M3.
 
-- [ ] Add aspect-corrected geometry with null-safe outputs.
-- [ ] Add separate quality gates for knee and hip metrics.
-- [ ] Lock the visible side and implement time-aware smoothing.
-- [ ] Implement standing baseline and comfortable setup cycle calibration.
-- [ ] Implement the state machine, durations, dwell and reset rules.
-- [ ] Validate one complete cycle counts once and incomplete/materially gapped cycles do not.
+- [x] Add aspect-corrected geometry with null-safe outputs.
+- [x] Add separate quality gates for knee and hip metrics.
+- [x] Lock the visible side and implement time-aware smoothing.
+- [x] Implement standing baseline and comfortable setup cycle calibration.
+- [x] Implement the state machine, durations, dwell and reset rules.
+- [x] Validate one complete cycle counts once and incomplete/materially gapped cycles do not.
 - [ ] Test five manually counted reps across at least three consenting testers with different heights if available.
 - [ ] Repeat camera placement and adjust only documented heuristic values.
 
 Exit evidence is passing logic fixtures and manual-count agreement on the recorded pilot checks. Materially gapped cycles are invalid; very short gaps follow the explicit coverage and anchor rules in section 6.3. If fewer testers are available, report the smaller sample rather than claiming broad validation. This is a usability pilot, not a clinical accuracy study.
 
+Checked implementation items below refer to deterministic fixtures and automated Chromium evidence. Physical-person exit evidence remains pending.
+
 ### M5. Complete capture, results and persistence
 
 Depends on M4.
 
-- [ ] Connect setup, calibration, ready, recording and finish states.
-- [ ] Keep Finish usable during tracking loss.
-- [ ] Save bounded chunks, finalize once and exclude partial reps from summaries.
-- [ ] Show quality, defined metrics, no-valid-rep state and unsaved/export recovery.
-- [ ] Add history, schema migration and reload verification.
+- [x] Connect setup, calibration, ready, recording and finish states.
+- [x] Keep Finish usable during tracking loss.
+- [x] Save bounded snapshots, finalize once and exclude partial reps from summaries (documented checkpoint deviation in section 21).
+- [x] Show quality, defined metrics, no-valid-rep state and unsaved/export recovery.
+- [x] Add history, strict schema-version rejection and reload verification (schema 1 only; future migration remains deferred).
 - [ ] Test interruption, a late inference reply, quota/write failure and recovery.
 
 Exit evidence is one real captured session that reloads correctly with matching reps, timestamps and metrics, and camera tracks stopped after capture.
@@ -823,11 +825,11 @@ Exit evidence is one real captured session that reloads correctly with matching 
 
 Depends on M5.
 
-- [ ] Draw recorded skeletons using source aspect and stable transforms.
-- [ ] Add rep selection, timestamped playback, scrubbing and speed controls.
-- [ ] Show angles, event markers, tracking gaps and a text-readable summary.
-- [ ] Add keyboard support and reduced-motion behavior.
-- [ ] Verify paused/seek behavior and no invented interpolation across invalid gaps.
+- [x] Draw recorded skeletons using source aspect and stable transforms.
+- [x] Add rep selection, timestamped playback, scrubbing and speed controls.
+- [x] Show angles, event markers, tracking gaps and a text-readable summary.
+- [x] Add keyboard support and reduced-motion behavior.
+- [x] Verify paused/seek behavior and no invented interpolation across invalid gaps.
 
 Exit evidence is playback of the real session from M5, not only sample data. Seek and displayed metrics must refer to the same underlying timestamp.
 
@@ -835,12 +837,12 @@ Exit evidence is playback of the real session from M5, not only sample data. See
 
 Depends on M6.
 
-- [ ] Capture Set B with a setup recheck and compatible profile.
-- [ ] Implement compatibility classification and explain failures.
-- [ ] Compute valid-rep medians, variation and directional deltas.
-- [ ] Implement start/bottom/end alignment without changing actual duration metrics.
-- [ ] Add selected-rep comparison and matching text values.
-- [ ] Implement deterministic observation rules with evidence IDs and sensitivity gates.
+- [x] Capture Set B with a setup recheck and compatible profile.
+- [x] Implement compatibility classification and explain failures.
+- [x] Compute valid-rep medians, variation and directional deltas.
+- [x] Implement start/bottom/end alignment without changing actual duration metrics.
+- [x] Add selected-rep comparison and matching text values.
+- [x] Implement deterministic observation rules with evidence IDs and sensitivity gates.
 
 Exit evidence is two live sessions compared end to end, correct delta signs, and safe behavior with incompatible/low-quality fixtures. Comparison and grounded observations are mandatory parts of this MVP.
 
@@ -848,13 +850,13 @@ Exit evidence is two live sessions compared end to end, correct delta signs, and
 
 Depends on working M6/M7 routes. Manifest basics may be prepared earlier.
 
-- [ ] Add verified icon sizes, manifest metadata and install guidance.
-- [ ] Implement the narrow cache inventory and offline preparation state.
-- [ ] Test hard reload of history/replay/compare while offline after preparation.
-- [ ] Verify lazy replay chunks, model cache misses and an incomplete prepare attempt.
+- [x] Add verified icon sizes, manifest metadata and install guidance.
+- [x] Implement the narrow cache inventory and offline preparation state.
+- [x] Test hard reload of history/replay/compare while offline after preparation.
+- [x] Verify lazy replay chunks, model cache misses and an incomplete prepare attempt.
 - [ ] Verify standalone installation and permission flow on an actual iPhone.
-- [ ] Verify waiting-update behavior during an active recording.
-- [ ] Implement validated export/import and local data deletion.
+- [x] Verify waiting-update behavior during an active recording.
+- [x] Implement validated export/import and local data deletion.
 
 Exit evidence is a previously saved session replaying from a hard offline reload and a tested install flow. Live offline tracking is not required to pass M8.
 
@@ -870,7 +872,7 @@ Depends on M0–M8.
 - [ ] Rehearse the three-minute demo three times without modifying code between runs.
 - [ ] Prepare a consented demo recording and exported fixture fallback.
 - [ ] Verify the submitted URL and commit correspond to the frozen build.
-- [ ] Update README with actual run commands and actual implemented features.
+- [x] Update README with actual run commands and actual implemented features.
 
 Exit evidence is the complete definition of done in section 16. Stretch work starts only after this gate.
 
@@ -1100,6 +1102,20 @@ Additional evaluated community sources
 | M0 constraints and organizer resolution | Constraints recorded; partial | Schedule/team limit verified; reuse policy, actual team and devices unresolved; see docs/EXECUTION.md |
 | M1 clean web scaffold | Built/deployed; acceptance partial | Install/lint/typecheck/build/provenance and HTTPS responses passed; desktop navigation verified; automated desktop/mobile-sized Chromium suite passed; keyboard/physical-phone and upstream skill installation evidence pending; see docs/EXECUTION.md |
 | M2 camera spike | Implemented; acceptance partial | Real SDK inference verified with prerecorded browser input; physical-camera/device performance pending; see docs/EXECUTION.md |
-| M3–M9 implementation and release | Not started | No recording, repetition counting, comparison or offline installation yet |
+| M3–M8 feature implementation | Implemented; acceptance in progress | Versioned contracts, calibrated recording, local persistence, replay, comparison, data controls, manifest and offline preparation; see docs/EXECUTION.md |
+| M9 release acceptance | Partial | Physical-device checks, real-person movement pilot, installation and demo rehearsal remain pending |
 
-The current implementation is the M2 camera spike. Checked implementation tasks do not establish the real-device exit gate. Organizer/device evidence remains open in M0. Do not skip directly to polished dashboards.
+The current implementation includes the M3–M8 feature flow. The user explicitly authorized continuing before iPhone access. Checked implementation tasks do not establish the real-device exit gate. Organizer/device evidence remains open in M0. Do not skip directly to polished dashboards.
+
+## 21. Implemented decisions and deferred acceptance
+
+The user explicitly authorized continuing M3 and later work on October 10 while the iPhone was unavailable. Implementation order remains M3 contracts → M4 motion logic → M5 persistence → M6 replay → M7 comparison → M8 offline. Phone/real-person/release gates remain deferred, not waived.
+
+- The visible anatomical side is explicitly selected and confirmed by the user, then locked during calibration/capture. Automatic sustained-confidence side selection is deferred; both anatomical index mappings are tested.
+- Each session contains one capture segment. Hiding, interruption or camera changes end it; another set starts a new session with a setup recheck. No repetition is joined across segments or interruptions.
+- Zod validates bounded coordinates, confidence, timestamps, calibration policy, anchors and provenance. Imports preserve original timestamps and declared source, receive a new local ID, are labelled imported, and recompute angles/filtering/reps/summary from landmarks.
+- Draft checkpoints persist a bounded snapshot approximately every two seconds, replacing that session's draft rather than appending unbounded chunks. Final session/profile/draft removal is atomic. Recovery may omit the most recent two seconds and excludes unfinished cycles.
+- Comparison uses fixed standing geometry per session, a 101-position phase scrubber and one playback clock. It retains original seconds. Source/setup/version gates precede deltas; sensitivity uses the standing noise estimate. Imported provenance cannot be independently authenticated.
+- Offline preparation verifies literal versioned copies of prerendered HTML and all generated JS/CSS chunks plus icons/manifest. Full-document links support query-selected local sessions without caching RSC responses as HTML. Model/WASM are excluded from the required replay inventory.
+- A cache completion marker is written only after verified assets are copied. Missing cached files can be repaired explicitly. Updates query every app client before activating; active capture or an unresponsive client blocks the update. Old caches remain while older clients report using them. Personal data is never in the HTTP cache.
+- Manifest/icon delivery and Chromium offline behavior do not prove iPhone installation, standalone storage behavior, live performance or movement accuracy. These checks remain in DEVICE_CHECKLIST.md and M9.
