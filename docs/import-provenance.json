@@ -1,0 +1,242 @@
+{
+  "source": "shuknuk/menhel-ai-analyzer",
+  "sourceCommit": "943ac34aa12d4f900a4a170f8dbde6234883bed2",
+  "importCommit": "7a77ebaf1c1cd3b37dc190816834f10b912f4862",
+  "files": [
+    {
+      "path": ".eslintrc.json",
+      "sha256": "67e5ad54f05d6e981eb5120974df5a0970ea56d6c0d837acdd440149c4d97ba7",
+      "bytes": 25
+    },
+    {
+      "path": ".gitignore",
+      "sha256": "5d669f16b0859838465402d7f238b08202966a449ab903134dc042663f92309e",
+      "bytes": 447
+    },
+    {
+      "path": "CLAUDE.md",
+      "sha256": "778aa218674dd5f614020ba3568437d2faa53d1deca1ac85941c8711142bce85",
+      "bytes": 3989
+    },
+    {
+      "path": "COMPONENT_TAILWIND_GUIDELINES.md",
+      "sha256": "46d2ba800489d3cd3545ba5c3b8dd0694355b3c5d82e7e6c3610c83077c154a8",
+      "bytes": 3476
+    },
+    {
+      "path": "README.md",
+      "sha256": "e820cbab643ae81d9de6e33208b89568192edee2fcec78abbc5302ca2d66e86c",
+      "bytes": 8696
+    },
+    {
+      "path": "app.json",
+      "sha256": "d600eab9ca8aec7cfc04d7123f7ffba14d641f3bf28b67e88e6e59e8d32a8a36",
+      "bytes": 791
+    },
+    {
+      "path": "app/(tabs)/_layout.tsx",
+      "sha256": "05ac36d323213f841c1d1df23b16dad5fe9baf2391ec14992e27e7133296c5a3",
+      "bytes": 3223
+    },
+    {
+      "path": "app/(tabs)/body.tsx",
+      "sha256": "012c7f4e05e366b9c55d88cfcb0e2169d8cc15e4053b9b1f4ebd674df7d4cd48",
+      "bytes": 10358
+    },
+    {
+      "path": "app/(tabs)/chat.tsx",
+      "sha256": "951b22c642ef988ff40d2ad7335c3d5b280466118feedc8e653c62bb8b505158",
+      "bytes": 6121
+    },
+    {
+      "path": "app/(tabs)/index.tsx",
+      "sha256": "0b0487c27042e793469c5bb78c34199566773de460e51ff33cd8a8a5d06d9512",
+      "bytes": 13364
+    },
+    {
+      "path": "app/(tabs)/profile.tsx",
+      "sha256": "abae35930a2b50b1bea792823de84a1d62eece832295f6834e4753c179a5df89",
+      "bytes": 10455
+    },
+    {
+      "path": "app/(tabs)/recover.tsx",
+      "sha256": "ac699e7fabfd41342d10a347bf4ee4586be1aa5f8ad2c3bed3d311a12dce632a",
+      "bytes": 18528
+    },
+    {
+      "path": "app/(tabs)/stats.tsx",
+      "sha256": "ed1b9a97ea13b9994109209b44cb24e6b9ac3c3dcd79f3214919e1dc8a85e18d",
+      "bytes": 12477
+    },
+    {
+      "path": "app/(tabs)/videos.tsx",
+      "sha256": "e8e18d7369a3552da77bafd9fb8322c7510b540e5fe1400301f2872368697ca6",
+      "bytes": 12617
+    },
+    {
+      "path": "app/_layout.tsx",
+      "sha256": "e5ed7cac2ed865fd0aaff05c5ee4e0e384964e750b709a055ffa672e3568c79f",
+      "bytes": 709
+    },
+    {
+      "path": "app/hand-tracker.tsx",
+      "sha256": "5611eed60fdf21f822a4402be42175569af52fd81bc399c15cfe4b0127a10cf2",
+      "bytes": 9881
+    },
+    {
+      "path": "app/squat-tracker.tsx",
+      "sha256": "f514927f41f3e085c09e45bd71d45b9bbac53e76aa3b7a7549813e4dd6890783",
+      "bytes": 5396
+    },
+    {
+      "path": "assets/adaptive-icon.png",
+      "sha256": "5f4c0a732b6325bf4071d9124d2ae67e037cb24fcc9c482ef82bea742109a3b8",
+      "bytes": 17547
+    },
+    {
+      "path": "assets/favicon.png",
+      "sha256": "24272cdaeff82cc5facdaccd982a6f05b60c4504704bbf94c19a6388659880bb",
+      "bytes": 1466
+    },
+    {
+      "path": "assets/icon.png",
+      "sha256": "74c64047eb557b1341bba7a2831eedde9ddb705e6451a9ad9f5552bf558f13de",
+      "bytes": 22380
+    },
+    {
+      "path": "assets/splash-icon.png",
+      "sha256": "5f4c0a732b6325bf4071d9124d2ae67e037cb24fcc9c482ef82bea742109a3b8",
+      "bytes": 17547
+    },
+    {
+      "path": "babel.config.js",
+      "sha256": "f81b044b5bba815f3e5b5c8882c9090e66939efddbcea365027c975fe6bbd314",
+      "bytes": 194
+    },
+    {
+      "path": "components/BouncingLogo.tsx",
+      "sha256": "2f59dc51bf3a581aad5fdc9e55f5423a74d8391277547f9e7b25210dbe483c61",
+      "bytes": 2883
+    },
+    {
+      "path": "components/ChatBubble.tsx",
+      "sha256": "abc2a84cb0634a999cd259f105c23b6c8c2f2048e6070b0e5a7de5e85ca37ef3",
+      "bytes": 2693
+    },
+    {
+      "path": "components/GlassCard.tsx",
+      "sha256": "cc00f7f1d376f99c4e6fbdf15dcf6276a12a9a570a83b2dc15aac888224794f5",
+      "bytes": 2402
+    },
+    {
+      "path": "components/OrbitSystem.tsx",
+      "sha256": "63ff31de9e8cc95f3dd2b5c17bbd6f97815920f37ea34142149f06605720361d",
+      "bytes": 7066
+    },
+    {
+      "path": "components/SquatCamera.tsx",
+      "sha256": "674ca8bda470ece33b014fdf176156f00e470950041413e960799caae6b85741",
+      "bytes": 4719
+    },
+    {
+      "path": "components/TrendGraph.tsx",
+      "sha256": "6d1f1582370c9fc4d77329d3b30482b9bb6623a8f934c649ed520b3e618c1941",
+      "bytes": 7719
+    },
+    {
+      "path": "constants/theme.ts",
+      "sha256": "799852e6e57ecd8e52afa45c9d03ee8e2ba5010f392c89d6ff9ac2324de433a3",
+      "bytes": 2923
+    },
+    {
+      "path": "hooks/useMomentum.ts",
+      "sha256": "93e02b10b4f80d33daf49b74543138926d4bb122829fbc7f9c90593041b44b5f",
+      "bytes": 3953
+    },
+    {
+      "path": "hooks/useShakeDetect.ts",
+      "sha256": "1cc500e1ccd827ca1498c4c09ed132dd0b583544cc00d04bb60ebc8be3035da7",
+      "bytes": 2125
+    },
+    {
+      "path": "hooks/useTheme.tsx",
+      "sha256": "7b42c72103943dc8a481ea9ebbb7cd9c9bf4647afb4e6db502c203bcf2ef4402",
+      "bytes": 1584
+    },
+    {
+      "path": "index.ts",
+      "sha256": "178e13dae7557a85382cce30565a88878c7840c85dc2fac1a569bc00e623be88",
+      "bytes": 28
+    },
+    {
+      "path": "metro.config.js",
+      "sha256": "4c6fab60cf5f559803b3e70022eaba94c22ca920049b25f61c7ee602ca1c90c2",
+      "bytes": 185
+    },
+    {
+      "path": "modules/mediapipe-pose/expo-module.config.json",
+      "sha256": "7aec06443e4461d7d1e4623f1b65f4a310780b1a15b7f2235abddfb1bd8cc87b",
+      "bytes": 190
+    },
+    {
+      "path": "modules/mediapipe-pose/index.tsx",
+      "sha256": "fc641556d3f876afa992084344cd7aef08000fb6ae681823bf81d0046868c027",
+      "bytes": 1844
+    },
+    {
+      "path": "modules/mediapipe-pose/ios/HandTrackerModule.swift",
+      "sha256": "2879f32abc38fc2bb94188829585812ff1fbb10e9bc599577bc75745502ec093",
+      "bytes": 249
+    },
+    {
+      "path": "modules/mediapipe-pose/ios/HandTrackerView.swift",
+      "sha256": "8db5d4dda3728c852ad932dd710c58d568574afc10d780bc9fab61e6a7614f01",
+      "bytes": 9093
+    },
+    {
+      "path": "modules/mediapipe-pose/ios/MediapipePose.podspec",
+      "sha256": "b5663b12a09cb95a10da5e67eed897278e97e684d52776ad2e9f111d3489a678",
+      "bytes": 804
+    },
+    {
+      "path": "modules/mediapipe-pose/ios/MediapipePoseModule.swift",
+      "sha256": "c95d1bbea94865d733724c59ab9979e505e291f95a586960d532912e3c87a8a4",
+      "bytes": 512
+    },
+    {
+      "path": "modules/mediapipe-pose/ios/MediapipePoseView.swift",
+      "sha256": "8e6402694fefbb51615027f14cc04106f9d44c3cdb4e4193f1b99a8dfdce7d44",
+      "bytes": 5217
+    },
+    {
+      "path": "modules/mediapipe-pose/package.json",
+      "sha256": "09e550600a8b9ec5602b1ae06bfad82797de4a8fa44506b15c605a3808c69c71",
+      "bytes": 81
+    },
+    {
+      "path": "package-lock.json",
+      "sha256": "adc65a14b89186af830d31adc0e4cda3965e3b3b06b00c91be86ca8721266313",
+      "bytes": 558053
+    },
+    {
+      "path": "package.json",
+      "sha256": "a098521b0a0b65e7bce5f540fddad25a68b76cbac7851d313197ef2cfaa5e79c",
+      "bytes": 1386
+    },
+    {
+      "path": "tsconfig.json",
+      "sha256": "712583ff9cdb4b4e4f9b000a4a56d68db8dc1921cbfbc36d490a3a9f2be3dd72",
+      "bytes": 85
+    },
+    {
+      "path": "types/health.ts",
+      "sha256": "20a91bd9b4750cdb5403a5f86b223b7ad14acc58472d65f68c758d84a497bc02",
+      "bytes": 2664
+    },
+    {
+      "path": "utils/storage.ts",
+      "sha256": "ecdeb642b4b3d2c705d94bf698e6abda7146b1c29af17fe9c2218f6deacefd63",
+      "bytes": 4936
+    }
+  ]
+}

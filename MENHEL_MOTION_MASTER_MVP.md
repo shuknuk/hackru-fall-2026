@@ -48,10 +48,10 @@ Do not turn a starting heuristic into a claim of clinical accuracy. Do not turn 
 | Import commit | `7a77ebaf1c1cd3b37dc190816834f10b912f4862` |
 | Imported files | 47 tracked files, including four PNG assets |
 | Exact imported tree | `f586e59619ec16c33264ff4c11ffb6e6648e9f6b` |
-| Current application | React Native, Expo, TypeScript, custom Swift modules |
+| Imported application | React Native, Expo, TypeScript, custom Swift modules, now archived |
 | Native pose implementation | Apple Vision through `VNDetectHumanBodyPoseRequest` |
 | Current repetition signal | Hip movement rather than the new angle-based algorithm |
-| Web MVP | Not implemented |
+| Web MVP | Clean web scaffold at M1; live tracking not implemented |
 
 The inherited README and `CLAUDE.md` describe some functionality more broadly than the code supports and describe the native tracking as MediaPipe. They are historical documentation. The Swift implementation is the authoritative evidence for the imported native tracker.
 
@@ -66,7 +66,9 @@ The official website identifies Fall 2026 as a 24-hour event on October 10–11 
 **Unresolved before submission**
 
 - The Fall 2026 policy on pre-existing code and earlier projects.
-- The actual hacking cutoff, submission requirements, team limits, AI-use disclosure, and current sponsor challenges.
+- Submission requirements, AI-use disclosure, and current sponsor challenges.
+
+The official schedule was rechecked during implementation on October 10. It lists Saturday noon hacking start, Sunday noon submissions due, and Sunday 1 PM judging start. The FAQ sets a maximum of four humans per team. Actual team size and demo devices remain unconfirmed. See [execution evidence](docs/EXECUTION.md). [S01]
 - Whether an earlier project that was not judged may be reused. Not winning or not presenting does not establish permission.
 
 The public website did not resolve these rules, and the attempted Fall 2026 Devpost URLs were inaccessible during research. Do not use Fall 2025 rules as proof of Fall 2026 rules. Ask an organizer and record the answer, source, and time in this document. No contact has been sent on the team's behalf.
@@ -140,7 +142,7 @@ Optional speech feedback may read short setup or rep messages. It requires user 
 
 ### 3.1 Chosen stack
 
-These are build decisions. Exact npm versions will be resolved and recorded before scaffolding is accepted. Documentation versions are not proof that the same package release is available or compatible.
+These are build decisions. Exact direct versions are pinned in package.json and recorded with compatibility metadata in [the dependency ledger](docs/dependency-metadata.json). The clean install/typecheck/lint/build passed; real-device acceptance remains pending. Documentation versions are not proof that the same package release is available or compatible.
 
 | Layer | Selected technology | Responsibility | Guideline sources |
 | --- | --- | --- | --- |
@@ -182,14 +184,14 @@ Before implementation milestone M1 passes
 
 | Item to freeze | Current status |
 | --- | --- |
-| Node and npm for implementation/deployment | Pending compatibility check |
-| Next.js, React, React DOM | Pending registry resolution and build |
-| TypeScript, lint and styling packages | Pending registry resolution |
+| Node and npm for implementation/deployment | Local Node 24.19.0/npm 11.9.0 verified; deployment pending |
+| Next.js, React, React DOM | 16.4.0 / 19.3.0 / 19.3.0, build passed |
+| TypeScript, lint and styling packages | TS 5.9.3, ESLint 9.39.5/config 16.4.0, Tailwind/PostCSS plugin 4.3.3; checks passed |
 | MediaPipe SDK, WASM and model checksum | Pending asset preparation and device spike |
-| `idb`, Zod and Lucide | Pending registry resolution |
-| Vitest, Vite and Playwright | Pending registry resolution |
+| `idb`, Zod and Lucide | 8.0.4 / 4.6.5 / 1.55.0, pinned; features pending |
+| Vitest, Vite and Playwright | 5.0.3 / 8.3.4 / 1.64.0; browser binary download blocked |
 
-Leaving these fields pending is intentional. This plan does not invent a tested dependency combination.
+See [the execution ledger](docs/EXECUTION.md) for the actual selected versions and clean build evidence. MediaPipe assets, phone/browser runtime and deployment evidence remain separate gates.
 
 Registry metadata snapshot, retrieved with `npm view <package> version engines peerDependencies license --json` on October 10, 2026
 
@@ -1095,7 +1097,8 @@ Additional evaluated community sources
 | Research framework/library guidance | Passed | Source registry and explicit unresolved items |
 | Research applicable AI skills | Passed | Inspected source files, revisions, applicability and prerequisite checks |
 | Write this master MVP | Complete planning artifact | This document |
-| M0 constraints and organizer resolution | Not started | Event details/team constraints still require confirmation |
-| M1–M9 implementation and release | Not started | No Next.js MVP runtime has been built or tested |
+| M0 constraints and organizer resolution | Constraints recorded; partial | Schedule/team limit verified; reuse policy, actual team and devices unresolved; see docs/EXECUTION.md |
+| M1 clean web scaffold | In progress | New web shell and archived source; verification evidence in docs/EXECUTION.md |
+| M2–M9 implementation and release | Not started | No live pose runtime has been verified |
 
-The next implementation action is M0, followed by the clean scaffold and real-device MediaPipe spike. Do not skip directly to polished dashboards.
+The current implementation is M1. Real-device MediaPipe work follows the scaffold checks. Organizer/device evidence remains open in M0. Do not skip directly to polished dashboards.
