@@ -1,5 +1,5 @@
 import type { Session, Rep, Sample } from "./schema";
-import { summary } from "./analysis";
+import { MAX_VALID_SAMPLE_INTERVAL_MS, summary } from "./analysis";
 export function compatibility(a: Session, b: Session, confirmed: boolean) {
   const reasons: string[] = [];
   if (
@@ -88,7 +88,7 @@ export function sampleAt(samples: Sample[], time: number): Sample | null {
     !b ||
     !a.valid ||
     !b.valid ||
-    b.t - a.t > 150 ||
+    b.t - a.t > MAX_VALID_SAMPLE_INTERVAL_MS ||
     a.joints.length !== 22 ||
     b.joints.length !== 22
   )

@@ -31,6 +31,12 @@ export const CONNECTIONS = [
   [30, 32],
   [28, 32],
 ];
+// A valid pose result is evidence that tracking is present even when inference is
+// slower than the drawing loop. Four processed frames per second is sufficient
+// for the detector's dwell rules; explicit invalid samples still use the much
+// shorter loss tolerance below.
+export const MAX_VALID_SAMPLE_INTERVAL_MS = 400;
+export const MAX_TRACKING_LOSS_MS = 150;
 export function median(values: number[]): number | null {
   if (!values.length) return null;
   const a = [...values].sort((x, y) => x - y);
@@ -165,7 +171,7 @@ export class SquatDetector {
       throw new Error("Non-increasing detector timestamp");
     this.last = s;
     const gap = prev ? s.t - prev.t : 0;
-    if (gap > 150) {
+    if (gap > MAX_VALID_SAMPLE_INTERVAL_MS) {
       this.reset();
       this.gapStart = null;
     }
@@ -174,7 +180,7 @@ export class SquatDetector {
         this.gapStart = prev?.t ?? s.t;
         this.gapValue = prev?.filtered ?? null;
       }
-      if (s.t - this.gapStart > 150) this.reset();
+      if (s.t - this.gapStart > MAX_TRACKING_LOSS_MS) this.reset();
       return null;
     }
     const x = s.filtered,
@@ -185,7 +191,7 @@ export class SquatDetector {
         [p.stand, p.down, p.qualify].some(
           (t) => (this.gapValue! - t) * (x - t) <= 0,
         );
-      if (s.t - this.gapStart > 150 || crossed) this.reset();
+      if (s.t - this.gapStart > MAX_TRACKING_LOSS_MS || crossed) this.reset();
       this.gapStart = null;
     }
     if (this.candidate && s.t - this.candidate.start > 15000) this.reset();
@@ -223,7 +229,7 @@ export class SquatDetector {
       return null;
     }
     const c = this.candidate!;
-    if (prev?.valid && gap <= 150) c.validMs += gap;
+    if (prev?.valid && gap <= MAX_VALID_SAMPLE_INTERVAL_MS) c.validMs += gap;
     if (x > c.peak) {
       c.peak = x;
       c.bottom = s.t;
@@ -306,7 +312,7 @@ export function trackingCoverage(samples: Sample[]) {
     const a = samples[i - 1],
       b = samples[i],
       dt = b.t - a.t;
-    if (a.valid && b.valid && dt <= 150) valid += dt;
+    if (a.valid && b.valid && dt <= MAX_VALID_SAMPLE_INTERVAL_MS) valid += dt;
   }
   const duration = samples.length
     ? samples[samples.length - 1].t - samples[0].t

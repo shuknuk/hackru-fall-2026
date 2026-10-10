@@ -4,6 +4,7 @@ import PoseSpike from "./PoseSpike";
 import type { Joint } from "@/lib/pose/types";
 import {
   makeProfile,
+  MAX_VALID_SAMPLE_INTERVAL_MS,
   measure,
   median,
   mad,
@@ -64,11 +65,15 @@ export default function CaptureSession() {
   const recording = useRef<Recording | null>(null);
   const clock = useRef(0);
   const lastUI = useRef(0);
+  const poseTimes = useRef<number[]>([]);
   const [telemetry, setTelemetry] = useState({
     count: 0,
     knee: null as number | null,
     hip: null as number | null,
     seconds: 0,
+    phase: "Waiting",
+    poseRate: 0,
+    tracking: "Waiting",
   });
   const cameraControl = useRef<{ stop: () => void } | null>(null);
   const [cameraReady, setCameraReady] = useState(false);
@@ -193,8 +198,9 @@ export default function CaptureSession() {
     width: number,
     height: number,
   ) {
-    const frameGap = clock.current ? time - clock.current : 0;
     clock.current = time;
+    poseTimes.current.push(time);
+    poseTimes.current = poseTimes.current.filter((t) => time - t <= 3000);
     const capture = meta.current;
     if (!capture) return;
     if (width !== capture.width || height !== capture.height) {
@@ -233,7 +239,7 @@ export default function CaptureSession() {
         c.start ??= time;
         c.values.push(x);
         if (c.values.length > 60) c.values.shift();
-        if (time - c.start >= 1500 && c.values.length >= 12) {
+        if (time - c.start >= 1500 && c.values.length >= 6) {
           const baseline = median(c.values)!;
           const noise = mad(c.values)!;
           if (noise > 5) {
@@ -295,10 +301,6 @@ export default function CaptureSession() {
       }
     }
     const r = recording.current;
-    if (r && frameGap > 150)
-      setNotice(
-        "Tracking is too sparse for continuous rep timing. Try another engine or improve the setup; interrupted cycles are excluded.",
-      );
     if (r) {
       const t = time - r.start;
       if (
@@ -337,11 +339,28 @@ export default function CaptureSession() {
     }
     if (time - lastUI.current >= 200) {
       lastUI.current = time;
+      const times = poseTimes.current;
+      const poseRate =
+        times.length > 1
+          ? ((times.length - 1) * 1000) / (times[times.length - 1] - times[0])
+          : 0;
       setTelemetry({
         knee: m.knee,
         hip: m.hip,
         count: r?.detector.reps.length ?? 0,
         seconds: r ? (time - r.start) / 1000 : 0,
+        phase: r
+          ? r.detector.phase[0].toUpperCase() + r.detector.phase.slice(1)
+          : stage === "calibrating"
+            ? "Setup"
+            : "Waiting",
+        poseRate,
+        tracking:
+          m.knee === null
+            ? "Pose lost"
+            : poseRate > 0 && poseRate < 6
+              ? "Tracking · low rate"
+              : "Tracking",
       });
     }
   }
@@ -354,7 +373,7 @@ export default function CaptureSession() {
       !capture ||
       stage !== "ready" ||
       !confirmed ||
-      performance.now() - clock.current > 200 ||
+      performance.now() - clock.current > MAX_VALID_SAMPLE_INTERVAL_MS ||
       telemetry.knee === null ||
       telemetry.knee > p.stand
     ) {
@@ -482,10 +501,24 @@ export default function CaptureSession() {
             <dt>Set elapsed</dt>
             <dd>{telemetry.seconds.toFixed(1)} s</dd>
           </div>
+          <div>
+            <dt>Movement phase</dt>
+            <dd>{telemetry.phase}</dd>
+          </div>
+          <div>
+            <dt>Processed pose rate</dt>
+            <dd>{telemetry.poseRate ? `${telemetry.poseRate.toFixed(1)} fps` : "—"}</dd>
+          </div>
+          <div>
+            <dt>Tracking state</dt>
+            <dd>{telemetry.tracking}</dd>
+          </div>
         </dl>
         <p className="status">
-          Ten completed reps or 90 seconds maximum. Tracking loss invalidates
-          incomplete movement. Stop camera ends a set as interrupted.
+          Ten completed reps or 90 seconds maximum. A low pose rate remains
+          valid when each processed sample contains the selected leg. Lost-pose
+          samples invalidate incomplete movement. Stop camera ends a set as
+          interrupted.
         </p>
       </section>
       <PoseSpike

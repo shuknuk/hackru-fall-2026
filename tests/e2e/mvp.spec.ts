@@ -28,6 +28,26 @@ test("sample sets persist, replay, compare, export, import and delete", async ({
   await expect(
     page.getByText(/Set B showed about .* more estimated knee flexion/),
   ).toBeVisible();
+  const coachButton = page.getByRole("button", {
+    name: "Ask Gemini to explain",
+  });
+  await expect(coachButton).toBeDisabled();
+  await page
+    .getByRole("checkbox", {
+      name: "Send this measurement summary for a one-time explanation.",
+    })
+    .check();
+  const coachRequest = page.waitForRequest("**/api/coach");
+  await coachButton.click();
+  const posted = JSON.parse((await coachRequest).postData() ?? "{}");
+  expect(Object.keys(posted).sort()).toEqual(["evidence", "setA", "setB"]);
+  expect(JSON.stringify(posted)).not.toMatch(/landmarks|joints|sessionId|samples/);
+  await expect(
+    page.getByText("The optional Gemini coach is not configured."),
+  ).toBeVisible();
+  await expect(
+    page.getByText(/Set B showed about .* more estimated knee flexion/),
+  ).toBeVisible();
   expect(
     await page.evaluate(
       () => document.documentElement.scrollWidth <= innerWidth,

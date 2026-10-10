@@ -12,6 +12,7 @@ import {
 } from "@/lib/motion/compare";
 import { summary } from "@/lib/motion/analysis";
 import { Skeleton, AngleValues } from "./ReplayPlayer";
+import GeminiCoach from "./GeminiCoach";
 export default function CompareSessions() {
   const [sets, setSets] = useState<[Session, Session] | null>(null);
   const [message, setMessage] = useState("Loading two local sets…");
@@ -82,7 +83,8 @@ export default function CompareSessions() {
   const [a, b] = sets,
     check = compatibility(a, b, confirmed),
     sa = summary(a.reps),
-    sb = summary(b.reps);
+    sb = summary(b.reps),
+    evidence = check.allowed ? observations(a, b) : [];
   const ra = a.reps[repA],
     rb = b.reps[repB];
   const ta = ra ? alignedTime(ra, progress) : 0,
@@ -257,7 +259,7 @@ export default function CompareSessions() {
               treated as uncertain.
             </p>
             <ul>
-              {observations(a, b).map((o) => (
+              {evidence.map((o) => (
                 <li key={o.metric}>
                   <p>{o.text}</p>
                   <details>
@@ -277,6 +279,7 @@ export default function CompareSessions() {
                 </li>
               ))}
             </ul>
+            <GeminiCoach setA={a} setB={b} evidence={evidence} />
           </section>
         </>
       ) : null}

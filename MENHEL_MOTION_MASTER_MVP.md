@@ -876,6 +876,19 @@ Depends on M0–M8.
 
 Exit evidence is the complete definition of done in section 16. Stretch work starts only after this gate.
 
+### M10. Optional grounded Gemini explanation
+
+This sponsor extension does not replace any M0–M9 release gate. The deterministic comparison remains the source of measurements and the complete offline fallback.
+
+- [x] Require a separate, explicit opt-in before any AI request.
+- [x] Send only bounded set aggregates and the existing deterministic statements; exclude video, images, landmarks, session IDs and saved session records.
+- [x] Keep the Gemini API key on the server and allow the model name to be configured server-side.
+- [x] Require structured JSON with known measurement evidence IDs and reject claims tied to IDs that were not submitted.
+- [x] Preserve the deterministic observations when no key is configured, the network fails or the generated response is invalid.
+- [ ] Exercise the live Gemini request with the team key and record the selected model/API response evidence.
+
+M10 is implemented behind `GEMINI_API_KEY`. Its local schema/prompt boundary is tested; no live API success is claimed without a configured key.
+
 ## 14. Verification contract
 
 ### 14.1 Proposed package scripts
@@ -1104,6 +1117,7 @@ Additional evaluated community sources
 | M2 camera spike | Implemented; acceptance partial | Real SDK inference verified with prerecorded browser input; physical-camera/device performance pending; see docs/EXECUTION.md |
 | M3–M8 feature implementation | Implemented; acceptance in progress | Versioned contracts, calibrated recording, local persistence, replay, comparison, data controls, manifest and offline preparation; see docs/EXECUTION.md |
 | M9 release acceptance | Partial | Physical-device checks, real-person movement pilot, installation and demo rehearsal remain pending |
+| M10 optional Gemini explanation | Implemented; live-key acceptance pending | Explicit opt-in, aggregate-only server request, structured response and evidence-ID validation; live Gemini request not tested without a team key |
 
 The current implementation includes the M3–M8 feature flow. The user explicitly authorized continuing before iPhone access. Checked implementation tasks do not establish the real-device exit gate. Organizer/device evidence remains open in M0. Do not skip directly to polished dashboards.
 

@@ -1,0 +1,19 @@
+{
+  "sourceRepository": "https://github.com/RepDB/exercise-dataset",
+  "exerciseId": "bodyweight-squat",
+  "retrievedAt": "2026-10-10",
+  "license": "LICENSE-repdb.md",
+  "attribution": "Exercise data by RepDB (repdb.co)",
+  "assets": [
+    {
+      "path": "public/exercises/bodyweight-squat-start.webp",
+      "sourcePath": "images/flat/bodyweight-squat-start.webp",
+      "sha256": "4a60f7025c29ef528140ce86c74a96202ae5c700b7787cb06e891338081126ca"
+    },
+    {
+      "path": "public/exercises/bodyweight-squat-peak.webp",
+      "sourcePath": "images/flat/bodyweight-squat-peak.webp",
+      "sha256": "d06462ba7470ff34695e8dd3fc1a90a1ce4520a407e436433ed45f639d7e7a4d"
+    }
+  ]
+}

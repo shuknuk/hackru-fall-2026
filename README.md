@@ -36,6 +36,8 @@ Start at `/session`, choose the visible anatomical side and confirm a stable sid
 
 Synthetic samples demonstrate software behavior, not a recorded person or pose accuracy. Imported sources are declared provenance; imports are labelled and metrics are recomputed. Twenty session slots and a 5 MiB import/export limit apply. Storage can fail or be evicted; keep exports of important data. Local history belongs to the browser origin and does not automatically move between deployment URLs or installed-app storage contexts.
 
+Compatible comparisons retain deterministic measurement observations. An optional Gemini explanation appears only after a separate opt-in and sends bounded aggregate measurements and their evidence IDs through the server; it never sends video, images, landmarks, session IDs or saved set records. Configure `GEMINI_API_KEY` server-side and optionally set `GEMINI_MODEL` (default `gemini-2.5-flash`). Without a key or a successful response, the deterministic comparison remains available.
+
 ## Verification
 
 Browser tests run against the production build on a dedicated fresh port. Install the standard test browser with `npx playwright install chromium`. A nonstandard executable can be specified using `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH`. `PLAYWRIGHT_FAKE_VIDEO` enables explicit prerecorded webcam input for real SDK integration; it is test tooling only. The calibration/recording integration test replaces browser camera/worker APIs with explicitly simulated landmark sequences and a deterministic capture clock. Neither is physical-camera acceptance.
@@ -45,3 +47,5 @@ See [the device checklist](docs/DEVICE_CHECKLIST.md) before claiming phone compa
 ## Provenance
 
 The original 47-file Menhel import is preserved under `legacy/menhel/`. The original repository remains unchanged. [Hash manifest](docs/import-provenance.json). Event code-reuse eligibility remains unresolved.
+
+The session setup guide uses the free-tier Bodyweight Squat illustrations from [RepDB](https://repdb.co), under the included [RepDB free-tier license](docs/LICENSE-repdb.md). The app displays the required attribution beside the images.

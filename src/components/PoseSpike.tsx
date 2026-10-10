@@ -294,7 +294,7 @@ export default function PoseSpike({ onFrame, onReady, onStopped, ref }: Props) {
               canvas!
                 .getContext("2d")
                 ?.clearRect(0, 0, canvas!.width, canvas!.height);
-          }, 150);
+          }, 600);
           frames++;
           latencies.push(result.inferenceMs);
           if (latencies.length > 180) latencies.shift();

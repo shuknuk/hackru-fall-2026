@@ -22,6 +22,10 @@ test("home leads to honest session setup without requesting camera access", asyn
     page.getByRole("heading", { name: "Room to move." }),
   ).toBeVisible();
   await expect(
+    page.getByRole("heading", { name: "One comfortable down-and-up cycle" }),
+  ).toBeVisible();
+  await expect(page.getByText("RepDB (repdb.co)")).toBeVisible();
+  await expect(
     page.getByRole("button", { name: "Start camera" }),
   ).toBeEnabled();
   await expect(

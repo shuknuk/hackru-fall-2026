@@ -128,6 +128,10 @@ it("does not arm from standing jitter and tolerates valid 10 Hz sampling", () =>
     ),
   ).toHaveLength(3);
 });
+it("counts continuous valid motion at 4 processed frames per second", () => {
+  const slow = fixtureSamples().filter((_, i) => i % 5 === 0);
+  expect(analyze(slow, profile)).toHaveLength(3);
+});
 it("preserves a short non-transition gap and rearms after an invalid cycle", () => {
   const short = fixtureSamples([65]).map((s) =>
     s.t === 1750 ? { ...s, valid: false, filtered: null } : s,
