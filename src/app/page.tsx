@@ -1,3 +1,4 @@
+import TechText from "@/components/TechText";
 import Link from "next/link";
 import { ArrowUpRight, Eye, Layers, ShieldCheck } from "lucide-react";
 
@@ -10,10 +11,9 @@ export default function Home() {
       </header>
       <section className="hero" aria-labelledby="title">
         <p className="eyebrow">A LITTLE MORE UNDERSTANDING, EVERY REP</p>
-        <h1 id="title">
-          See your movement.
-          <br />
-          <span>Find your rhythm.</span>
+        <h1 id="title" className="tech-text-headline">
+          <TechText text="See your movement." fontSize={76} color="#263127" accentColor="#485b37" labels={false} draggable={false} />
+          <TechText text="Find your rhythm." fontSize={76} color="#485b37" accentColor="#485b37" labels={false} draggable={false} />
         </h1>
         <p className="lede">
           A camera, a side view, and room to move. Compare two squat sets
