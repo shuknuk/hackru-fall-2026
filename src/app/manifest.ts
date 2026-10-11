@@ -2,8 +2,8 @@ import type { MetadataRoute } from "next";
 export default function manifest(): MetadataRoute.Manifest {
   return {
     id: "/",
-    name: "SpotOn",
-    short_name: "SpotOn",
+    name: "Menhel Motion",
+    short_name: "Menhel",
     description: "Local squat capture, skeleton replay and movement comparison",
     start_url: "/",
     scope: "/",

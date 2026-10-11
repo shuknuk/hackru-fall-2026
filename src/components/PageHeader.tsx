@@ -1,5 +1,4 @@
 import Link from "next/link";
-import Brand from "./Brand";
 export default function PageHeader({
   title,
   description,
@@ -10,7 +9,7 @@ export default function PageHeader({
   return (
     <>
       <nav className="top-nav" aria-label="Main navigation">
-        <Brand />
+        <Link href="/">Menhel Motion</Link>
         <Link href="/session">Record</Link>
         <Link href="/results/saved">Results</Link>
         <Link href="/history">History</Link>

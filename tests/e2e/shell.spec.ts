@@ -37,7 +37,7 @@ test("home leads to honest session setup without requesting camera access", asyn
       () => document.documentElement.scrollWidth <= window.innerWidth,
     ),
   ).toBe(true);
-  await page.getByRole("link", { name: "Back to SpotOn" }).click();
+  await page.getByRole("link", { name: "Back to Menhel" }).click();
   await expect(page).toHaveURL(/\/$/);
   expect(errors).toEqual([]);
 });
