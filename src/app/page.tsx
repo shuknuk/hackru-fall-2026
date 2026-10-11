@@ -22,7 +22,7 @@ export default function Home() {
             </Link>
             <Link className="text-link" href="/history">Open saved sets</Link>
           </div>
-          <p className="status">No account · No video upload · Local pose data</p>
+          <p className="status">Account optional · Camera processing stays local · Optional cloud workout summaries</p>
       </section>
       <section className="features" aria-labelledby="flow-title">
         <div className="feature-intro">
@@ -47,7 +47,7 @@ export default function Home() {
       </section>
       <footer>
         Built for everyday curiosity. Movement estimates are not a medical
-        assessment.
+        assessment. <a href="https://www.tigerdata.com/" rel="noreferrer">Powered by Tiger Data</a>
       </footer>
     </main>
   );

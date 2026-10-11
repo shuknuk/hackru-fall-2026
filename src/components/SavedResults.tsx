@@ -4,14 +4,17 @@ import { useEffect, useState } from "react";
 import { summary } from "@/lib/motion/analysis";
 import type { Session } from "@/lib/motion/schema";
 import { listSessions } from "@/lib/motion/storage";
+import { useAccount } from "./AuthContext";
+import SessionStorageStatus from "./SessionStorageStatus";
 
 export default function SavedResults() {
+  const { userId } = useAccount();
   const [sessions, setSessions] = useState<Session[]>([]);
   const [message, setMessage] = useState("Loading saved results…");
 
   useEffect(() => {
     let active = true;
-    void listSessions().then((records) => {
+    void listSessions(userId).then((records) => {
       if (!active) return;
       setSessions(records);
       setMessage(records.length ? `${records.length} saved ${records.length === 1 ? "set" : "sets"}.` : "No saved results yet.");
@@ -19,7 +22,7 @@ export default function SavedResults() {
       if (active) setMessage(`Could not load saved results: ${error instanceof Error ? error.message : "Local storage error"}`);
     });
     return () => { active = false; };
-  }, []);
+  }, [userId]);
 
   return <>
     <p role="status">{message}</p>
@@ -39,6 +42,7 @@ export default function SavedResults() {
             <div><dt>Visible side</dt><dd>{session.capture.side}</dd></div>
             <div><dt>Status</dt><dd>{session.status}</dd></div>
           </dl>
+          <p><SessionStorageStatus sessionId={session.id} /></p>
           <div className="actions"><a className="button" href={`/results?id=${session.id}`}>View full results</a><a className="secondary-button" href={`/replay?id=${session.id}`}>Replay</a></div>
         </article>;
       })}

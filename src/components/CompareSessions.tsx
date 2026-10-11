@@ -2,6 +2,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { Session } from "@/lib/motion/schema";
 import { getSession } from "@/lib/motion/storage";
+import { useAccount } from "./AuthContext";
 import {
   compatibility,
   observations,
@@ -14,6 +15,7 @@ import { summary } from "@/lib/motion/analysis";
 import { Skeleton, AngleValues } from "./ReplayPlayer";
 import GeminiCoach from "./GeminiCoach";
 export default function CompareSessions() {
+  const { userId } = useAccount();
   const [sets, setSets] = useState<[Session, Session] | null>(null);
   const [message, setMessage] = useState("Loading two local sets…");
   const [confirmed, setConfirmed] = useState(false);
@@ -30,7 +32,7 @@ export default function CompareSessions() {
         b = q.get("b");
       if (!a || !b || a === b)
         throw new Error("Select two different sessions from history.");
-      const [x, y] = await Promise.all([getSession(a), getSession(b)]);
+      const [x, y] = await Promise.all([getSession(a, userId), getSession(b, userId)]);
       if (!x || !y)
         throw new Error("One of these sessions is missing on this device.");
       return [x, y];
@@ -38,7 +40,7 @@ export default function CompareSessions() {
     void load()
       .then(setSets)
       .catch((e) => setMessage(e.message));
-  }, []);
+  }, [userId]);
   const refs = useMemo(() => sets?.map(spatialReference), [sets]);
   useEffect(() => {
     clock.current = progress;

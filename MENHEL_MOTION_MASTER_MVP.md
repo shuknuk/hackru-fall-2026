@@ -126,9 +126,11 @@ P0 establishes the capture and replay foundation. P1 completes the promised MVP.
 
 ### 2.4 Explicit scope boundary
 
-The MVP supports one person, one exercise, one side-view setup, and short sets. It does not implement mood tracking, mental-health chat, HRV, recovery scores, exercise libraries, WhatsApp, calendars, accounts, cloud sync, payments, medical prescriptions, automatic injury detection, or an overall form grade.
+The MVP supports one person, one exercise, one side-view setup, and short sets. It does not implement mood tracking, mental-health chat, HRV, recovery scores, exercise libraries, WhatsApp, calendars, payments, medical prescriptions, automatic injury detection, or an overall form grade. Clerk accounts and opt-in summary-only sync are the separately authorized extension below, not a change to movement-analysis scope.
 
 It does not promise live tracking on every browser or every phone. Browser access is broadly useful; camera inference and install behavior still depend on the environment. Google names Chrome and Safari in its MediaPipe web setup requirements. These are the initial live-tracking targets. Edge and Firefox must be tested separately before claiming support. [S04]
+
+October 11 authorized extension: Clerk accounts and opt-in Tiger Data workout-summary sync are now post-MVP additions. Guests retain five successfully saved real workouts; authenticated accounts unlock unlimited recording. Camera media, pose landmarks, calibration and full replay data remain local. This extension does not close any M0–M9 physical-device, movement-pilot, install or organizer gate.
 
 Front-view asymmetry analysis, knee valgus detection, 3D avatars, raw-video replay, loaded squats, and additional exercises are post-MVP work.
 
