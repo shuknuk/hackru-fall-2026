@@ -379,3 +379,7 @@ Deployed verification: preview dpl_Gz44vaBBoK8bp8oLgyuZtKWo4d5w reached READY at
 ## October 11 — direct theme toggle and blue-black dark mode
 
 Replaced the theme dropdown with one persistent, accessible light/dark toggle in the shared root layout. Light mode retains the green and warm-white palette. Dark mode now uses deep blue accents, blue-black glass surfaces and a near-black page background; the former red dark-mode tokens and dropdown implementation were removed. Theme storage, pre-hydration application, shared glass/touch styles and application behavior remain unchanged. Typecheck, lint and unit-test evidence accompany deployment verification.
+
+## October 11 — editorial interface revision
+
+Reworked the shared presentation to remove the repeated AI-template signals identified in the deployed UI: decorative background gradients, blanket glass blur, glowing shadows, pill navigation, oversized rounding, equal-card marketing grids and nonfunctional hover lift. The landing page now uses a focused editorial hierarchy, one primary session action, a quiet history link, a simple motion-line identity and a numbered process divided by rules. Application routes use an integrated header, flat sections, restrained controls, monospace measurements and borders only where they communicate grouping. Theme persistence, camera/calibration flow, squat detection, saving, replay, comparison, posture feedback and Gemini behavior are unchanged. Automated and deployed visual verification follows.

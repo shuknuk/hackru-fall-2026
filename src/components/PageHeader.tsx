@@ -10,11 +10,13 @@ export default function PageHeader({
     <>
       <nav className="top-nav" aria-label="Main navigation">
         <Link href="/">Menhel Motion</Link>
-        <a href="/session">Record</a>
-        <a href="/history">History</a>
+        <Link href="/session">Record</Link>
+        <Link href="/history">History</Link>
       </nav>
-      <h1 className="page-title">{title}</h1>
-      <p className="lede">{description}</p>
+      <header className="page-heading">
+        <h1 className="page-title">{title}</h1>
+        <p className="lede">{description}</p>
+      </header>
     </>
   );
 }

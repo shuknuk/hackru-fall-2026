@@ -24,7 +24,7 @@ export default function ThemeControl() {
   const dark = theme === "dark";
   return <div className="theme-dock">
     <button type="button" className="theme-toggle" aria-label={`Switch to ${dark ? "light" : "dark"} theme`} aria-pressed={dark} onClick={toggle}>
-      <span className="theme-toggle__track" aria-hidden="true"><span className="theme-toggle__thumb">{dark ? <Moon size={16} /> : <Sun size={16} />}</span></span>
+      <span aria-hidden="true">{dark ? <Moon size={17} /> : <Sun size={17} />}</span>
       <span>{dark ? "Dark" : "Light"}</span>
     </button>
   </div>;
