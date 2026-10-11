@@ -39,7 +39,7 @@ export default async function SessionSetup({ searchParams }: { searchParams: Pro
         <div className="guide-poses">
           <figure>
             <Image
-              src="/exercises/bodyweight-squat-start.webp"
+              src="/exercises/bodyweight-squat-start-transparent.png"
               alt="Illustration of the standing start position for a bodyweight squat"
               width={512}
               height={512}
@@ -49,7 +49,7 @@ export default async function SessionSetup({ searchParams }: { searchParams: Pro
           </figure>
           <figure>
             <Image
-              src="/exercises/bodyweight-squat-peak.webp"
+              src="/exercises/bodyweight-squat-peak-transparent.png"
               alt="Illustration of the lowered turning position for a bodyweight squat"
               width={512}
               height={512}

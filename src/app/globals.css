@@ -196,12 +196,15 @@ footer {
 }
 .guide-poses figure {
   margin: 0;
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto;
 }
 .guide-poses img {
   display: block;
   width: 100%;
   height: auto;
   border-radius: 18px;
+  background: var(--paper);
 }
 .guide-poses figcaption {
   margin-top: 10px;
@@ -632,7 +635,7 @@ summary:active { transform: scale(.97); }
 
 :root[data-theme="dark"] .camera-placeholder { color: var(--ink); }
 :root[data-theme="dark"] .skip-link { background: #071022; }
-:root[data-theme="dark"] .guide-poses img { opacity: .9; }
+:root[data-theme="dark"] .guide-poses img { opacity: 1; }
 
 @media (max-width: 640px) {
   .theme-dock { top: 12px; right: 12px; }
@@ -802,7 +805,12 @@ textarea {
   background: #09100b;
   box-shadow: none;
 }
-.guide-poses img { border-radius: 6px; }
+.guide-poses img {
+  aspect-ratio: 1;
+  object-fit: contain;
+  border-radius: 0;
+  transition: background-color 220ms ease;
+}
 .metric-grid {
   gap: 0;
   border-top: 1px solid var(--line);
