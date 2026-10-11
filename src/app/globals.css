@@ -177,10 +177,17 @@ footer {
   max-width: 640px;
 }
 .setup-card ol {
-  padding-left: 24px;
+  padding-left: 0;
+  list-style: none;
   color: var(--muted);
   line-height: 1.8;
 }
+.setup-card__heading {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.setup-card__heading h2 { margin: 0; }
 .guide-poses {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -347,6 +354,15 @@ summary {
 .panel h2 {
   font-size: 25px;
   margin-top: 0;
+}
+.voice-guidance__toggle {
+  margin: 0 0 16px;
+  border: 0;
+  cursor: pointer;
+}
+.voice-guidance__description {
+  margin: 0;
+  color: var(--muted);
 }
 .panel h3 {
   font-weight: 500;

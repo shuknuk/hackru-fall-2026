@@ -17,8 +17,10 @@ export default async function SessionSetup({ searchParams }: { searchParams: Pro
         comfortable squat range on the next page.
       </p>
       <section className="setup-card" aria-labelledby="setup-title">
-        <Camera size={36} aria-hidden="true" />
-        <h2 id="setup-title">Side-view squat setup</h2>
+        <div className="setup-card__heading">
+          <Camera size={36} aria-hidden="true" />
+          <h2 id="setup-title">Side-view squat setup</h2>
+        </div>
         <ol>
           <li>Place your device securely at hip height.</li>
           <li>Stand side-on with your full body in the frame.</li>

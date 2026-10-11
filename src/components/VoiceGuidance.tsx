@@ -31,8 +31,8 @@ export default function VoiceGuidance({ cue, immediate, onEnabledChange }: { cue
     document.addEventListener("visibilitychange", stop);
     return () => { document.removeEventListener("visibilitychange", stop); audio.current?.pause(); audio.current = null; };
   }, []);
-  return <section className="panel" aria-label="Voice guidance">
-    <button className="secondary-button" aria-pressed={enabled || starting} onClick={() => {
+  return <section className="panel voice-guidance" aria-label="Voice guidance">
+    <button className="button voice-guidance__toggle" aria-pressed={enabled || starting} onClick={() => {
       setError("");
       if (enabled || starting) {
         audio.current?.pause();
@@ -61,7 +61,7 @@ export default function VoiceGuidance({ cue, immediate, onEnabledChange }: { cue
         setError("Voice could not start. Check your sound settings and try again.");
       });
     }}>{starting ? "Cancel voice setup" : enabled ? "Mute voice guidance" : "Enable voice guidance"}</button>
-    <p>ElevenLabs voice: River. Generated setup instructions; camera images stay on this device.</p>
+    <p className="voice-guidance__description">ElevenLabs voice: River. Generated setup instructions; camera images stay on this device.</p>
     {enabled && spoken ? <p>Voice: {CUES[spoken]}</p> : null}
     {error ? <p role="status">{error}</p> : null}
   </section>;
