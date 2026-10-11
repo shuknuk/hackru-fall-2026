@@ -14,17 +14,17 @@
   color-scheme: light;
 }
 :root[data-theme="dark"] {
-  --ink: #edf2fa;
-  --muted: #aab7ca;
-  --paper: #070b12;
-  --olive: #3b82f6;
-  --accent: #3b82f6;
-  --accent-hover: #60a5fa;
-  --accent-soft: rgba(59, 130, 246, 0.22);
-  --surface: #0c1626;
-  --surface-strong: #111f34;
-  --line: #263a55;
-  --critical: #ef8f7d;
+  --ink: #edf4ef;
+  --muted: #aab8ad;
+  --paper: #070a08;
+  --olive: #56a46c;
+  --accent: #56a46c;
+  --accent-hover: #70bb84;
+  --accent-soft: rgba(86, 164, 108, 0.2);
+  --surface: #0e1711;
+  --surface-strong: #142319;
+  --line: #294232;
+  --critical: #ef6b61;
   color-scheme: dark;
 }
 * {
@@ -43,7 +43,7 @@ a {
   color: inherit;
 }
 :focus-visible {
-  outline: 3px solid #8a4b20;
+  outline: 3px solid var(--accent);
   outline-offset: 5px;
 }
 .skip-link {
@@ -799,7 +799,7 @@ textarea {
 .skeleton {
   border: 1px solid var(--line);
   border-radius: 8px;
-  background: #0b111a;
+  background: #09100b;
   box-shadow: none;
 }
 .guide-poses img { border-radius: 6px; }
@@ -819,6 +819,31 @@ textarea {
   letter-spacing: -.04em;
 }
 .gemini-button { background: transparent; border-color: var(--accent); color: var(--accent); }
+.posture-feedback {
+  margin-top: 32px;
+  padding-top: 24px;
+  border-top: 1px solid var(--line);
+}
+.posture-feedback--pass > p:first-of-type {
+  color: var(--accent);
+}
+.posture-feedback--review > p:first-of-type,
+[role="alert"] {
+  color: var(--critical);
+}
+.posture-feedback details[data-feedback="pass"] > summary { color: var(--accent); }
+.posture-feedback details[data-feedback="review"] > summary { color: var(--critical); }
+:root:not([data-theme="dark"]) .secondary-button,
+:root:not([data-theme="dark"]) .gemini-button {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: white;
+}
+:root:not([data-theme="dark"]) .secondary-button:hover,
+:root:not([data-theme="dark"]) .gemini-button:hover {
+  background: var(--accent-hover);
+  border-color: var(--accent-hover);
+}
 .brand-dot { box-shadow: none; }
 .back-link { margin-bottom: 38px; font-size: 14px; }
 footer { border-color: var(--line); }
