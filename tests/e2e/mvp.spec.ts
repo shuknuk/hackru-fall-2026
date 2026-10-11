@@ -38,7 +38,7 @@ test("sample sets persist, replay, compare and delete without export or data con
   ).toBeVisible();
   await page.getByRole("slider", { name: "Squat replay progress" }).fill("50");
   await expect(
-    page.getByText("50% Â· Bottom of squat", { exact: true }),
+    page.getByText("50% · Bottom of squat", { exact: true }),
   ).toBeVisible();
   await expect(
     page.getByText(/Set B showed about .* more estimated knee flexion/),
@@ -224,7 +224,7 @@ test("a checkpointed draft recovers only completed cycles and the library cap ne
     .getByRole("button", { name: "Recover draft", exact: true })
     .click();
   await expect(page.getByRole("status").first()).toContainText("3 of 20");
-  await expect(page.getByText(/Â· interrupted/)).toBeVisible();
+  await expect(page.getByText(/· interrupted/)).toBeVisible();
   await expect(
     page.getByRole("heading", { name: "Interrupted drafts", exact: true }),
   ).toHaveCount(0);
