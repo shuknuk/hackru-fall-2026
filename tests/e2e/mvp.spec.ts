@@ -187,7 +187,7 @@ test("a checkpointed draft recovers only completed cycles and the library cap ne
     .click();
   await page.getByRole("link", { name: "Inspect this set" }).first().click();
   const original = await page.evaluate(() => new Promise<Session>((resolve, reject) => {
-    const request = indexedDB.open("menhel-motion", 1);
+    const request = indexedDB.open("menhel-motion", 2);
     request.onerror = () => reject(request.error);
     request.onsuccess = () => {
       const db = request.result;
@@ -199,7 +199,7 @@ test("a checkpointed draft recovers only completed cycles and the library cap ne
   // Seed an authored fixture as a draft solely to verify the recovery transaction.
   await page.evaluate(async (s) => {
     await new Promise<void>((resolve, reject) => {
-      const r = indexedDB.open("menhel-motion", 1);
+      const r = indexedDB.open("menhel-motion", 2);
       r.onerror = () => reject(r.error);
       r.onsuccess = () => {
         const db = r.result,
@@ -230,7 +230,7 @@ test("a checkpointed draft recovers only completed cycles and the library cap ne
   ).toHaveCount(0);
   await page.evaluate(async (s) => {
     await new Promise<void>((resolve, reject) => {
-      const r = indexedDB.open("menhel-motion", 1);
+      const r = indexedDB.open("menhel-motion", 2);
       r.onsuccess = () => {
         const db = r.result,
           tx = db.transaction("sessions", "readwrite"),

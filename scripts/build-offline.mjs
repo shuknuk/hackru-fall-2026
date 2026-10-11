@@ -38,7 +38,16 @@ await new Promise((resolve, reject) => portServer.close((error) => error ? rejec
 const server = spawn(
   process.execPath,
   ["node_modules/next/dist/bin/next", "start", "--hostname", "127.0.0.1", "--port", String(port)],
-  { stdio: "ignore", env: { ...process.env, NEXT_TELEMETRY_DISABLED: "1" } },
+  {
+    stdio: "ignore",
+    // Capture only the public guest shell; account responses must never enter the shared offline cache.
+    env: {
+      ...process.env,
+      NEXT_TELEMETRY_DISABLED: "1",
+      CLERK_SECRET_KEY: "disabled",
+      NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: "disabled",
+    },
+  },
 );
 const serverExit = new Promise((resolve) => server.once("exit", resolve));
 async function stopServer() {

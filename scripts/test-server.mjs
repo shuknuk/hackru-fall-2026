@@ -3,7 +3,8 @@ import http from "node:http";
 import { spawn } from "node:child_process";
 import { readFile } from "node:fs/promises";
 const port = Number(process.env.PLAYWRIGHT_PORT ?? 3017),
-  backend = port + 1000;
+  backend = process.env.PLAYWRIGHT_LIVE_AUTH === "1" ? port : port + 1000;
+const liveAuth = process.env.PLAYWRIGHT_LIVE_AUTH === "1";
 let updateVersion = null;
 const next = spawn(
   process.execPath,
@@ -11,15 +12,31 @@ const next = spawn(
     "node_modules/next/dist/bin/next",
     "start",
     "--hostname",
-    "127.0.0.1",
+    "localhost",
     "--port",
     String(backend),
   ],
-  { stdio: ["ignore", "pipe", "inherit"] },
+  {
+    stdio: ["ignore", "pipe", "inherit"],
+    env: {
+      ...process.env,
+      ...(liveAuth
+        ? {}
+        : {
+            CLERK_SECRET_KEY: "disabled",
+            NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: "disabled",
+          }),
+    },
+  },
 );
 const server = http.createServer(async (req, res) => {
   try {
     const path = new URL(req.url, "http://localhost").pathname;
+    if (path === "/__test/ready") {
+      res.writeHead(200, { "Content-Type": "text/plain", "Cache-Control": "no-store" });
+      res.end("ready");
+      return;
+    }
     if (path === "/__test/update" && req.method === "POST") {
       let body = "";
       for await (const chunk of req) {
@@ -76,11 +93,11 @@ const server = http.createServer(async (req, res) => {
     }
     const upstream = http.request(
       {
-        hostname: "127.0.0.1",
+        hostname: "localhost",
         port: backend,
         path: req.url,
         method: req.method,
-        headers: { ...req.headers, host: `127.0.0.1:${backend}` },
+        headers: { ...req.headers, host: `localhost:${backend}` },
       },
       (response) => {
         res.writeHead(response.statusCode ?? 502, response.headers);
@@ -102,7 +119,7 @@ next.stdout.on("data", (chunk) => {
   process.stdout.write(chunk);
   if (!listening && chunk.toString().includes("Ready")) {
     listening = true;
-    server.listen(port, "127.0.0.1");
+    if (!liveAuth) server.listen(port, "127.0.0.1");
   }
 });
 next.on("exit", (code) => {

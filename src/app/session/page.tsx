@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { ArrowLeft, Camera } from "lucide-react";
+import WorkoutGate from "@/components/WorkoutGate";
 
 export default async function SessionSetup({ searchParams }: { searchParams: Promise<{ profile?: string }> }) {
   const { profile } = await searchParams;
@@ -66,7 +67,7 @@ export default async function SessionSetup({ searchParams }: { searchParams: Pro
           .
         </p>
       </section>
-      <div className="actions"><Link className="button" href={next}>Continue to camera setup</Link></div>
+      <WorkoutGate><div className="actions"><Link className="button" href={next}>Continue to camera setup</Link></div></WorkoutGate>
     </main>
   );
 }

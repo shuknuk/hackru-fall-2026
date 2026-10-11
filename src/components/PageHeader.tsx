@@ -13,6 +13,7 @@ export default function PageHeader({
         <Link href="/session">Record</Link>
         <Link href="/results/saved">Results</Link>
         <Link href="/history">History</Link>
+        <Link href="/dashboard">Progress</Link>
       </nav>
       <header className="page-heading">
         <h1 className="page-title">{title}</h1>
