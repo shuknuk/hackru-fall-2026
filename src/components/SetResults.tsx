@@ -44,6 +44,7 @@ export default function SetResults() {
         <div><dt>Median ascent time</dt><dd>{stats.ascent === null ? "Unavailable" : `${(stats.ascent / 1000).toFixed(1)} s`}</dd></div>
         <div><dt>Tracking coverage</dt><dd>{(session.summary.trackingCoverage * 100).toFixed(0)}%</dd></div>
       </dl>
+      {session.summary.trackingCoverage < 0.75 ? <p role="alert"><strong>We had trouble seeing your movement.</strong> Move closer to the camera while keeping your hips, knees, legs and feet fully in view. Make sure they are clearly visible from the side, then try another set.</p> : null}
       {!stats.count ? <p>No completed squats were recorded. Partial movements and unreliable tracking are excluded.</p> : null}
       <SquatPosture session={session} />
       <div className="actions">

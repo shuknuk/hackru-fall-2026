@@ -17,29 +17,29 @@ export default function SquatPosture({ session }: { session: Session }) {
   return (
     <section aria-labelledby="posture-title">
       <h3 id="posture-title">Squat posture feedback</h3>
-      <p><strong>{feedback.state === "pass" ? "Visible posture checks passed" : feedback.state === "review" ? "Your squat posture needs attention" : "Not enough clear tracking to assess all posture checks"}</strong></p>
-      <p>These checks look at completed squats from your side view. They cannot certify correct form or safety, or assess spine curvature, knee alignment from the front, or balance.</p>
+      <p><strong>{feedback.state === "pass" ? "Your squats looked consistent with these movement cues" : feedback.state === "review" ? "Here is what to work on next time" : "We could not see enough of your movement to give complete feedback"}</strong></p>
+      <p>We look at how you lower and stand back up from the side. One camera cannot show everything about your posture or tell you whether an exercise is safe for you.</p>
       {!feedback.reps.length ? <p>Record a completed squat with your shoulders, hips, knees, heels and toes visible to receive feedback.</p> : null}
       {feedback.reps.map((rep) => (
         <details key={rep.id} open={rep.checks.some((check) => check.state === "review")}>
-          <summary>Rep {rep.id}: {rep.checks.some((check) => check.state === "review") ? "Needs attention" : rep.checks.some((check) => check.state === "unknown") ? "Some checks unavailable" : "Checks passed"}</summary>
+          <summary>Rep {rep.id}: {rep.checks.some((check) => check.state === "review") ? "Needs attention" : rep.checks.some((check) => check.state === "unknown") ? "We could not see everything clearly" : "Looked good in this view"}</summary>
           <ul>{rep.checks.map((check) => <li key={check.name}>
-            <strong>{check.name}: {check.state === "pass" ? "Matched" : check.state === "review" ? "Review" : "Cannot assess"}</strong>
+            <strong>{check.name}: {check.state === "pass" ? "Looked good" : check.state === "review" ? "Try this next time" : "Could not see clearly"}</strong>
             <p>{check.detail}</p>
             {check.state === "review" ? <p>{check.cue}</p> : null}
           </li>)}</ul>
         </details>
       ))}
       <details open={feedback.state === "review"}>
-        <summary>See a reference squat animation</summary>
-        <p>This authored skeleton demonstrates bending at the hips and knees, keeping the feet planted, and returning to standing. Press Play to see one slow squat.</p>
-        <p>The example reaches roughly thigh-parallel depth. Its hip and knee angles illustrate one squat, not targets you must copy. Use your comfortable range; there is no single ideal angle for every body.</p>
-        <ReplayPlayer session={example} />
+        <summary>See an example squat</summary>
+        <p>Press Play to watch a slow example: bend your hips and knees, keep your feet on the floor, then stand back up.</p>
+        <p>This is a demonstration, not a recording of you. Squat only as low as feels comfortable; you do not need to match the example exactly.</p>
+        <ReplayPlayer session={example} showMeasurements={false} />
       </details>
       <details>
         <summary>How these checks work and their sources</summary>
-        <p>Angles are 2D estimates, measured from standing (0 degrees means straight). We check an observable hip-bend change of at least 15 degrees alongside knee bend, a return within 15 degrees of your standing hip angle, and a heel-to-toe slope change of no more than 0.2. These are provisional app tolerances, not research-validated correctness scores. At least three clear samples per window and 90% rep tracking are required. Missing evidence is reported as unavailable.</p>
-        <p>Technique cues come from <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC4262933/" target="_blank" rel="noreferrer">Myer et al.: bodyweight squat assessment</a>. Depth and joint angles vary with technique and body proportions; see <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC10987311/" target="_blank" rel="noreferrer">the squat biomechanics review</a>.</p>
+        <p>We look for your hips and knees bending together, your heels staying down, and a return to standing. When the camera cannot see you clearly, we say so instead of guessing.</p>
+        <p>These cues are based on <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC4262933/" target="_blank" rel="noreferrer">published squat guidance</a>. Everyone moves a little differently; <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC10987311/" target="_blank" rel="noreferrer">research explains why squat positions vary</a>. These checks are a guide, not proof of perfect posture.</p>
         <p>Only completed repetitions are assessed. This feedback does not affect rep counting, calibration or saved measurements.</p>
       </details>
     </section>

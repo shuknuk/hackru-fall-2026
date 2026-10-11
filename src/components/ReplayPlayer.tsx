@@ -116,7 +116,7 @@ function Trace({
     </svg>
   );
 }
-export default function ReplayPlayer({ session }: { session: Session }) {
+export default function ReplayPlayer({ session, showMeasurements = true }: { session: Session; showMeasurements?: boolean }) {
   const [selected, setSelected] = useState(-1);
   const [playing, setPlaying] = useState(false);
   const [speed, setSpeed] = useState(1);
@@ -191,7 +191,7 @@ export default function ReplayPlayer({ session }: { session: Session }) {
         height={session.capture.height}
         label="Recorded skeleton"
       />
-      <AngleValues sample={sample} />
+      {showMeasurements ? <AngleValues sample={sample} /> : null}
       <div className="actions">
         <button
           className="secondary-button"
@@ -244,10 +244,10 @@ export default function ReplayPlayer({ session }: { session: Session }) {
       </label>
       <p>
         {(time / 1000).toFixed(2)} s of {(end / 1000).toFixed(2)} s ·{" "}
-        {sample ? "Valid knee sample" : "Tracking unavailable"}
+        {showMeasurements ? (sample ? "Valid knee sample" : "Tracking unavailable") : "Example squat"}
       </p>
-      <Trace session={session} start={start} end={end} time={time} completedOnly={selected < 0} />
-      {rep ? (
+      {showMeasurements ? <Trace session={session} start={start} end={end} time={time} completedOnly={selected < 0} /> : null}
+      {rep && showMeasurements ? (
         <p>
           Rep {rep.id} · peak estimated knee bend {rep.peak?.toFixed(0)}° ·
           descent {(rep.descent / 1000).toFixed(2)} s · ascent{" "}
