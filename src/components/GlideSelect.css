@@ -1,0 +1,14 @@
+.glide-select { --gs-row: 44px; position: relative; display: inline-block; }
+.glide-select__trigger { display: inline-flex; align-items: center; justify-content: space-between; gap: 10px; min-width: 124px; height: 48px; padding: 0 14px; border: 1px solid var(--glass-border); border-radius: 999px; background: var(--glass); color: var(--ink); box-shadow: var(--glass-shadow); backdrop-filter: blur(18px) saturate(140%); cursor: pointer; transition: transform 160ms ease, background 160ms ease, box-shadow 160ms ease; touch-action: manipulation; }
+.glide-select__trigger:hover, .glide-select__trigger[aria-expanded="true"] { background: var(--glass-strong); box-shadow: var(--glass-shadow-hover); }
+.glide-select__trigger:active { transform: scale(.96); }
+.glide-select__trigger svg { transition: transform 180ms ease; }
+.glide-select__trigger[aria-expanded="true"] svg { transform: rotate(180deg); }
+.glide-select__menu { position: absolute; z-index: 100; top: calc(100% + 8px); right: 0; width: 190px; padding: 6px; border: 1px solid var(--glass-border); border-radius: 18px; background: var(--glass-strong); box-shadow: var(--glass-shadow-hover); backdrop-filter: blur(24px) saturate(160%); animation: glide-pop 180ms cubic-bezier(.23,1,.32,1); overflow: hidden; }
+.glide-select__pill { position: absolute; left: 6px; right: 6px; top: 6px; height: var(--gs-row); border-radius: 13px; background: var(--accent-soft); transform: translateY(calc(var(--gs-active) * var(--gs-row))); transition: transform 220ms cubic-bezier(.23,1,.32,1); }
+.glide-select__option { position: relative; z-index: 1; display: grid; grid-template-columns: 1fr auto auto; align-items: center; gap: 8px; height: var(--gs-row); padding: 0 10px; border-radius: 13px; color: var(--ink); cursor: pointer; user-select: none; touch-action: manipulation; }
+.glide-select__option small { color: var(--muted); }
+.glide-select__option svg { opacity: 0; color: var(--accent); }
+.glide-select__option svg.is-selected { opacity: 1; }
+@keyframes glide-pop { from { opacity: 0; transform: scale(.94) translateY(-4px); } }
+@media (prefers-reduced-motion: reduce) { .glide-select__menu { animation: none; } .glide-select__pill, .glide-select__trigger, .glide-select__trigger svg { transition: none; } }

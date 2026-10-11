@@ -4,6 +4,32 @@
   --muted: #596454;
   --paper: #f6f5ed;
   --olive: #485b37;
+  --accent: #485b37;
+  --accent-hover: #35452a;
+  --accent-soft: rgba(72, 91, 55, 0.16);
+  --surface: rgba(238, 239, 227, 0.72);
+  --glass: rgba(255, 255, 255, 0.58);
+  --glass-strong: rgba(247, 248, 240, 0.88);
+  --glass-border: rgba(72, 91, 55, 0.2);
+  --glass-shadow: 0 10px 30px rgba(38, 49, 39, 0.08);
+  --glass-shadow-hover: 0 16px 44px rgba(38, 49, 39, 0.16);
+  color-scheme: light;
+}
+:root[data-theme="dark"] {
+  --ink: #fff4f2;
+  --muted: #d4aaa5;
+  --paper: #080606;
+  --olive: #ed3b32;
+  --accent: #ed3b32;
+  --accent-hover: #ff5a50;
+  --accent-soft: rgba(237, 59, 50, 0.2);
+  --surface: rgba(27, 10, 10, 0.72);
+  --glass: rgba(28, 12, 12, 0.58);
+  --glass-strong: rgba(24, 8, 8, 0.9);
+  --glass-border: rgba(255, 88, 77, 0.28);
+  --glass-shadow: 0 12px 34px rgba(0, 0, 0, 0.4);
+  --glass-shadow-hover: 0 18px 50px rgba(237, 59, 50, 0.18);
+  color-scheme: dark;
 }
 * {
   box-sizing: border-box;
@@ -13,6 +39,10 @@ body {
   background: var(--paper);
   color: var(--ink);
   font-family: Arial, Helvetica, sans-serif;
+  min-height: 100vh;
+  background-image: radial-gradient(circle at 90% 5%, var(--accent-soft), transparent 32rem), radial-gradient(circle at 5% 75%, color-mix(in srgb, var(--accent) 9%, transparent), transparent 30rem);
+  background-attachment: fixed;
+  transition: background-color 220ms ease, color 220ms ease;
 }
 a {
   color: inherit;
@@ -112,9 +142,9 @@ h1 span {
 }
 .features article,
 .setup-card {
-  background: #eeefe3;
+  background: var(--surface);
   padding: 30px;
-  border: 1px solid #d9dece;
+  border: 1px solid var(--glass-border);
   border-radius: 24px;
 }
 .features svg,
@@ -311,9 +341,9 @@ summary {
   font-weight: 600;
 }
 .panel {
-  background: #eeefe3;
+  background: var(--surface);
   padding: 28px;
-  border: 1px solid #d9dece;
+  border: 1px solid var(--glass-border);
   border-radius: 24px;
   margin: 24px 0;
 }
@@ -503,3 +533,115 @@ button {
 .gemini-diagnostics { white-space: pre-wrap; overflow-wrap: anywhere; max-height: 24rem; overflow: auto; font-size: .8rem; }
 @keyframes gemini-spin { to { transform: rotate(360deg); } }
 @media (prefers-reduced-motion: reduce) { .gemini-orbit.is-loading::before { animation: none; } }
+
+/* Shared theme, glass, and touch interaction layer. */
+.theme-dock { position: fixed; z-index: 90; top: 18px; right: 18px; }
+.panel,
+.features article,
+.setup-card,
+.diagnostics,
+.coach-result,
+.pwa-controls,
+details[open] {
+  border-color: var(--glass-border);
+  background: var(--glass);
+  box-shadow: var(--glass-shadow);
+  backdrop-filter: blur(18px) saturate(135%);
+  -webkit-backdrop-filter: blur(18px) saturate(135%);
+}
+.top-nav {
+  position: sticky;
+  top: 14px;
+  z-index: 40;
+  padding: 10px 154px 10px 14px;
+  border: 1px solid var(--glass-border);
+  border-radius: 999px;
+  background: var(--glass);
+  box-shadow: var(--glass-shadow);
+  backdrop-filter: blur(20px) saturate(150%);
+  -webkit-backdrop-filter: blur(20px) saturate(150%);
+}
+.button { background: var(--accent); }
+.button:hover { background: var(--accent-hover); }
+.secondary-button { border-color: var(--accent); color: var(--accent); background: var(--glass); backdrop-filter: blur(12px); }
+select,
+input[type="text"],
+input:not([type]),
+textarea { background: var(--glass); color: var(--ink); border: 1px solid var(--glass-border); }
+.coach-result { background: var(--glass); }
+.camera-view,
+.skeleton { background: color-mix(in srgb, var(--paper) 72%, #000); border: 1px solid var(--glass-border); box-shadow: var(--glass-shadow); }
+.angle-trace,
+.features svg,
+.setup-card svg,
+.eyebrow,
+.step { color: var(--accent); }
+.brand-dot { background: var(--accent); box-shadow: 0 0 20px var(--accent-soft); }
+.check input,
+input[type="range"] { accent-color: var(--accent); }
+th,
+td,
+footer,
+.coach,
+.diagnostics dl > div { border-color: var(--glass-border); }
+.gemini-button { background: var(--glass); border-color: var(--glass-border); color: var(--accent); box-shadow: var(--glass-shadow); backdrop-filter: blur(16px); }
+
+a,
+button,
+summary,
+select,
+input[type="checkbox"],
+input[type="range"],
+.panel,
+.features article,
+.setup-card {
+  -webkit-tap-highlight-color: transparent;
+}
+a,
+button,
+summary,
+select,
+input[type="checkbox"] { touch-action: manipulation; }
+.button,
+.secondary-button,
+.gemini-button,
+.top-nav a,
+summary,
+.features article,
+.setup-card,
+.panel {
+  transition: transform 160ms ease, background-color 220ms ease, border-color 220ms ease, box-shadow 220ms ease, color 220ms ease;
+}
+@media (hover: hover) and (pointer: fine) {
+  .panel:hover,
+  .features article:hover,
+  .setup-card:hover { border-color: color-mix(in srgb, var(--accent) 42%, var(--glass-border)); box-shadow: var(--glass-shadow-hover); }
+  .secondary-button:hover,
+  .gemini-button:hover { background: var(--accent-soft); box-shadow: var(--glass-shadow-hover); }
+}
+.button:active,
+.secondary-button:active,
+.gemini-button:active,
+.top-nav a:active,
+summary:active { transform: scale(.97); }
+
+:root[data-theme="dark"] .camera-placeholder { color: var(--ink); }
+:root[data-theme="dark"] .skip-link { background: #160909; }
+:root[data-theme="dark"] .guide-poses img { opacity: .9; }
+
+@media (max-width: 640px) {
+  .theme-dock { top: 12px; right: 12px; }
+  .top-nav { padding-right: 132px; gap: 12px; }
+  .glide-select__trigger { min-width: 112px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  body,
+  .button,
+  .secondary-button,
+  .gemini-button,
+  .top-nav a,
+  summary,
+  .features article,
+  .setup-card,
+  .panel { transition: none; }
+}

@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import ThemeControl from "@/components/ThemeControl";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -14,11 +15,13 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
+      <head><script dangerouslySetInnerHTML={{ __html: `try{document.documentElement.dataset.theme=localStorage.getItem('menhel-theme')==='dark'?'dark':'light'}catch{document.documentElement.dataset.theme='light'}` }} /></head>
       <body data-menhel-shell="v1">
         <a className="skip-link" href="#main">
           Skip to content
         </a>
+        <ThemeControl />
         {children}
       </body>
     </html>
