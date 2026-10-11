@@ -407,7 +407,8 @@ Pre-PR final verification on the branch based on `911cd9b`: lint, strict typeche
 
 The two RepDB-derived setup illustrations now use transparent-background adaptations rather than the original baked-in pale-blue squares. Their containers inherit the active page background, so the standing and lowered poses sit naturally on warm white in light mode and near-black in dark mode. The guide text, pose meaning, attribution and recording flow are unchanged.
 
-
 Publication reconciliation: PR #1 was opened, then main advanced to `47d7629` with transparent squat-guide artwork. Merged that main commit into the published branch without rewriting history; preserved both execution-log entries. Narration code is unchanged. Rebuild and focused shell/narration/capture production checks follow.
 
 Post-merge check: lint, strict typecheck and production build passed with main's `47d7629` artwork. All 12 focused production browser tests passed (shell navigation, generated audio delivery/real startup/mute/cancellation, full simulated calibration/three-rep capture/local replay) on both Chromium projects. The 28-pass applicable-suite result above remains the broader verification; the last main addition changed guide assets and their presentation only. Conflict resolved by preserving both execution histories.
+
+Comfortaa is loaded once in the root layout through the installed Next.js font loader as a self-hosted variable font. The root class applies it to every route, and explicit body, measurement, button, input, select and textarea overrides now inherit that same family. This removes the previous system-body and monospace measurement exceptions so headings, navigation, controls, tables, diagnostics, results and Gemini UI all use Comfortaa consistently.
