@@ -44,14 +44,9 @@ test("sample sets persist, replay, compare and delete without export or data con
     page.getByText(/Set B showed about .* more estimated knee flexion/),
   ).toBeVisible();
   const coachButton = page.getByRole("button", {
-    name: "Ask Gemini to explain",
+    name: "Analyze with Gemini",
   });
-  await expect(coachButton).toBeDisabled();
-  await page
-    .getByRole("checkbox", {
-      name: "Send this measurement summary for a one-time explanation.",
-    })
-    .check();
+  await expect(coachButton).toBeEnabled();
   const coachRequest = page.waitForRequest("**/api/coach");
   await coachButton.click();
   const posted = JSON.parse((await coachRequest).postData() ?? "{}");

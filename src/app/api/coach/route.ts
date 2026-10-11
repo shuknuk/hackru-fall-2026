@@ -1,3 +1,4 @@
+import { providerError } from "../../../lib/gemini-diagnostics";
 import { NextResponse } from "next/server";
 import {
   coachPrompt,
@@ -60,6 +61,7 @@ export async function POST(request: Request) {
 
   const model = process.env.GEMINI_MODEL ?? "gemini-2.5-flash";
   let failure = "response";
+  let diagnostics: unknown = null;
   // Retry one temporary upstream failure; never return a fabricated AI explanation.
   for (let attempt = 0; attempt < 2; attempt++) {
     const controller = new AbortController();
@@ -86,6 +88,7 @@ export async function POST(request: Request) {
       );
       if (!response.ok) {
         failure = `upstream-${response.status}`;
+        diagnostics = await providerError(response, model, key, attempt);
         console.warn("Gemini comparison failed", { status: response.status, attempt });
         if (attempt === 0 && response.status >= 500) continue;
         break;
@@ -99,6 +102,7 @@ export async function POST(request: Request) {
       const grounded = parseGroundedCoachResponse(JSON.parse(text), input.evidence.map((item) => item.metricId));
       return NextResponse.json(grounded);
     } catch {
+      diagnostics = null;
       failure = controller.signal.aborted ? "timeout" : "response";
       console.warn("Gemini comparison failed", { reason: failure, attempt });
     } finally {
@@ -112,5 +116,5 @@ export async function POST(request: Request) {
       : failure === "upstream-400" || failure === "upstream-401" || failure === "upstream-403" || failure === "upstream-404"
         ? "Gemini could not connect with the current app configuration. Please contact the app owner."
         : "Gemini could not complete this comparison. Please try again.";
-  return NextResponse.json({ error }, { status: 502 });
+  return NextResponse.json({ error, diagnostics: diagnostics ?? { source: "Menhel", reason: failure, model, timeoutMs: 25000, attempts: 2 } }, { status: 502 });
 }

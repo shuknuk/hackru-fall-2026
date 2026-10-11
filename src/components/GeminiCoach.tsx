@@ -1,5 +1,6 @@
 "use client";
 
+import GeminiButton from "./GeminiButton";
 import { useState } from "react";
 import type { Session } from "@/lib/motion/schema";
 import { summary } from "@/lib/motion/analysis";
@@ -21,9 +22,9 @@ export default function GeminiCoach({
   setB: Session;
   evidence: Evidence;
 }) {
-  const [consented, setConsented] = useState(false);
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<CoachResponse | null>(null);
+  const [diagnostics, setDiagnostics] = useState<unknown>(null);
   const [error, setError] = useState("");
 
   async function requestCoach() {
@@ -48,7 +49,7 @@ export default function GeminiCoach({
       })),
     };
     setLoading(true);
-    setError("");
+    setError(""); setDiagnostics(null);
     setResult(null);
     try {
       const response = await fetch("/api/coach", {
@@ -57,6 +58,7 @@ export default function GeminiCoach({
         body: JSON.stringify(body),
       });
       const value = await response.json();
+      if (!response.ok) setDiagnostics(value.diagnostics ?? { httpStatus: response.status });
       if (!response.ok)
         throw new Error(
           typeof value?.error === "string" ? value.error : "Gemini could not respond. Please try again.",
@@ -77,23 +79,10 @@ export default function GeminiCoach({
         Compare these squat sets with Gemini. Only the measurement summary shown above
         is sent to Google Gemini. Your video and body landmarks stay on this device.
       </p>
-      <label className="check">
-        <input
-          type="checkbox"
-          checked={consented}
-          onChange={(event) => setConsented(event.target.checked)}
-        />
-        Send this measurement summary for a one-time explanation.
-      </label>
-      <button
-        className="secondary-button"
-        disabled={!consented || loading}
-        onClick={() => void requestCoach()}
-      >
-        {loading ? "Gemini is comparing your sets..." : error ? "Try Gemini again" : "Ask Gemini to explain"}
-      </button>
+      <p>Pressing Analyze with Gemini sends these summaries to Google for this comparison.</p>
+      <GeminiButton busy={loading} onClick={() => void requestCoach()} />
       <div aria-live="polite">
-        {error ? <p role="alert">{error}</p> : null}
+        {error ? <p role="alert">{error}</p> : null}{diagnostics ? <details open><summary>Gemini error details</summary><pre className="gemini-diagnostics">{JSON.stringify(diagnostics, null, 2)}</pre></details> : null}
         {result ? (
           <div className="coach-result">
             <h4>{result.headline}</h4>

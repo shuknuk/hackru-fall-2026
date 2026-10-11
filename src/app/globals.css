@@ -494,3 +494,12 @@ button {
 }
 
 .replay-milestones { display: flex; justify-content: space-between; gap: 1rem; color: var(--muted, #5d6558); font-size: 0.9rem; }
+
+.gemini-button { display: inline-flex; align-items: center; gap: .75rem; padding: .6rem 1.2rem; border: 1px solid #8ab4f8; border-radius: 2rem; background: #eff6ff; color: #174ea6; font-weight: 600; cursor: pointer; }
+.gemini-button:disabled { cursor: default; opacity: .7; }
+.gemini-orbit { position: relative; display: inline-grid; place-items: center; width: 2.5rem; height: 2.5rem; }
+.gemini-orbit svg { width: 1.5rem; height: 1.5rem; }
+.gemini-orbit.is-loading::before { content: ""; position: absolute; inset: 0; border: 3px solid #d2e3fc; border-top-color: #4285f4; border-right-color: #4285f4; border-radius: 50%; animation: gemini-spin 1s linear infinite; }
+.gemini-diagnostics { white-space: pre-wrap; overflow-wrap: anywhere; max-height: 24rem; overflow: auto; font-size: .8rem; }
+@keyframes gemini-spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .gemini-orbit.is-loading::before { animation: none; } }
