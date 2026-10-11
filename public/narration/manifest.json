@@ -1,0 +1,189 @@
+{
+  "provider": "ElevenLabs",
+  "voice": "River",
+  "voiceId": "SAz9YHcvj6GT2YYXdXww",
+  "model": "eleven_flash_v2_5",
+  "generatedAt": "2026-10-11T04:25:58.685Z",
+  "clips": [
+    {
+      "id": "welcome",
+      "text": "Voice guidance is on. Start the camera, then turn side-on with your full body in view.",
+      "bytes": 79874,
+      "sha256": "6a40ec5a363cfc3a02a61d730b3cdf329d678d0575a1632702d394740ddecbdc"
+    },
+    {
+      "id": "camera",
+      "text": "Camera ready. Choose the side facing the camera, and confirm your setup when your full body is visible.",
+      "bytes": 89487,
+      "sha256": "080562a39a476841b54d76504d1d8b44277eb2c1dc69b5de839e944305bf65c3"
+    },
+    {
+      "id": "missing",
+      "text": "I cannot see your shoulders, hips, knees and feet clearly. Check your lighting and turn side-on to the camera.",
+      "bytes": 99936,
+      "sha256": "a786065d4a92b1a21c7e378606031bdedbff081318810882d0ac3f227b11327f"
+    },
+    {
+      "id": "back",
+      "text": "You are close to the edge of the picture. Move a little farther from the camera so your shoulders and feet fit in view.",
+      "bytes": 95338,
+      "sha256": "98ed753186dd3caf9c43b6bf366b27e680ffb4c5d54d84d1c37ab266f4308b05"
+    },
+    {
+      "id": "closer",
+      "text": "You look small in the picture. Move a little closer, keeping your shoulders and feet in view.",
+      "bytes": 85725,
+      "sha256": "2ec5d8cfe0b03c5f010363c7854976255c63d4495ccb29ef96f0dc1cccf6c14b"
+    },
+    {
+      "id": "upright",
+      "text": "Stand comfortably upright and gently straighten your legs. Do not lock your knees.",
+      "bytes": 67753,
+      "sha256": "bb5038469bbb80f33d731afcf62c50598c6183c1c6b482e39e71046e8aa67514"
+    },
+    {
+      "id": "framed",
+      "text": "Your shoulders, hips, knees and feet are in view. Confirm your side-on setup, then choose calibrate comfortable range.",
+      "bytes": 102862,
+      "sha256": "0e9d11506d53dd9e6db676e184ad9579203f10f3458161dab4e45fb47b87a5f5"
+    },
+    {
+      "id": "still",
+      "text": "Stand comfortably and hold still for one and a half seconds.",
+      "bytes": 47273,
+      "sha256": "8ee68a2bad25c64ef0941389d94eb41a1046c2aa03c89923a36dea54a0d7fb48"
+    },
+    {
+      "id": "squat",
+      "text": "Now do one comfortable setup squat, then stand back up. This squat is for calibration only.",
+      "bytes": 84889,
+      "sha256": "82c877c0872d8a6c29cd0613d1a8536d5bea18b6e283dec9fa23e79d1a01131c"
+    },
+    {
+      "id": "starting",
+      "text": "Calibration complete. Your set will start shortly. Stay standing in view until you hear recording started.",
+      "bytes": 100772,
+      "sha256": "5b20625515a475e1185dac7224589bc0815ab4328e06400fd313fc315bc6ebb9"
+    },
+    {
+      "id": "waiting",
+      "text": "Return to comfortable standing in view. Recording has not started yet.",
+      "bytes": 64827,
+      "sha256": "527d66e6dca7cdfefbedac30e7481a47923a7bc4486e46c3a7349dfaf79ebd75"
+    },
+    {
+      "id": "recording",
+      "text": "Recording started. Squat only as low as feels comfortable, then return to standing.",
+      "bytes": 76948,
+      "sha256": "dd380ff5fba891cb1974c0575b7413cd9788b8d7a24dc96ad4e4980e81462d90"
+    },
+    {
+      "id": "lost",
+      "text": "Tracking is unclear. Keep your hips, knees and feet in view, then return to standing to continue. Your completed reps are kept.",
+      "bytes": 119162,
+      "sha256": "85daab59effa436729fe30e4645f07fd596ad41575ce6a9e46086b0347f08bb4"
+    },
+    {
+      "id": "recovered",
+      "text": "Tracking is back. Complete each squat by returning to standing.",
+      "bytes": 61066,
+      "sha256": "f9ed8da7d9c8a76641e209222008423af10f9d75b9dcd25bc6f255a862125212"
+    },
+    {
+      "id": "ready",
+      "text": "Your previous setup is rechecked. Choose start set when you are ready.",
+      "bytes": 64409,
+      "sha256": "b4cbc9c9bd4c1f942dc116eb71837a65f02c0745ff3290b1fed4012ea9f88a3f"
+    },
+    {
+      "id": "noisy",
+      "text": "Keep the camera stable, improve your lighting and hold still so we can finish calibration.",
+      "bytes": 71097,
+      "sha256": "00c438bf60136c93e0c53cce17e1e6702ea4498314c324fd66ac3530423d1de8"
+    },
+    {
+      "id": "stopped",
+      "text": "Camera stopped. Restart the camera and recheck your setup before recording.",
+      "bytes": 66499,
+      "sha256": "2801d5be15c4608c4bcff98a904a5fc2f931bbea0a7cafe7cc6af3fa8fe19164"
+    },
+    {
+      "id": "cancelled",
+      "text": "Start cancelled. Recheck your setup when you are ready.",
+      "bytes": 46437,
+      "sha256": "57f2f4f59af5589b8e7550ffed1b33bf0aaa75d536d04ca7d34265202c4b11d7"
+    },
+    {
+      "id": "changed",
+      "text": "Your camera setup changed. Restart the camera and calibrate again.",
+      "bytes": 58976,
+      "sha256": "a2df68c531cac9b05168cbcc63ba57559dec74cf23a70fc1db302e05fc7030a5"
+    },
+    {
+      "id": "finish",
+      "text": "Set finished. Opening results.",
+      "bytes": 30973,
+      "sha256": "677e9fb8f1f7ad30f742b21b7420a8685bc32a7463138e5e096de8d269aea893"
+    },
+    {
+      "id": "rep1",
+      "text": "One.",
+      "bytes": 10075,
+      "sha256": "eb0eb233aeba63927371b377e8882a2da2f9a2a85cd5726ab363b714f555e72c"
+    },
+    {
+      "id": "rep2",
+      "text": "Two.",
+      "bytes": 10911,
+      "sha256": "baa3f3948de70040cb37738f34ae1606d42a4eb1684dd184defaa04b337f80af"
+    },
+    {
+      "id": "rep3",
+      "text": "Three.",
+      "bytes": 11328,
+      "sha256": "0a766f55c8fbb6c4f31c793b179b8a75b3b5098fa4c694f78dea79344abf0d1b"
+    },
+    {
+      "id": "rep4",
+      "text": "Four.",
+      "bytes": 10911,
+      "sha256": "73dd54af5fd9b2007e730e3d24c9c1fccb5fc84016d38bc1bbf856ac07191c33"
+    },
+    {
+      "id": "rep5",
+      "text": "Five.",
+      "bytes": 12164,
+      "sha256": "3cc58c1333a7ee321aec200befa53e0faaf9c36cd2c179ebedc33367bb79a2af"
+    },
+    {
+      "id": "rep6",
+      "text": "Six.",
+      "bytes": 12164,
+      "sha256": "8b8f70fe515974ab78c6a61a4d2381be6354fbd61ab777bb3c856478481b9193"
+    },
+    {
+      "id": "rep7",
+      "text": "Seven.",
+      "bytes": 10911,
+      "sha256": "a8ae6962764405a1f7d8fc365097f3bea17aa72922f6ab9b48cb413e6f755aad"
+    },
+    {
+      "id": "rep8",
+      "text": "Eight.",
+      "bytes": 10911,
+      "sha256": "264f52759582b7ff61e6e6fc4bc1334bba9a36695484d3aa8ae35abce55d3a98"
+    },
+    {
+      "id": "rep9",
+      "text": "Nine.",
+      "bytes": 10911,
+      "sha256": "1da60df11e151aa84f1c6b5850e171777d6d375a37bb948480c06fd5bf9c18ee"
+    },
+    {
+      "id": "rep10",
+      "text": "Ten. Set complete.",
+      "bytes": 24703,
+      "sha256": "fdfae2179515971d55a1726211fa7c67cf3f1451aeea3f525a36e876bb1c0fef"
+    }
+  ]
+}

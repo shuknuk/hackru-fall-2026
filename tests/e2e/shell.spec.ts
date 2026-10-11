@@ -14,9 +14,9 @@ test("home leads to honest session setup without requesting camera access", asyn
   page.on("pageerror", (error) => errors.push(error.message));
   await page.goto("/");
   await expect(page.getByRole("heading", { level: 1 })).toContainText(
-    "See your movement",
+    "See how your squat moves.",
   );
-  await page.getByRole("link", { name: "Explore session setup" }).click();
+  await page.getByRole("link", { name: "Start a squat session" }).click();
   await expect(page).toHaveURL(/\/session$/);
   await expect(
     page.getByRole("heading", { name: "Get ready for your squats." }),

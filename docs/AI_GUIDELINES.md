@@ -12,3 +12,11 @@ The master MVP section 4 is the source registry and selection rationale. Root AG
 Framework/library sources and package-specific constraints for MediaPipe, Tailwind, IndexedDB/idb, Zod, Vitest, PWA APIs and TypeScript are in master sections 3, 4 and 19. There is no verified official MediaPipe AI skill; use its official web documentation and installed types instead of an unrelated community agent script.
 
 Scaffold review applied the installed Vercel react-best-practices skill: pages are Server Components, imports are named, no camera or storage side effects run during render, decorative icons are hidden from assistive technology, headings and navigation are semantic, and focus and skip navigation are present. Runtime verification follows the Vercel verification skill. Their review does not prove real-device suitability.
+
+### ElevenLabs narration references — October 11, 2026
+
+- Official skill source: https://github.com/elevenlabs/skills/blob/main/text-to-speech/SKILL.md (reviewed as reference; no installer run).
+- Model documentation: https://elevenlabs.io/docs/overview/models
+- Voice inventory: https://elevenlabs.io/docs/api-reference/voices/search
+- TTS API: https://elevenlabs.io/docs/api-reference/text-to-speech/convert
+- Regenerate the fixed, evidence-based clips with `node scripts/generate-narration.mjs` only when intentionally spending generation credits. Keep `ELEVENLABS_API_KEY` server/local-only; no `NEXT_PUBLIC_` key.

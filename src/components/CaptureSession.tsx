@@ -3,6 +3,8 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { handoffResult } from "@/lib/motion/result-handoff";
 import PoseSpike from "./PoseSpike";
+import VoiceGuidance from "./VoiceGuidance";
+import { framingCue, noticeCue, type Cue } from "@/lib/motion/narration";
 import { jointVisible, type Joint } from "@/lib/pose/types";
 import {
   makeProfile,
@@ -87,6 +89,8 @@ export default function CaptureSession() {
   });
   const cameraControl = useRef<{ stop: () => void } | null>(null);
   const [cameraReady, setCameraReady] = useState(false);
+  const voiceEnabled = useRef(false);
+  const [framing, setFraming] = useState<Cue>("missing");
   useEffect(() => {
     const id = new URLSearchParams(location.search).get("profile");
     if (id)
@@ -139,6 +143,8 @@ export default function CaptureSession() {
       const saving = r.queue.then(() => saveSession(session)).then(() => null)
         .catch((error: unknown) => error instanceof Error ? error.message : "Local storage error");
       handoffResult(session, saving);
+      // Start saving immediately; allow the completion cue before navigating.
+      if (voiceEnabled.current) await new Promise(resolve => setTimeout(resolve, 2500));
       router.push(`/results?id=${encodeURIComponent(session.id)}`);
     } catch (e) {
       setNotice(
@@ -312,6 +318,7 @@ export default function CaptureSession() {
           }
         }
       } else {
+        if (c.lostSince !== null) setNotice("Now perform one comfortable setup squat and return to standing. It will not count toward your set.");
         c.lostSince = null;
         c.peak = Math.max(c.peak, x);
         if (c.peak - c.baseline >= 20 && x <= c.baseline + 5) {
@@ -388,6 +395,7 @@ export default function CaptureSession() {
     }
     if (time - lastUI.current >= 200) {
       lastUI.current = time;
+      setFraming(framingCue(joints, side, width, height, Boolean(c && c.baseline === null)));
       const times = poseTimes.current;
       const poseRate =
         times.length > 1
@@ -467,6 +475,11 @@ export default function CaptureSession() {
   }
   return (
     <>
+      <VoiceGuidance
+        onEnabledChange={enabled => { voiceEnabled.current = enabled; }}
+        cue={stage === "finishing" ? "finish" : cameraReady && (stage === "positioning" || (stage === "calibrating" && cal.current?.baseline === null)) ? framing : noticeCue(notice)}
+        immediate={stage !== "positioning" && !(stage === "calibrating" && cal.current?.baseline === null)}
+      />
       <PoseSpike
         onFrame={onFrame}
         onReady={onReady}
