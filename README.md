@@ -38,6 +38,8 @@ Synthetic samples demonstrate software behavior, not a recorded person or pose a
 
 Compatible comparisons retain deterministic measurement observations. An optional Gemini explanation appears only after a separate opt-in and sends bounded aggregate measurements and their evidence IDs through the server; it never sends video, images, landmarks, session IDs or saved set records. Configure `GEMINI_API_KEY` server-side and optionally set `GEMINI_MODEL` (default `gemini-2.5-flash`). Without a key or a successful response, the deterministic comparison remains available.
 
+Optional ElevenLabs narration: on the capture page, select **Enable voice guidance** for framing, calibration and rep announcements; mute it at any time. The 30 River voice clips are checked in, so playback needs no API key or paid API request. Only deliberate regeneration with `node scripts/generate-narration.mjs` uses `ELEVENLABS_API_KEY` from your environment or ignored `.env.local` and spends provider credits. Camera images and pose data are never sent to ElevenLabs. Framing cues are heuristics awaiting real-phone testing.
+
 ## Verification
 
 Browser tests run against the production build on a dedicated fresh port. Install the standard test browser with `npx playwright install chromium`. A nonstandard executable can be specified using `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH`. `PLAYWRIGHT_FAKE_VIDEO` enables explicit prerecorded webcam input for real SDK integration; it is test tooling only. The calibration/recording integration test replaces browser camera/worker APIs with explicitly simulated landmark sequences and a deterministic capture clock. Neither is physical-camera acceptance.

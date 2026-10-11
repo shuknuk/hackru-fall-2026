@@ -138,6 +138,8 @@ Optional Gemini summaries may rewrite the existing deterministic observations in
 
 Optional speech feedback may read short setup or rep messages. It requires user control and text equivalents. Neither stretch feature can displace comparison, PWA verification, or demo rehearsal.
 
+October 11 implementation: explicit Enable/Mute voice guidance uses 30 pre-generated ElevenLabs River/Flash v2.5 clips for framing, calibration, capture and reps. Only fixed cue text is sent during deliberate regeneration; no live camera or pose upload and no client API key. Framing/standing cues use confidence and image-space heuristics, with stability and repeat cooldowns. Production browser evidence and outstanding phone/pilot gates are in [docs/EXECUTION.md](docs/EXECUTION.md).
+
 ## 3. Stack and dependency policy
 
 ### 3.1 Chosen stack

@@ -5,6 +5,18 @@ test("simulated camera landmarks complete calibration, recording and local repla
 }, testInfo) => {
   test.setTimeout(90000);
   await page.addInitScript(() => {
+    const voiceCalls: string[] = [];
+    Object.assign(window, { voiceCalls });
+    const play = HTMLMediaElement.prototype.play;
+    const pause = HTMLMediaElement.prototype.pause;
+    HTMLMediaElement.prototype.play = function () {
+      if (this instanceof HTMLAudioElement) { voiceCalls.push(this.src); return Promise.resolve(); }
+      return play.call(this);
+    };
+    HTMLMediaElement.prototype.pause = function () {
+      if (this instanceof HTMLAudioElement) voiceCalls.push("pause");
+      else pause.call(this);
+    };
     // This semantic capture test uses a deterministic 20 Hz capture clock.
     // Real scheduling/performance is exercised separately by the SDK/device checks.
     const state = { mode: "stand", since: 1000, clock: 1000 };
@@ -116,6 +128,7 @@ test("simulated camera landmarks complete calibration, recording and local repla
     };
   });
   await page.goto(`/session/record?verification=${Date.now()}`);
+  await page.getByRole("button", { name: "Enable voice guidance" }).click();
   await page.getByRole("button", { name: "Start camera", exact: true }).click();
   await expect(page.locator(".camera-view")).toHaveAttribute(
     "data-state",
@@ -137,7 +150,7 @@ test("simulated camera landmarks complete calibration, recording and local repla
     s.since = performance.now();
   });
   await expect(page.locator('[aria-labelledby="calibration-title"]').getByRole("status").first()).toContainText("Calibration complete. Your set is starting in 3 seconds", { timeout: 10000 });
-  await expect(page.getByText("Calibration complete", { exact: true })).toBeVisible();
+  await expect(page.locator("p").filter({ hasText: /^Calibration: Calibration complete$/ })).toBeVisible();
   await page.getByRole("button", { name: "Cancel start" }).click();
   await page.evaluate(() => {
     (window as unknown as { motionFixture: { mode: string } }).motionFixture.mode = "lost";
@@ -193,6 +206,10 @@ test("simulated camera landmarks complete calibration, recording and local repla
       });
       throw error;
     });
+  const spoken = await page.evaluate(() => (window as unknown as { voiceCalls: string[] }).voiceCalls);
+  for (const cue of ["squat", "starting", "recording", "rep1", "rep2"]) {
+    expect(spoken.some(url => url.endsWith(`/narration/${cue}.mp3`))).toBe(true);
+  }
   await page.getByRole("button", { name: "Finish set", exact: true }).click();
   await expect(page).toHaveURL(/\/results\?id=/);
   await expect(page.getByRole("heading", { name: "3 completed reps", exact: true })).toBeVisible();
