@@ -19,16 +19,16 @@
   --ink: #fff4f2;
   --muted: #d4aaa5;
   --paper: #080606;
-  --olive: #ed3b32;
-  --accent: #ed3b32;
-  --accent-hover: #ff5a50;
-  --accent-soft: rgba(237, 59, 50, 0.2);
-  --surface: rgba(27, 10, 10, 0.72);
-  --glass: rgba(28, 12, 12, 0.58);
-  --glass-strong: rgba(24, 8, 8, 0.9);
-  --glass-border: rgba(255, 88, 77, 0.28);
+  --olive: #3b82f6;
+  --accent: #3b82f6;
+  --accent-hover: #60a5fa;
+  --accent-soft: rgba(59, 130, 246, 0.22);
+  --surface: rgba(8, 18, 38, 0.72);
+  --glass: rgba(9, 20, 42, 0.6);
+  --glass-strong: rgba(7, 16, 34, 0.92);
+  --glass-border: rgba(96, 165, 250, 0.3);
   --glass-shadow: 0 12px 34px rgba(0, 0, 0, 0.4);
-  --glass-shadow-hover: 0 18px 50px rgba(237, 59, 50, 0.18);
+  --glass-shadow-hover: 0 18px 50px rgba(59, 130, 246, 0.2);
   color-scheme: dark;
 }
 * {
@@ -536,6 +536,12 @@ button {
 
 /* Shared theme, glass, and touch interaction layer. */
 .theme-dock { position: fixed; z-index: 90; top: 18px; right: 18px; }
+.theme-toggle { display: inline-flex; align-items: center; gap: 9px; min-height: 48px; padding: 6px 13px 6px 7px; border: 1px solid var(--glass-border); border-radius: 999px; background: var(--glass); color: var(--ink); box-shadow: var(--glass-shadow); backdrop-filter: blur(18px) saturate(140%); cursor: pointer; touch-action: manipulation; transition: transform 160ms ease, background 180ms ease, box-shadow 180ms ease; }
+.theme-toggle:hover { background: var(--glass-strong); box-shadow: var(--glass-shadow-hover); }
+.theme-toggle:active { transform: scale(.96); }
+.theme-toggle__track { position: relative; width: 46px; height: 30px; border-radius: 999px; background: var(--accent-soft); border: 1px solid var(--glass-border); }
+.theme-toggle__thumb { position: absolute; top: 3px; left: 3px; display: grid; place-items: center; width: 22px; height: 22px; border-radius: 50%; background: var(--accent); color: white; transition: transform 200ms cubic-bezier(.23,1,.32,1); }
+.theme-toggle[aria-pressed="true"] .theme-toggle__thumb { transform: translateX(16px); }
 .panel,
 .features article,
 .setup-card,
@@ -626,13 +632,13 @@ summary,
 summary:active { transform: scale(.97); }
 
 :root[data-theme="dark"] .camera-placeholder { color: var(--ink); }
-:root[data-theme="dark"] .skip-link { background: #160909; }
+:root[data-theme="dark"] .skip-link { background: #071022; }
 :root[data-theme="dark"] .guide-poses img { opacity: .9; }
 
 @media (max-width: 640px) {
   .theme-dock { top: 12px; right: 12px; }
   .top-nav { padding-right: 132px; gap: 12px; }
-  .glide-select__trigger { min-width: 112px; }
+  .theme-toggle { padding-right: 10px; }
 }
 @media (prefers-reduced-motion: reduce) {
   body,
@@ -644,4 +650,6 @@ summary:active { transform: scale(.97); }
   .features article,
   .setup-card,
   .panel { transition: none; }
+  .theme-toggle,
+  .theme-toggle__thumb { transition: none; }
 }

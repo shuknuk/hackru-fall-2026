@@ -1,10 +1,9 @@
 "use client";
 
+import { Moon, Sun } from "lucide-react";
 import { useSyncExternalStore } from "react";
-import GlideSelect from "./GlideSelect";
 
 type Theme = "light" | "dark";
-const options = [{ value: "light", label: "Light", tag: "Green" }, { value: "dark", label: "Dark", tag: "Red" }];
 
 export default function ThemeControl() {
   const theme = useSyncExternalStore(
@@ -16,11 +15,17 @@ export default function ThemeControl() {
     () => localStorage.getItem("menhel-theme") === "dark" ? "dark" : "light",
     () => "light",
   ) as Theme;
-  function change(next: string) {
-    const themeValue: Theme = next === "dark" ? "dark" : "light";
+  function toggle() {
+    const themeValue: Theme = theme === "dark" ? "light" : "dark";
     document.documentElement.dataset.theme = themeValue;
     localStorage.setItem("menhel-theme", themeValue);
     window.dispatchEvent(new Event("menhel-theme"));
   }
-  return <div className="theme-dock"><GlideSelect options={options} value={theme} onChange={change} ariaLabel="Color theme" /></div>;
+  const dark = theme === "dark";
+  return <div className="theme-dock">
+    <button type="button" className="theme-toggle" aria-label={`Switch to ${dark ? "light" : "dark"} theme`} aria-pressed={dark} onClick={toggle}>
+      <span className="theme-toggle__track" aria-hidden="true"><span className="theme-toggle__thumb">{dark ? <Moon size={16} /> : <Sun size={16} />}</span></span>
+      <span>{dark ? "Dark" : "Light"}</span>
+    </button>
+  </div>;
 }
