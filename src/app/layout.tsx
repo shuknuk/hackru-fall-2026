@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Comfortaa } from "next/font/google";
 import ThemeControl from "@/components/ThemeControl";
+import SiteFooter from "@/components/SiteFooter";
 import "./globals.css";
 
 const comfortaa = Comfortaa({
@@ -30,6 +31,7 @@ export default function RootLayout({
         </a>
         <ThemeControl />
         {children}
+        <SiteFooter />
       </body>
     </html>
   );
