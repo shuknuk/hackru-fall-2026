@@ -1,183 +1,368 @@
-# Execution ledger
-
-## M0 constraints — recorded, evidence still pending
-
-Checked October 10, 2026. The official [HackRU Fall 2026 website](https://www.hackru.org/) lists hacking starting Saturday at noon, submissions due Sunday at noon and judging starting Sunday at 1 PM. These are event-local schedule times; interpreting them as America/New_York is a venue-based assumption. At the start of this work, approximately 23 hours remained to the published submission time.
-
-Team limit is four humans. The repository description lists Aditya, Ayra and Kinshuk, a three-person team. Current attendance, physical phones/browser versions and stable demo device remain unconfirmed. Current workspace is Node 24.19.0 and npm 11.9.0. Desktop browser emulation is not physical-device evidence.
-
-The site does not establish the Fall 2026 pre-existing code/AI-use submission policy. No organizer clearance is claimed and no message has been sent. Ask an on-site organizer and record their answer before asserting eligibility. Newly implemented web code is tracked separately from the 47-file historical import. Archiving does not establish eligibility.
-
-Read the master contract, source import and root native guidance. Preserved exact imported bytes under legacy/menhel, including the original README and native agent instructions. docs/import-provenance.json lists each file SHA-256 and size. Original repo unchanged.
-
-## M1 scaffold — built and deployed; acceptance partial
-
-New root Next.js App Router package, strict TypeScript, Tailwind v4, semantic home and session setup shell, scripts and production-browser checks. Archive excluded from TypeScript, ESLint and Vitest. No camera request or invented session metrics.
-
-Dependencies are exact-pinned in package.json and package-lock.json. TypeScript 5.9.3 was selected instead of the newly observed 7.x major to reduce tooling compatibility risk; acceptance still depends on the clean build. Exact Node is recorded in .nvmrc.
-
-Verified: npm ci completed, lint passed with no warnings after config correction, strict typecheck passed, production build generated / and /session, and all 47 archive hashes passed.
-
-The initial build exposed empty root app directories shadowing src/app; these were removed and the correct route inventory verified.
-
-Playwright browser downloads returned unusable zero-size/truncated archives for 1.64.0 and an attempted 1.58.2 fallback, including headless-shell retry. Reverted to the planned 1.64.0 because downgrading did not fix the download. Browser tests remain unverified until a browser can launch.
-
-Verified server responses: production / and /session return 200 HTML with the expected page content. npm run test:e2e was executed; both browser projects stopped at launch because the required browser executable is absent, so no UI interaction assertions passed.
-
-Cloud desktop Chrome check passed: home rendered, Explore session setup navigated to /session, Back to Menhel returned home, and measured document width 1348px was within the 1363px viewport. Screenshot visually confirmed the olive/sage shell. App-origin console errors were not observed; extension metadata and earlier Vercel-login FedCM errors were present and excluded from application evidence. Keyboard focus checks were inconclusive in this browser surface.
-
-Pending evidence: automated browser suite, keyboard acceptance, mobile viewport and real-phone shell check. Skill references are active project guidance; upstream skill packages have not been installed. SDK/WASM/model checksums and live runtime belong to M2 and are still pending.
-
-## M2 camera spike — implemented; device acceptance pending
-
-Prepared exact MediaPipe Tasks Vision 1.1.0 classic bundle and matched SIMD/module/non-SIMD WASM assets from the installed package. The official Lite float16 v1 model is 5,777,746 bytes with SHA-256 59929e1d1ee95287735ddd833b19cf4ac46d29bc7afddbbf6753c459690d574a. Every prepared asset is checked against docs/mediapipe-assets.json. Apache-2.0 license and official model-card attribution are recorded. Generated public assets are reproduced during predev/prebuild rather than committed.
-
-Explicit user-initiated Start/Stop, front/rear preference, video readiness, stream/engine/frame cleanup, late-permission cancellation, hidden-page stop and camera-disconnection errors are implemented. Fresh-frame scheduling permits one inference in flight. Confidence-gated torso/limb skeleton clears when results become stale. Missing confidence remains null; optional presence is gated only when supplied. No calibration, rep counting or invented measurements are shown.
-
-Worker CPU uses a same-origin classic worker to preserve the SDK importScripts loader, transferable ImageBitmap input and OffscreenCanvas. The worker exists as a standalone public script rather than a Next.js module worker; production-server integration checks exercise the deployed file structure. Main-thread CPU/GPU are explicit diagnostic alternatives, with no automatic fallback. Main-thread synchronous inference may block controls; physical-device evidence must determine whether it is usable.
-
-Asset preparation, strict typecheck, lint, production build, two meaningful unit tests (late permission cleanup and confidence adaptation), and all 47 archive provenance checks passed. A corrupt generated Turbopack cache was cleared before the successful build.
-
-Browser provisioning workaround: the Playwright CDN downloads failed previously, but npm-distributed @sparticuz/chromium 153.0.0 provided Chromium 153.0.8010.0 for automated checks. This is scratch-only test tooling, not an application dependency. Chromium desktop and iPhone-sized Chromium checks exercise shell navigation, denied permissions and late permission release; they do not represent Safari or a physical phone.
-
-Inference integration uses the official https://storage.googleapis.com/mediapipe-assets/pose.jpg (SHA-256 c8a830ed683c0276d713dd5aeda28f415f10cd6291972084a40d0d8b934ed62b), converted to a looping 640×428 prerecorded YUV webcam input. Tests invoke the actual SDK/model, require 33 detected landmarks and at least 12 frames, and check track release and Stop/restart. This static image is integration evidence only, not motion accuracy or live-camera proof. Software-rendered virtual-hardware latency is unsuitable for selecting the phone engine. Two initial frame-count polls exceeded five seconds; the tests now allow twenty seconds and run sequentially to reduce CPU contention.
-
-See DEVICE_CHECKLIST.md for live-person camera, phone/Safari, facing, orientation, visibility, performance and cleanup acceptance. M2 remains partial until those results are recorded. M3–M8 were subsequently implemented under the user’s explicit authorization to defer phone acceptance; see the current implementation evidence below. M9 release acceptance is still partial.
-
-## Version decisions
-
-Exact direct package versions, licenses, engines and peer declarations are in dependency-metadata.json, with transitive versions/integrities in package-lock.json. ESLint 10.12.0 caused peer warnings from bundled plugins that only declare support through 9; selected 9.39.5. npm marks 9.39.5 unsupported, so this is an explicitly recorded compatibility compromise pending an upstream plugin upgrade. No peer overrides are used in the selected package.
-
-## HTTPS deployment evidence
-
-- Team: shuk’s projects / kinshukgoels-projects.
-- Project: menhel-motion (`prj_vutnVrEjmKulOQ7JRm1WC0OM2Lme`).
-- Code commit: `bda60bb36928d92c11543734f2a9a73f9860d9cb`.
-- Deployment: `dpl_HHUdpWCtfpTKGS2LmFhN7h9CR8qN`.
-- Target: staging. Status: READY. Framework: Next.js. Configured Node: 24.x.
-- URL: https://menhel-motion-3p7w4rw3q-kinshukgoels-projects.vercel.app
-- Vercel build duration: approximately 42 seconds, from buildingAt to ready.
-- Deployment Protection: Vercel authentication enabled for all except custom domains, as returned by project settings. Protection was not disabled.
-- Authenticated HTTPS fetches of / and /session returned 200 with expected shell content. This proves server delivery, not visual layout, keyboard navigation, browser hydration or physical-phone compatibility.
-
-An initial request with omitted target was unexpectedly classified as production. Cancelled before completion (`dpl_8SrEg9axAqNfb3zACn5XHzEzow8w`, CANCELED). An explicit preview target was rejected by the API; staging was accepted and confirmed. No production release is claimed.
-
-External skills remain reviewed references, with root AGENTS.md active. Installing complete upstream skill bundles remains open; do not claim that requirement passed. M1 is therefore partial, pending full browser/phone acceptance and selected skill installation where supported. The M2 camera/model spike and subsequent implementation evidence follow below.
-
-Final selected-lockfile npm ci, lint, typecheck and provenance check were rerun after restoring Playwright 1.64.0 and passed. No unit tests exist yet; no movement or camera behavior is claimed as tested.
-
-M2 browser result: all six desktop Chromium tests passed in the sequential rerun, including actual worker CPU, main CPU and main GPU inference, denied permission, late permission cancellation and shell navigation. GPU integration required approximately 72 seconds including model initialization/restart; this is not a usability performance pass. The final mobile-sized Chromium rerun passed all three shell/denial/cancellation checks; three inference variants were deliberately skipped on that project. Total final browser evidence is nine passed, three intentional skips across sequential desktop/mobile runs. This is not iPhone/Safari evidence.
-
-## M2 HTTPS staging evidence
-
-Code commit b04947b7b0665d7667d07a59763ea36504600e7e. Deployment dpl_5pYEbHvRmbSKtQjFUgRZcqu4yDF1 is READY on target staging, Node 24.x, Next.js; build took approximately 44 seconds. URL: https://menhel-motion-dpwwdzia9-kinshukgoels-projects.vercel.app/session . Authentication protection remains enabled. Authenticated fetches of /session, /pose-worker.js and /mediapipe/asset-manifest.json returned 200, with expected Start camera content and pinned model checksum. This establishes delivery, not physical-camera behavior.
-
-The build reported five high npm audit findings through the development-only eslint-config-next → @next/eslint-plugin-next → fast-glob → micromatch → braces chain, rooted in GHSA-vfj7-8cjw-p6xm (deeply nested glob-pattern stack exhaustion). Audit suggests a breaking downgrade to eslint-config-next 14.2.35; it was not applied to the Next 16 setup. Record and resolve the tooling advisory before final release; do not claim a clean full-dependency audit.
-
-Production-only audit (`npm audit --omit=dev --json`) returned zero vulnerabilities. This does not erase the development tooling findings.
-
-## M3–M8 current implementation — October 10, 2026
-
-The user explicitly requested continuing the full build while the iPhone was unavailable. This overrides waiting for physical-device acceptance before subsequent development; it does not establish device acceptance. Earlier entries above record the historical milestone state, not the current feature inventory.
-
-Implemented body-only bounded session schemas, aspect-corrected projected knee/hip/lean measurements, null-safe confidence gates, median/MAD calibration, anatomical-side locking and time-aware smoothing. The hysteresis/dwell detector requires standing, descent, a qualified bottom, ascent and standing return. Incomplete, timed-out or materially gapped cycles are excluded. Tracking coverage is derived from valid timestamp intervals. One segment is supported per set; interruption finishes that set rather than resuming across a discontinuity.
-
-The capture UI connects explicit camera start, side/setup confirmation, standing baseline, a comfortable setup cycle, ready, recording, finish, results and profile recheck for another set. Limits are ten completed reps, 90 seconds, 1,801 samples and 5 MiB. A bounded body-landmark snapshot replaces the draft about every two seconds, rather than append-only chunks. Finishing releases the camera and atomically commits the session/profile while removing its draft. Failed persistence remains visible with export/retry. Interrupted draft recovery preserves the original timestamp and excludes unfinished cycles; the last uncheckpointed seconds may be absent.
-
-IndexedDB history supports twenty sessions, draft recovery, export/import and confirmed deletion. Imports are strictly validated and derived geometry/filter/reps/summary are recomputed; declared provenance is labelled, not authenticated. It does not silently remove earlier sessions to make room. Schema version 1 accepts only the implemented schema, with unsupported versions rejected rather than pretending a migration exists.
-
-Stored replay includes rep selection, original timestamps, scrubbing, play/pause, speed controls, knee trace, gap-aware skeletons and text metrics. Replay pauses when hidden and starts paused. Comparison checks model, algorithm, calibration/profile, anatomical side, camera facing, aspect and declared source. Confirmed compatible sets show valid-rep medians, directional deltas and at most three deterministic observations with metric IDs and sensitivity thresholds. Selected reps align start/bottom/end at 0/50/100 percent while preserving actual seconds. The standing-hip reference and fixed body scale are per session; there is no frame-wise recentering. This is projected motion observation, not clinical or 3D accuracy evidence.
-
-The installable shell has verified 192/512 icons, a 512 maskable icon and a 180 Apple touch icon, native manifest metadata and contextual installation guidance. The build captures versioned route HTML and the manifest from its freshly built production server, then hashes those exact bytes with all static chunks and icons. The deployed inventory has 31 assets, 1,078,799 bytes. Model/WASM are excluded; offline live tracking is not promised. A completeness marker is written last, failures never report ready, and explicit preparation repairs missing cache entries. If the first status check races worker activation, the UI reruns verified preparation and checks again before reporting ready. Full-document navigation avoids relying on uncached RSC payloads. Service worker updates wait for explicit application and ask every window whether it is recording; unknown clients block. Old caches needed by open app versions are retained.
-
-### Verification boundaries
-
-- Production build, lint, strict typecheck, eighteen unit tests across three files, and all 47 unchanged archive hashes passed. Unit tests exercise both anatomical sides, confidence absence, aspect geometry, hysteresis/partial/gapped cycles, smoothing/timestamp ordering, strict import bounds/tampering, phase alignment and directional observations.
-- Browser tests use production Next through a test-only reverse proxy, never an application/deployed API. The proxy can serve a different worker generation for update coordination. This tests recording-tab blocking and safe activation; it does not prove a distinct application-bundle A→B upgrade.
-- The calibration/three-rep capture test explicitly replaces browser camera/worker APIs with authored landmark sequences, a canvas stream and a deterministic 20 Hz capture clock. It validates UI state transitions, local persistence, camera release and replay after reload; it is not MediaPipe movement accuracy evidence.
-- Separate camera tests use the real SDK/model and a prerecorded static image input. They cover worker CPU and main CPU/GPU integration, not live-person performance.
-- The synthetic pair is labelled on screens and in stored/exported data. Browser request checks confirm sample/replay/comparison flows do not load the vision model. Source review found no camera/landmark upload in the core flow; camera pixels exist only in local video/inference buffers. Export is explicitly user initiated.
-- A combined browser run exposed virtual-host scheduling gaps up to 235 ms in the wall-clock synthetic recording test. The application correctly invalidated these cycles under the unchanged 150 ms rule. The semantic recording harness now advances a declared deterministic capture clock per delivered video frame, separating UI/state-machine integration from scheduling/performance acceptance. Real SDK checks retain actual timestamps.
-
-Browser integration covers local reload, selected phase metrics, export/import/delete, unsupported import, storage-open failure, draft recovery, the twenty-slot cap, hard offline reload of history/replay/compare, cache repair, failed inventory preparation and cross-tab update coordination. Chromium phone-size checks are not Safari evidence.
-
-Remaining release gates: physical iPhone/Safari installation and permissions, live-person pilot counts, actual device engine/FPS/latency/heat, a real distinct-bundle update, three-minute rehearsal, consented demo recording and organizer code/AI-use eligibility. The master MVP and DEVICE_CHECKLIST.md retain those pending checks. Complete upstream skill bundles remain reviewed references, not installed packages. The existing development-only audit advisory remains open; no clean full-dependency audit is claimed.
-
-Final browser evidence: the full matrix passed 21 checks and intentionally skipped three mobile real-SDK variants. After the test-only clock correction, both desktop and phone-sized recording cases passed (17.0 and 17.3 seconds). After production-server offline-shell and readiness-race fixes, all ten history/offline tests passed again across desktop and phone-sized Chromium. The resulting evidence is 33 passing browser checks across those runs and three deliberate mobile inference skips. Lint, strict typecheck, production build, 18 unit tests and all 47 archive hashes pass. No physical device or Safari acceptance is claimed.
-
-## M3–M8 publication and deployment status
-
-The app is published on `shuknuk/hackru-fall-2026/main`; the final code commit is `0621f6aade6f011ad920186f3a59ee0789ab863d`. The original 47-file archive remains hash-verified and unchanged.
-
-The user approved staging deployment to the existing Vercel project `menhel-motion` (`prj_vutnVrEjmKulOQ7JRm1WC0OM2Lme`, team `team_DF3duWhqUYoT84K4m8fUymHa`). The first staging build exposed that Vercel’s Next.js adapter omits internal prerender HTML and manifest files; generation now captures both through the built production server and verifies their exact bytes. The final deployment is `dpl_4eAtnUqLfDzceTcP23fjDFrA1xYV`, **READY**, target **staging**, commit `0621f6a`, framework Next.js, Node 24.x. Build completed in about 41 seconds. URL: https://menhel-motion-ltftal055-kinshukgoels-projects.vercel.app .
-
-Authenticated HTTPS checks returned 200 for `/`, `/session`, `/history`, `/compare`, `/manifest.webmanifest`, `/sw.js`, `/offline-inventory.json`, versioned offline HTML, and icons. Session returned the explicit Start camera and side-view setup UI. History returned synthetic-pair and Prepare offline controls. The service worker and inventory report the same build version `a54909ad-e24e-472a-86ef-e60912c3d03e`. Deployment protection remains enabled. This verifies deployment delivery and local-browser offline behavior, not Safari installation or live-person movement accuracy. The initial approval review rejected deployment before the user explicitly approved the staging target; that approval was received and the final deployment completed.
-
-## Post-MVP checklist implementation — October 10, 2026
-
-Slow but valid pose inference is now distinct from landmark loss. Consecutive valid samples remain continuous through a 400 ms interval, which covers 4 processed frames/s with timing margin; explicit invalid samples retain the 150 ms loss rule. Rep coverage and replay interpolation use the same bounded valid-sample interval. A deterministic 4 fps regression fixture counts the same three completed cycles. The capture UI exposes detector phase, rolling processed pose rate and a separate tracking state so a low valid rate is not described as lost tracking. Physical-device performance and motion accuracy remain pending.
-
-The setup page includes the free-tier RepDB Bodyweight Squat start and peak illustrations as a visual orientation guide, not a required depth target. The app shows visible RepDB attribution; the upstream free-tier license and asset hashes are retained in the repository. No image was used as generative-model input.
-
-M10 adds an optional Gemini explanation after the deterministic comparison. The browser must receive a separate user opt-in. The strict request accepts only rep counts, tracking coverage, median knee flexion, median ascent duration and up to three existing measurement statements with known IDs. Camera frames, images, landmarks, session IDs and stored records are excluded. `GEMINI_API_KEY` and the optional model selection remain server-side. Gemini must return structured JSON, and the server rejects response entries without a submitted evidence ID. Missing configuration, timeout, upstream failure and invalid output leave the deterministic observations intact. Schema, prompt-boundary and evidence-grounding tests pass locally; a live Gemini request remains untested because no team API key was present.
-
-Post-checklist verification passed: lint, strict typecheck, production build, all 21 unit tests and all 47 archive provenance hashes. The browser matrix passed all 20 runnable desktop/mobile-sized Chromium checks; six real-SDK prerecorded-camera variants were intentionally skipped because no fake video path was supplied. A focused rerun passed four desktop/mobile checks that verify the RepDB guide, aggregate-only Gemini request shape, missing-key fallback and preserved deterministic observations. These automated checks do not close the physical-device or live-Gemini gates.
-
-The checklist implementation was published to `main` as commit `6b302b16563a284128c83ba4dd94338a2d4bb4df` and deployed to the already approved `menhel-motion` staging project. Deployment `dpl_BjbkD5vtRUe84E65ffrYogRoNXio` reached **READY** on target **staging** with Next.js and Node 24.x after about 37 seconds. Its protected URL is https://menhel-motion-495cs8593-kinshukgoels-projects.vercel.app . Authenticated fetches returned 200 for `/session`, `/compare`, and the RepDB illustration; the session HTML contains the guide heading and visible attribution. No `GEMINI_API_KEY` was provided, so the deployed live-Gemini path is intentionally unverified and uses the documented unavailable fallback.
-
-## Live start-set failure fix — October 10, 2026
-Observed live camera processing around 12 fps while selected-leg measurements were unavailable. Clicking Start set after calibration returned a standing warning without recording (0.0 seconds elapsed). Start now enters a cancellable waiting state and begins recording only after 300 ms of consecutive valid standing samples; invalid landmarks or a gap over 400 ms reset the wait. Calibration/start warnings name missing selected-leg joints. Confidence thresholds remain unchanged. The simulated recording test covers lost tracking, cancellation, recovery, and three complete cycles. Typecheck and all 21 unit tests pass (workspace TEMP used to avoid sandbox temp errors). Local production build is blocked by Windows sandbox canonicalization access denial; production browser regression and live-device acceptance remain pending.
-
-Staging deployment dpl_8CaQP1C4bJr8FssrvbzDAvLTE3gy reached READY at https://menhel-motion-j1qnaowdt-kinshukgoels-projects.vercel.app from commit 5c6711d1ef8137676b541feba978a3a1ca18a8f8. Full lint and targeted lint passed. The deployed session page loads. Production browser regression remains unexecuted: Playwright browser extraction also fails with sandbox realpath EPERM. Live camera acceptance remains pending; no live counted-rep success is claimed.
-
-## Explicit calibration and automatic recording start — October 10, 2026
-Calibration now displays persistent step status and completion. A completed setup squat queues recording after a three-second standing preparation period, with explicit Calibration complete / Set started messages and a persistent recording indicator. Brief missing samples use the existing 150 ms tracking-loss tolerance instead of immediately discarding calibration. Pending start retains up to 400 ms of actual standing landmark frames to arm the detector before the first squat, keeping live and saved analysis consistent. Finish set is unchanged. Typecheck, targeted lint and all 22 unit tests pass, including first-rep arming. The browser fixture asserts completion messaging and pending-start behavior; execution remains blocked by sandbox browser extraction. Physical-camera accuracy is still pending.
-
-## Dedicated set results — October 10, 2026
-Capture now shows completed reps and elapsed time; processed pose rate, tracking state, estimated hip/knee flexion and movement phase are removed from the capture metrics. Finish retains camera cleanup, completed-rep analysis and local saving, but immediately navigates to /results?id=... with an in-memory handoff while saving continues. Results show count, duration, knee-bend median, ascent median and tracking coverage, plus replay, another set, export and history/comparison links. Saving errors preserve the in-memory result with retry/export; saved results reload from IndexedDB. Results are included in offline shells and route inventory. All 24 unit tests, typecheck and targeted lint pass; browser integration assertions cover redirect, saved status and reload but remain unexecuted due the documented sandbox extraction restriction.
-
-## Missed completed standing return — October 10, 2026
-A user-exported failed set had zero reps, 49% tracking coverage and an interrupted ending. The UI simplification had not changed the detector. Inspection identified an observed down-and-up cycle with two valid standing frames about 100 ms apart that was discarded by the 250 ms completion hold before tracking loss. Return confirmation now requires 80 ms between valid standing samples; initial standing arming, depth qualification, duration, coverage and gap rules remain unchanged. A local-only replay of the exported set recovers exactly one observed complete squat; other ascents lose tracking before standing and remain excluded. Personal capture data is not committed. Two authored regression tests cover confirmed return before loss and missing return; all 26 unit tests, typecheck and targeted lint pass. Capture now shows plain positioning guidance on sustained loss while keeping technical metrics hidden. Results routing is preserved. Live acceptance remains pending.
-
-## Library simplification and live Gemini check — October 10, 2026
-Removed export controls and the download helper from library, results and replay. Replay and per-set deletion remain. Removed the Your data controls section (import, persistence request and delete-all UI). Saved results still support retry saving. Browser specs now test the absence of export/data controls and retain replay, recovery and capacity coverage without file export/import. All 26 unit tests, typecheck and targeted lint pass; browser suite execution remains blocked by the documented sandbox restriction.
-A live opt-in Gemini request on an existing synthetic-pair comparison succeeded. Displayed sets had three reps each, knee medians 72 and 61 degrees, and ascent medians 0.95 and 1.00 seconds. The response referenced about 10 degrees less estimated knee flexion, an ascent difference below 0.2 seconds, and similar between-repetition variation, with submitted evidence IDs. It included the single-camera/non-medical caveat and made no injury diagnosis or video-based form judgment. Synthetic pairs remain labelled authored demonstration sequences, not camera-accuracy evidence.
-
-
-## October 10 - focused squat UX and Gemini reliability
-
-Removed the global Keep replay close section. Its worker implementation remains intact. Record now opens a guide at /session and continues to /session/record for camera, calibration and recording; the prior-profile query is preserved. Capture state machine, detector thresholds, calibration, auto-start, Finish set and results handoff remain unchanged. Comparison uses everyday labels and standing/bottom/standing timeline landmarks; alignment calculations remain unchanged. Squat demo geometry keeps feet planted and lowers hips; both demo sets still contain three completed squats. Coach labels are Gemini and Measurement coach.
-
-The old deployed Gemini request succeeded during reproduction; the reported generic error was intermittent. API changes disable extra thinking for supported Flash models, allow 25 seconds per attempt, retry one temporary server/transport/invalid-response failure, combine non-thought response text parts, preserve response evidence validation, and show specific timeout/rate-limit/configuration messages. Logs record only status/reason and attempt, not user measurements or credentials. Automated verification: 30 unit tests pass, including retry, rate-limit, rejected evidence and squat-demo geometry; typecheck and lint pass. Production deployment/browser verification follows. Physical live squat acceptance remains user-run; no claim of a new physical camera test.
-
-Deployed verification: staging dpl_AKY2QNf9n6UJjeeJcu67YmKt7wd3 is READY at https://menhel-motion-qoywhw6up-kinshukgoels-projects.vercel.app (commit 5443d9b). Browser verified guide-only first page, Continue navigation to camera/setup page, absent offline panel, two three-rep squat demo sets, 50 percent Bottom of squat alignment, renamed coach labels and successful real Gemini explanation grounded in displayed knee bend, ascent and variation. Screenshot saved in chat outputs. Full local Playwright production suite remains unrun due the previously documented Windows environment limitation; this is deployed browser UI verification, not a new physical-camera acceptance run.
-
-
-## October 10 - squat-only replay and independently calibrated comparisons
-
-Whole-set replay now starts at the first completed squat, skips intervals outside completed squat anchors, and ends at the final completed squat. Trace follows the same interval filter. Zero-rep sets have no playable squat replay. Stored samples, rep detection, calibration, capture and results are unchanged. Independently calibrated sets no longer fail solely on exact profile IDs, floating-point calibration values or redundant fingerprint strings; actual exercise/version/source/body side/camera facing/aspect and completed-rep gates remain. Same-person/camera confirmation is still required. Separate calibrations produce a Limited comparison notice explaining the counting qualification.
-
-All 32 unit tests pass; typecheck and lint pass. Regression tests cover leading setup, between-rep idle time and trailing partial movement exclusion, separately calibrated left sets after confirmation, and preserved right-side/camera-facing blocks. Live physical-camera revalidation and local production Playwright suite remain pending; deployment verification follows.
-
-## October 10 - results-only squat posture feedback
-
-Added a results panel assessing visible hip/knee bending, possible heel rise and return to standing for completed reps. Sources: https://pmc.ncbi.nlm.nih.gov/articles/PMC4262933/ and https://pmc.ncbi.nlm.nih.gov/articles/PMC10987311/ . No universal ideal hip/knee angle or full correctness claim is made. Thresholds are explicitly provisional app heuristics: 15 degree hip change/return tolerance and 0.2 projected foot slope change. Clear evidence requires three samples per window and 90 percent rep coverage; insufficient evidence remains unavailable. A labelled authored reference skeleton uses the existing replay player and is never saved as user data. Only SetResults and new supporting component/analysis/tests change; calibration, counting, saving, existing replay and comparison are unchanged. All 37 unit tests, typecheck and lint pass. Five new tests cover shallow/deeper squats, missing hip bend, both anatomical heels, missing tracking and incomplete hip return. Physical-camera posture accuracy remains unvalidated.
-
-## October 10 - friendly feedback and low-coverage camera guidance
-
-Rephrased posture feedback and its help text in everyday language without angle values or technical measurement terms. Reference animation hides measurement overlays; ordinary replay retains its default display and behavior. Results show a camera-positioning alert strictly below 75 percent tracking coverage: move closer while keeping hips, knees, legs and feet clearly in side view. No posture thresholds, rep counting, calibration, storage, comparison or Gemini behavior changed. 37 unit tests pass; typecheck and lint pass before the reference-only display adjustment; final checks follow. Gemini ideas are discussion only, no new calls/features implemented.
-
-## October 10 - four grounded Gemini helpers
-
-Implemented explicit-action set summaries (what went well + one next step), selected posture-cue explanations, questions about displayed set results, and chronological summaries of two to five selected compatible saved sets. Source/setup/version comparison gates and same-person/camera confirmation apply to history summaries. Poor coverage produces recording guidance instead of progress claims. Consent describes set summaries, posture outcomes and question transmission; video, joints, IDs and dates remain local. Existing comparison coach, recording, calibration, counting, storage, posture thresholds and replay are unchanged.
-
-New /api/gemini-help uses the existing configured Google REST model/key without adding dependencies, server-only credentials, strict bounded request/response schemas, evidence IDs, approved cue prompts, no technical angle wording, 25-second per-attempt timeout, one temporary retry, maximum 2048 output tokens, bounded payload and a best-effort three-request per-instance concurrency cap (not a durable global spend limit). Model text remains fallible; an evidence-ID match alone does not prove semantic correctness. Unknown evidence is not interpreted as wrong posture. 47 unit tests pass including ten new payload, mode, evidence, visibility, retry, configuration and rate-limit checks. Typecheck and lint checks accompany deployment. Physical-camera accuracy and the previously blocked full local Playwright suite remain unverified; live Gemini UI verification follows.
-
-Live deployed verification: staging dpl_7afyk4SqBrX75hDv49RFTxktVkJN reached READY at https://menhel-motion-gcfgtyrv6-kinshukgoels-projects.vercel.app (472caafc). Verified results controls for all three single-set modes, selected heel cue and question submission, history selection of two demo sets, demonstration confirmation, consent gating and progress submission. Real Gemini requests timed out and later returned an upstream request-limit response; no successful generated answer is claimed. The unchanged comparison coach also logged two 25-second upstream timeouts on the same deployment, supporting a service/connection limitation rather than a new-helper regression. UI keeps recorded results and shows retry messages. All 47 tests, typecheck and lint passed; full local production Playwright suite remains blocked as documented earlier. Screenshots are in this chat's outputs.
-
-
-## October 10 — Gemini diagnostics and analysis button
-
-User withdrew the two-key fallback request after the original write-only credential could not be recovered. Retained the newer key. Added sanitized Google error payload, HTTP status, model, attempt and Retry-After diagnostics in both Gemini APIs and expandable UI details; timeout/validation and local concurrency errors are distinguished from Google errors. Credentials and submitted summaries are excluded. Replaced the transmission consent checkbox with an explicit Analyze with Gemini action and adjacent disclosure. Existing feedback/question/progress selection and comparison gates remain. Shared star icon and blue loading ring support reduced motion; recreated appearance, not a claimed official Google animation asset. Preview model will be pinned to gemini-2.5-flash with thinking disabled, based on direct full-prompt timings (1.054s vs latest 24.629s), without a ten-second guarantee. Recording, counting, calibration, replay and posture logic untouched. Automated and deployed verification recorded below.
-
-Verification: 48 unit tests pass, including quota/retry diagnostics and credential redaction; typecheck and lint pass. Browser test selector updated for direct action. Full local browser suite remains blocked by the previously recorded Windows restriction; deployed verification follows.
+# Execution ledger
+
+
+
+## M0 constraints — recorded, evidence still pending
+
+
+
+Checked October 10, 2026. The official [HackRU Fall 2026 website](https://www.hackru.org/) lists hacking starting Saturday at noon, submissions due Sunday at noon and judging starting Sunday at 1 PM. These are event-local schedule times; interpreting them as America/New_York is a venue-based assumption. At the start of this work, approximately 23 hours remained to the published submission time.
+
+
+
+Team limit is four humans. The repository description lists Aditya, Ayra and Kinshuk, a three-person team. Current attendance, physical phones/browser versions and stable demo device remain unconfirmed. Current workspace is Node 24.19.0 and npm 11.9.0. Desktop browser emulation is not physical-device evidence.
+
+
+
+The site does not establish the Fall 2026 pre-existing code/AI-use submission policy. No organizer clearance is claimed and no message has been sent. Ask an on-site organizer and record their answer before asserting eligibility. Newly implemented web code is tracked separately from the 47-file historical import. Archiving does not establish eligibility.
+
+
+
+Read the master contract, source import and root native guidance. Preserved exact imported bytes under legacy/menhel, including the original README and native agent instructions. docs/import-provenance.json lists each file SHA-256 and size. Original repo unchanged.
+
+
+
+## M1 scaffold — built and deployed; acceptance partial
+
+
+
+New root Next.js App Router package, strict TypeScript, Tailwind v4, semantic home and session setup shell, scripts and production-browser checks. Archive excluded from TypeScript, ESLint and Vitest. No camera request or invented session metrics.
+
+
+
+Dependencies are exact-pinned in package.json and package-lock.json. TypeScript 5.9.3 was selected instead of the newly observed 7.x major to reduce tooling compatibility risk; acceptance still depends on the clean build. Exact Node is recorded in .nvmrc.
+
+
+
+Verified: npm ci completed, lint passed with no warnings after config correction, strict typecheck passed, production build generated / and /session, and all 47 archive hashes passed.
+
+
+
+The initial build exposed empty root app directories shadowing src/app; these were removed and the correct route inventory verified.
+
+
+
+Playwright browser downloads returned unusable zero-size/truncated archives for 1.64.0 and an attempted 1.58.2 fallback, including headless-shell retry. Reverted to the planned 1.64.0 because downgrading did not fix the download. Browser tests remain unverified until a browser can launch.
+
+
+
+Verified server responses: production / and /session return 200 HTML with the expected page content. npm run test:e2e was executed; both browser projects stopped at launch because the required browser executable is absent, so no UI interaction assertions passed.
+
+
+
+Cloud desktop Chrome check passed: home rendered, Explore session setup navigated to /session, Back to Menhel returned home, and measured document width 1348px was within the 1363px viewport. Screenshot visually confirmed the olive/sage shell. App-origin console errors were not observed; extension metadata and earlier Vercel-login FedCM errors were present and excluded from application evidence. Keyboard focus checks were inconclusive in this browser surface.
+
+
+
+Pending evidence: automated browser suite, keyboard acceptance, mobile viewport and real-phone shell check. Skill references are active project guidance; upstream skill packages have not been installed. SDK/WASM/model checksums and live runtime belong to M2 and are still pending.
+
+
+
+## M2 camera spike — implemented; device acceptance pending
+
+
+
+Prepared exact MediaPipe Tasks Vision 1.1.0 classic bundle and matched SIMD/module/non-SIMD WASM assets from the installed package. The official Lite float16 v1 model is 5,777,746 bytes with SHA-256 59929e1d1ee95287735ddd833b19cf4ac46d29bc7afddbbf6753c459690d574a. Every prepared asset is checked against docs/mediapipe-assets.json. Apache-2.0 license and official model-card attribution are recorded. Generated public assets are reproduced during predev/prebuild rather than committed.
+
+
+
+Explicit user-initiated Start/Stop, front/rear preference, video readiness, stream/engine/frame cleanup, late-permission cancellation, hidden-page stop and camera-disconnection errors are implemented. Fresh-frame scheduling permits one inference in flight. Confidence-gated torso/limb skeleton clears when results become stale. Missing confidence remains null; optional presence is gated only when supplied. No calibration, rep counting or invented measurements are shown.
+
+
+
+Worker CPU uses a same-origin classic worker to preserve the SDK importScripts loader, transferable ImageBitmap input and OffscreenCanvas. The worker exists as a standalone public script rather than a Next.js module worker; production-server integration checks exercise the deployed file structure. Main-thread CPU/GPU are explicit diagnostic alternatives, with no automatic fallback. Main-thread synchronous inference may block controls; physical-device evidence must determine whether it is usable.
+
+
+
+Asset preparation, strict typecheck, lint, production build, two meaningful unit tests (late permission cleanup and confidence adaptation), and all 47 archive provenance checks passed. A corrupt generated Turbopack cache was cleared before the successful build.
+
+
+
+Browser provisioning workaround: the Playwright CDN downloads failed previously, but npm-distributed @sparticuz/chromium 153.0.0 provided Chromium 153.0.8010.0 for automated checks. This is scratch-only test tooling, not an application dependency. Chromium desktop and iPhone-sized Chromium checks exercise shell navigation, denied permissions and late permission release; they do not represent Safari or a physical phone.
+
+
+
+Inference integration uses the official https://storage.googleapis.com/mediapipe-assets/pose.jpg (SHA-256 c8a830ed683c0276d713dd5aeda28f415f10cd6291972084a40d0d8b934ed62b), converted to a looping 640×428 prerecorded YUV webcam input. Tests invoke the actual SDK/model, require 33 detected landmarks and at least 12 frames, and check track release and Stop/restart. This static image is integration evidence only, not motion accuracy or live-camera proof. Software-rendered virtual-hardware latency is unsuitable for selecting the phone engine. Two initial frame-count polls exceeded five seconds; the tests now allow twenty seconds and run sequentially to reduce CPU contention.
+
+
+
+See DEVICE_CHECKLIST.md for live-person camera, phone/Safari, facing, orientation, visibility, performance and cleanup acceptance. M2 remains partial until those results are recorded. M3–M8 were subsequently implemented under the user’s explicit authorization to defer phone acceptance; see the current implementation evidence below. M9 release acceptance is still partial.
+
+
+
+## Version decisions
+
+
+
+Exact direct package versions, licenses, engines and peer declarations are in dependency-metadata.json, with transitive versions/integrities in package-lock.json. ESLint 10.12.0 caused peer warnings from bundled plugins that only declare support through 9; selected 9.39.5. npm marks 9.39.5 unsupported, so this is an explicitly recorded compatibility compromise pending an upstream plugin upgrade. No peer overrides are used in the selected package.
+
+
+
+## HTTPS deployment evidence
+
+
+
+- Team: shuk’s projects / kinshukgoels-projects.
+
+- Project: menhel-motion (`prj_vutnVrEjmKulOQ7JRm1WC0OM2Lme`).
+
+- Code commit: `bda60bb36928d92c11543734f2a9a73f9860d9cb`.
+
+- Deployment: `dpl_HHUdpWCtfpTKGS2LmFhN7h9CR8qN`.
+
+- Target: staging. Status: READY. Framework: Next.js. Configured Node: 24.x.
+
+- URL: https://menhel-motion-3p7w4rw3q-kinshukgoels-projects.vercel.app
+
+- Vercel build duration: approximately 42 seconds, from buildingAt to ready.
+
+- Deployment Protection: Vercel authentication enabled for all except custom domains, as returned by project settings. Protection was not disabled.
+
+- Authenticated HTTPS fetches of / and /session returned 200 with expected shell content. This proves server delivery, not visual layout, keyboard navigation, browser hydration or physical-phone compatibility.
+
+
+
+An initial request with omitted target was unexpectedly classified as production. Cancelled before completion (`dpl_8SrEg9axAqNfb3zACn5XHzEzow8w`, CANCELED). An explicit preview target was rejected by the API; staging was accepted and confirmed. No production release is claimed.
+
+
+
+External skills remain reviewed references, with root AGENTS.md active. Installing complete upstream skill bundles remains open; do not claim that requirement passed. M1 is therefore partial, pending full browser/phone acceptance and selected skill installation where supported. The M2 camera/model spike and subsequent implementation evidence follow below.
+
+
+
+Final selected-lockfile npm ci, lint, typecheck and provenance check were rerun after restoring Playwright 1.64.0 and passed. No unit tests exist yet; no movement or camera behavior is claimed as tested.
+
+
+
+M2 browser result: all six desktop Chromium tests passed in the sequential rerun, including actual worker CPU, main CPU and main GPU inference, denied permission, late permission cancellation and shell navigation. GPU integration required approximately 72 seconds including model initialization/restart; this is not a usability performance pass. The final mobile-sized Chromium rerun passed all three shell/denial/cancellation checks; three inference variants were deliberately skipped on that project. Total final browser evidence is nine passed, three intentional skips across sequential desktop/mobile runs. This is not iPhone/Safari evidence.
+
+
+
+## M2 HTTPS staging evidence
+
+
+
+Code commit b04947b7b0665d7667d07a59763ea36504600e7e. Deployment dpl_5pYEbHvRmbSKtQjFUgRZcqu4yDF1 is READY on target staging, Node 24.x, Next.js; build took approximately 44 seconds. URL: https://menhel-motion-dpwwdzia9-kinshukgoels-projects.vercel.app/session . Authentication protection remains enabled. Authenticated fetches of /session, /pose-worker.js and /mediapipe/asset-manifest.json returned 200, with expected Start camera content and pinned model checksum. This establishes delivery, not physical-camera behavior.
+
+
+
+The build reported five high npm audit findings through the development-only eslint-config-next → @next/eslint-plugin-next → fast-glob → micromatch → braces chain, rooted in GHSA-vfj7-8cjw-p6xm (deeply nested glob-pattern stack exhaustion). Audit suggests a breaking downgrade to eslint-config-next 14.2.35; it was not applied to the Next 16 setup. Record and resolve the tooling advisory before final release; do not claim a clean full-dependency audit.
+
+
+
+Production-only audit (`npm audit --omit=dev --json`) returned zero vulnerabilities. This does not erase the development tooling findings.
+
+
+
+## M3–M8 current implementation — October 10, 2026
+
+
+
+The user explicitly requested continuing the full build while the iPhone was unavailable. This overrides waiting for physical-device acceptance before subsequent development; it does not establish device acceptance. Earlier entries above record the historical milestone state, not the current feature inventory.
+
+
+
+Implemented body-only bounded session schemas, aspect-corrected projected knee/hip/lean measurements, null-safe confidence gates, median/MAD calibration, anatomical-side locking and time-aware smoothing. The hysteresis/dwell detector requires standing, descent, a qualified bottom, ascent and standing return. Incomplete, timed-out or materially gapped cycles are excluded. Tracking coverage is derived from valid timestamp intervals. One segment is supported per set; interruption finishes that set rather than resuming across a discontinuity.
+
+
+
+The capture UI connects explicit camera start, side/setup confirmation, standing baseline, a comfortable setup cycle, ready, recording, finish, results and profile recheck for another set. Limits are ten completed reps, 90 seconds, 1,801 samples and 5 MiB. A bounded body-landmark snapshot replaces the draft about every two seconds, rather than append-only chunks. Finishing releases the camera and atomically commits the session/profile while removing its draft. Failed persistence remains visible with export/retry. Interrupted draft recovery preserves the original timestamp and excludes unfinished cycles; the last uncheckpointed seconds may be absent.
+
+
+
+IndexedDB history supports twenty sessions, draft recovery, export/import and confirmed deletion. Imports are strictly validated and derived geometry/filter/reps/summary are recomputed; declared provenance is labelled, not authenticated. It does not silently remove earlier sessions to make room. Schema version 1 accepts only the implemented schema, with unsupported versions rejected rather than pretending a migration exists.
+
+
+
+Stored replay includes rep selection, original timestamps, scrubbing, play/pause, speed controls, knee trace, gap-aware skeletons and text metrics. Replay pauses when hidden and starts paused. Comparison checks model, algorithm, calibration/profile, anatomical side, camera facing, aspect and declared source. Confirmed compatible sets show valid-rep medians, directional deltas and at most three deterministic observations with metric IDs and sensitivity thresholds. Selected reps align start/bottom/end at 0/50/100 percent while preserving actual seconds. The standing-hip reference and fixed body scale are per session; there is no frame-wise recentering. This is projected motion observation, not clinical or 3D accuracy evidence.
+
+
+
+The installable shell has verified 192/512 icons, a 512 maskable icon and a 180 Apple touch icon, native manifest metadata and contextual installation guidance. The build captures versioned route HTML and the manifest from its freshly built production server, then hashes those exact bytes with all static chunks and icons. The deployed inventory has 31 assets, 1,078,799 bytes. Model/WASM are excluded; offline live tracking is not promised. A completeness marker is written last, failures never report ready, and explicit preparation repairs missing cache entries. If the first status check races worker activation, the UI reruns verified preparation and checks again before reporting ready. Full-document navigation avoids relying on uncached RSC payloads. Service worker updates wait for explicit application and ask every window whether it is recording; unknown clients block. Old caches needed by open app versions are retained.
+
+
+
+### Verification boundaries
+
+
+
+- Production build, lint, strict typecheck, eighteen unit tests across three files, and all 47 unchanged archive hashes passed. Unit tests exercise both anatomical sides, confidence absence, aspect geometry, hysteresis/partial/gapped cycles, smoothing/timestamp ordering, strict import bounds/tampering, phase alignment and directional observations.
+
+- Browser tests use production Next through a test-only reverse proxy, never an application/deployed API. The proxy can serve a different worker generation for update coordination. This tests recording-tab blocking and safe activation; it does not prove a distinct application-bundle A→B upgrade.
+
+- The calibration/three-rep capture test explicitly replaces browser camera/worker APIs with authored landmark sequences, a canvas stream and a deterministic 20 Hz capture clock. It validates UI state transitions, local persistence, camera release and replay after reload; it is not MediaPipe movement accuracy evidence.
+
+- Separate camera tests use the real SDK/model and a prerecorded static image input. They cover worker CPU and main CPU/GPU integration, not live-person performance.
+
+- The synthetic pair is labelled on screens and in stored/exported data. Browser request checks confirm sample/replay/comparison flows do not load the vision model. Source review found no camera/landmark upload in the core flow; camera pixels exist only in local video/inference buffers. Export is explicitly user initiated.
+
+- A combined browser run exposed virtual-host scheduling gaps up to 235 ms in the wall-clock synthetic recording test. The application correctly invalidated these cycles under the unchanged 150 ms rule. The semantic recording harness now advances a declared deterministic capture clock per delivered video frame, separating UI/state-machine integration from scheduling/performance acceptance. Real SDK checks retain actual timestamps.
+
+
+
+Browser integration covers local reload, selected phase metrics, export/import/delete, unsupported import, storage-open failure, draft recovery, the twenty-slot cap, hard offline reload of history/replay/compare, cache repair, failed inventory preparation and cross-tab update coordination. Chromium phone-size checks are not Safari evidence.
+
+
+
+Remaining release gates: physical iPhone/Safari installation and permissions, live-person pilot counts, actual device engine/FPS/latency/heat, a real distinct-bundle update, three-minute rehearsal, consented demo recording and organizer code/AI-use eligibility. The master MVP and DEVICE_CHECKLIST.md retain those pending checks. Complete upstream skill bundles remain reviewed references, not installed packages. The existing development-only audit advisory remains open; no clean full-dependency audit is claimed.
+
+
+
+Final browser evidence: the full matrix passed 21 checks and intentionally skipped three mobile real-SDK variants. After the test-only clock correction, both desktop and phone-sized recording cases passed (17.0 and 17.3 seconds). After production-server offline-shell and readiness-race fixes, all ten history/offline tests passed again across desktop and phone-sized Chromium. The resulting evidence is 33 passing browser checks across those runs and three deliberate mobile inference skips. Lint, strict typecheck, production build, 18 unit tests and all 47 archive hashes pass. No physical device or Safari acceptance is claimed.
+
+
+
+## M3–M8 publication and deployment status
+
+
+
+The app is published on `shuknuk/hackru-fall-2026/main`; the final code commit is `0621f6aade6f011ad920186f3a59ee0789ab863d`. The original 47-file archive remains hash-verified and unchanged.
+
+
+
+The user approved staging deployment to the existing Vercel project `menhel-motion` (`prj_vutnVrEjmKulOQ7JRm1WC0OM2Lme`, team `team_DF3duWhqUYoT84K4m8fUymHa`). The first staging build exposed that Vercel’s Next.js adapter omits internal prerender HTML and manifest files; generation now captures both through the built production server and verifies their exact bytes. The final deployment is `dpl_4eAtnUqLfDzceTcP23fjDFrA1xYV`, **READY**, target **staging**, commit `0621f6a`, framework Next.js, Node 24.x. Build completed in about 41 seconds. URL: https://menhel-motion-ltftal055-kinshukgoels-projects.vercel.app .
+
+
+
+Authenticated HTTPS checks returned 200 for `/`, `/session`, `/history`, `/compare`, `/manifest.webmanifest`, `/sw.js`, `/offline-inventory.json`, versioned offline HTML, and icons. Session returned the explicit Start camera and side-view setup UI. History returned synthetic-pair and Prepare offline controls. The service worker and inventory report the same build version `a54909ad-e24e-472a-86ef-e60912c3d03e`. Deployment protection remains enabled. This verifies deployment delivery and local-browser offline behavior, not Safari installation or live-person movement accuracy. The initial approval review rejected deployment before the user explicitly approved the staging target; that approval was received and the final deployment completed.
+
+
+
+## Post-MVP checklist implementation — October 10, 2026
+
+
+
+Slow but valid pose inference is now distinct from landmark loss. Consecutive valid samples remain continuous through a 400 ms interval, which covers 4 processed frames/s with timing margin; explicit invalid samples retain the 150 ms loss rule. Rep coverage and replay interpolation use the same bounded valid-sample interval. A deterministic 4 fps regression fixture counts the same three completed cycles. The capture UI exposes detector phase, rolling processed pose rate and a separate tracking state so a low valid rate is not described as lost tracking. Physical-device performance and motion accuracy remain pending.
+
+
+
+The setup page includes the free-tier RepDB Bodyweight Squat start and peak illustrations as a visual orientation guide, not a required depth target. The app shows visible RepDB attribution; the upstream free-tier license and asset hashes are retained in the repository. No image was used as generative-model input.
+
+
+
+M10 adds an optional Gemini explanation after the deterministic comparison. The browser must receive a separate user opt-in. The strict request accepts only rep counts, tracking coverage, median knee flexion, median ascent duration and up to three existing measurement statements with known IDs. Camera frames, images, landmarks, session IDs and stored records are excluded. `GEMINI_API_KEY` and the optional model selection remain server-side. Gemini must return structured JSON, and the server rejects response entries without a submitted evidence ID. Missing configuration, timeout, upstream failure and invalid output leave the deterministic observations intact. Schema, prompt-boundary and evidence-grounding tests pass locally; a live Gemini request remains untested because no team API key was present.
+
+
+
+Post-checklist verification passed: lint, strict typecheck, production build, all 21 unit tests and all 47 archive provenance hashes. The browser matrix passed all 20 runnable desktop/mobile-sized Chromium checks; six real-SDK prerecorded-camera variants were intentionally skipped because no fake video path was supplied. A focused rerun passed four desktop/mobile checks that verify the RepDB guide, aggregate-only Gemini request shape, missing-key fallback and preserved deterministic observations. These automated checks do not close the physical-device or live-Gemini gates.
+
+
+
+The checklist implementation was published to `main` as commit `6b302b16563a284128c83ba4dd94338a2d4bb4df` and deployed to the already approved `menhel-motion` staging project. Deployment `dpl_BjbkD5vtRUe84E65ffrYogRoNXio` reached **READY** on target **staging** with Next.js and Node 24.x after about 37 seconds. Its protected URL is https://menhel-motion-495cs8593-kinshukgoels-projects.vercel.app . Authenticated fetches returned 200 for `/session`, `/compare`, and the RepDB illustration; the session HTML contains the guide heading and visible attribution. No `GEMINI_API_KEY` was provided, so the deployed live-Gemini path is intentionally unverified and uses the documented unavailable fallback.
+
+
+
+## Live start-set failure fix — October 10, 2026
+
+Observed live camera processing around 12 fps while selected-leg measurements were unavailable. Clicking Start set after calibration returned a standing warning without recording (0.0 seconds elapsed). Start now enters a cancellable waiting state and begins recording only after 300 ms of consecutive valid standing samples; invalid landmarks or a gap over 400 ms reset the wait. Calibration/start warnings name missing selected-leg joints. Confidence thresholds remain unchanged. The simulated recording test covers lost tracking, cancellation, recovery, and three complete cycles. Typecheck and all 21 unit tests pass (workspace TEMP used to avoid sandbox temp errors). Local production build is blocked by Windows sandbox canonicalization access denial; production browser regression and live-device acceptance remain pending.
+
+
+
+Staging deployment dpl_8CaQP1C4bJr8FssrvbzDAvLTE3gy reached READY at https://menhel-motion-j1qnaowdt-kinshukgoels-projects.vercel.app from commit 5c6711d1ef8137676b541feba978a3a1ca18a8f8. Full lint and targeted lint passed. The deployed session page loads. Production browser regression remains unexecuted: Playwright browser extraction also fails with sandbox realpath EPERM. Live camera acceptance remains pending; no live counted-rep success is claimed.
+
+
+
+## Explicit calibration and automatic recording start — October 10, 2026
+
+Calibration now displays persistent step status and completion. A completed setup squat queues recording after a three-second standing preparation period, with explicit Calibration complete / Set started messages and a persistent recording indicator. Brief missing samples use the existing 150 ms tracking-loss tolerance instead of immediately discarding calibration. Pending start retains up to 400 ms of actual standing landmark frames to arm the detector before the first squat, keeping live and saved analysis consistent. Finish set is unchanged. Typecheck, targeted lint and all 22 unit tests pass, including first-rep arming. The browser fixture asserts completion messaging and pending-start behavior; execution remains blocked by sandbox browser extraction. Physical-camera accuracy is still pending.
+
+
+
+## Dedicated set results — October 10, 2026
+
+Capture now shows completed reps and elapsed time; processed pose rate, tracking state, estimated hip/knee flexion and movement phase are removed from the capture metrics. Finish retains camera cleanup, completed-rep analysis and local saving, but immediately navigates to /results?id=... with an in-memory handoff while saving continues. Results show count, duration, knee-bend median, ascent median and tracking coverage, plus replay, another set, export and history/comparison links. Saving errors preserve the in-memory result with retry/export; saved results reload from IndexedDB. Results are included in offline shells and route inventory. All 24 unit tests, typecheck and targeted lint pass; browser integration assertions cover redirect, saved status and reload but remain unexecuted due the documented sandbox extraction restriction.
+
+
+
+## Missed completed standing return — October 10, 2026
+
+A user-exported failed set had zero reps, 49% tracking coverage and an interrupted ending. The UI simplification had not changed the detector. Inspection identified an observed down-and-up cycle with two valid standing frames about 100 ms apart that was discarded by the 250 ms completion hold before tracking loss. Return confirmation now requires 80 ms between valid standing samples; initial standing arming, depth qualification, duration, coverage and gap rules remain unchanged. A local-only replay of the exported set recovers exactly one observed complete squat; other ascents lose tracking before standing and remain excluded. Personal capture data is not committed. Two authored regression tests cover confirmed return before loss and missing return; all 26 unit tests, typecheck and targeted lint pass. Capture now shows plain positioning guidance on sustained loss while keeping technical metrics hidden. Results routing is preserved. Live acceptance remains pending.
+
+
+
+## Library simplification and live Gemini check — October 10, 2026
+
+Removed export controls and the download helper from library, results and replay. Replay and per-set deletion remain. Removed the Your data controls section (import, persistence request and delete-all UI). Saved results still support retry saving. Browser specs now test the absence of export/data controls and retain replay, recovery and capacity coverage without file export/import. All 26 unit tests, typecheck and targeted lint pass; browser suite execution remains blocked by the documented sandbox restriction.
+
+A live opt-in Gemini request on an existing synthetic-pair comparison succeeded. Displayed sets had three reps each, knee medians 72 and 61 degrees, and ascent medians 0.95 and 1.00 seconds. The response referenced about 10 degrees less estimated knee flexion, an ascent difference below 0.2 seconds, and similar between-repetition variation, with submitted evidence IDs. It included the single-camera/non-medical caveat and made no injury diagnosis or video-based form judgment. Synthetic pairs remain labelled authored demonstration sequences, not camera-accuracy evidence.
+
+
+
+
+
+## October 10 - focused squat UX and Gemini reliability
+
+
+
+Removed the global Keep replay close section. Its worker implementation remains intact. Record now opens a guide at /session and continues to /session/record for camera, calibration and recording; the prior-profile query is preserved. Capture state machine, detector thresholds, calibration, auto-start, Finish set and results handoff remain unchanged. Comparison uses everyday labels and standing/bottom/standing timeline landmarks; alignment calculations remain unchanged. Squat demo geometry keeps feet planted and lowers hips; both demo sets still contain three completed squats. Coach labels are Gemini and Measurement coach.
+
+
+
+The old deployed Gemini request succeeded during reproduction; the reported generic error was intermittent. API changes disable extra thinking for supported Flash models, allow 25 seconds per attempt, retry one temporary server/transport/invalid-response failure, combine non-thought response text parts, preserve response evidence validation, and show specific timeout/rate-limit/configuration messages. Logs record only status/reason and attempt, not user measurements or credentials. Automated verification: 30 unit tests pass, including retry, rate-limit, rejected evidence and squat-demo geometry; typecheck and lint pass. Production deployment/browser verification follows. Physical live squat acceptance remains user-run; no claim of a new physical camera test.
+
+
+
+Deployed verification: staging dpl_AKY2QNf9n6UJjeeJcu67YmKt7wd3 is READY at https://menhel-motion-qoywhw6up-kinshukgoels-projects.vercel.app (commit 5443d9b). Browser verified guide-only first page, Continue navigation to camera/setup page, absent offline panel, two three-rep squat demo sets, 50 percent Bottom of squat alignment, renamed coach labels and successful real Gemini explanation grounded in displayed knee bend, ascent and variation. Screenshot saved in chat outputs. Full local Playwright production suite remains unrun due the previously documented Windows environment limitation; this is deployed browser UI verification, not a new physical-camera acceptance run.
+
+
+
+
+
+## October 10 - squat-only replay and independently calibrated comparisons
+
+
+
+Whole-set replay now starts at the first completed squat, skips intervals outside completed squat anchors, and ends at the final completed squat. Trace follows the same interval filter. Zero-rep sets have no playable squat replay. Stored samples, rep detection, calibration, capture and results are unchanged. Independently calibrated sets no longer fail solely on exact profile IDs, floating-point calibration values or redundant fingerprint strings; actual exercise/version/source/body side/camera facing/aspect and completed-rep gates remain. Same-person/camera confirmation is still required. Separate calibrations produce a Limited comparison notice explaining the counting qualification.
+
+
+
+All 32 unit tests pass; typecheck and lint pass. Regression tests cover leading setup, between-rep idle time and trailing partial movement exclusion, separately calibrated left sets after confirmation, and preserved right-side/camera-facing blocks. Live physical-camera revalidation and local production Playwright suite remain pending; deployment verification follows.
+
+
+
+## October 10 - results-only squat posture feedback
+
+
+
+Added a results panel assessing visible hip/knee bending, possible heel rise and return to standing for completed reps. Sources: https://pmc.ncbi.nlm.nih.gov/articles/PMC4262933/ and https://pmc.ncbi.nlm.nih.gov/articles/PMC10987311/ . No universal ideal hip/knee angle or full correctness claim is made. Thresholds are explicitly provisional app heuristics: 15 degree hip change/return tolerance and 0.2 projected foot slope change. Clear evidence requires three samples per window and 90 percent rep coverage; insufficient evidence remains unavailable. A labelled authored reference skeleton uses the existing replay player and is never saved as user data. Only SetResults and new supporting component/analysis/tests change; calibration, counting, saving, existing replay and comparison are unchanged. All 37 unit tests, typecheck and lint pass. Five new tests cover shallow/deeper squats, missing hip bend, both anatomical heels, missing tracking and incomplete hip return. Physical-camera posture accuracy remains unvalidated.
+
+
+
+## October 10 - friendly feedback and low-coverage camera guidance
+
+
+
+Rephrased posture feedback and its help text in everyday language without angle values or technical measurement terms. Reference animation hides measurement overlays; ordinary replay retains its default display and behavior. Results show a camera-positioning alert strictly below 75 percent tracking coverage: move closer while keeping hips, knees, legs and feet clearly in side view. No posture thresholds, rep counting, calibration, storage, comparison or Gemini behavior changed. 37 unit tests pass; typecheck and lint pass before the reference-only display adjustment; final checks follow. Gemini ideas are discussion only, no new calls/features implemented.
+
+
+
+## October 10 - four grounded Gemini helpers
+
+
+
+Implemented explicit-action set summaries (what went well + one next step), selected posture-cue explanations, questions about displayed set results, and chronological summaries of two to five selected compatible saved sets. Source/setup/version comparison gates and same-person/camera confirmation apply to history summaries. Poor coverage produces recording guidance instead of progress claims. Consent describes set summaries, posture outcomes and question transmission; video, joints, IDs and dates remain local. Existing comparison coach, recording, calibration, counting, storage, posture thresholds and replay are unchanged.
+
+
+
+New /api/gemini-help uses the existing configured Google REST model/key without adding dependencies, server-only credentials, strict bounded request/response schemas, evidence IDs, approved cue prompts, no technical angle wording, 25-second per-attempt timeout, one temporary retry, maximum 2048 output tokens, bounded payload and a best-effort three-request per-instance concurrency cap (not a durable global spend limit). Model text remains fallible; an evidence-ID match alone does not prove semantic correctness. Unknown evidence is not interpreted as wrong posture. 47 unit tests pass including ten new payload, mode, evidence, visibility, retry, configuration and rate-limit checks. Typecheck and lint checks accompany deployment. Physical-camera accuracy and the previously blocked full local Playwright suite remain unverified; live Gemini UI verification follows.
+
+
+
+Live deployed verification: staging dpl_7afyk4SqBrX75hDv49RFTxktVkJN reached READY at https://menhel-motion-gcfgtyrv6-kinshukgoels-projects.vercel.app (472caafc). Verified results controls for all three single-set modes, selected heel cue and question submission, history selection of two demo sets, demonstration confirmation, consent gating and progress submission. Real Gemini requests timed out and later returned an upstream request-limit response; no successful generated answer is claimed. The unchanged comparison coach also logged two 25-second upstream timeouts on the same deployment, supporting a service/connection limitation rather than a new-helper regression. UI keeps recorded results and shows retry messages. All 47 tests, typecheck and lint passed; full local production Playwright suite remains blocked as documented earlier. Screenshots are in this chat's outputs.
+
+
+
+
+
+## October 10 — Gemini diagnostics and analysis button
+
+
+
+User withdrew the two-key fallback request after the original write-only credential could not be recovered. Retained the newer key. Added sanitized Google error payload, HTTP status, model, attempt and Retry-After diagnostics in both Gemini APIs and expandable UI details; timeout/validation and local concurrency errors are distinguished from Google errors. Credentials and submitted summaries are excluded. Replaced the transmission consent checkbox with an explicit Analyze with Gemini action and adjacent disclosure. Existing feedback/question/progress selection and comparison gates remain. Shared star icon and blue loading ring support reduced motion; recreated appearance, not a claimed official Google animation asset. Preview model will be pinned to gemini-2.5-flash with thinking disabled, based on direct full-prompt timings (1.054s vs latest 24.629s), without a ten-second guarantee. Recording, counting, calibration, replay and posture logic untouched. Automated and deployed verification recorded below.
+
+
+
+Verification: 48 unit tests pass, including quota/retry diagnostics and credential redaction; typecheck and lint pass. Browser test selector updated for direct action. Full local browser suite remains blocked by the previously recorded Windows restriction; deployed verification follows.
+
+
+Deployed verification: staging dpl_GvNLbbXMgwUgWxSvHHyu6eJ6fk8M READY at https://menhel-motion-2y621ah03-kinshukgoels-projects.vercel.app (627b1ff). Real synthetic-pair comparison and set-summary requests succeeded through the UI; results were observed within 4.589s and 6.634s respectively including observation overhead, not exact API latency. Verified direct-action disclosure, absent consent checkbox, disabled analyzing state and blue-ring/star screenshot. Summary wording remains model-generated and fallible (its next-step section described visibility instead of a concrete tip); no broader response-quality guarantee. Counting/calibration logic unchanged; physical-camera acceptance not rerun. Screenshots saved in chat outputs.
