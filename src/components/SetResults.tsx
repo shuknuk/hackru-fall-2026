@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import type { Session } from "@/lib/motion/schema";
 import { getSession, saveSession } from "@/lib/motion/storage";
 import { pendingResult } from "@/lib/motion/result-handoff";
+import SquatPosture from "./SquatPosture";
 import { summary } from "@/lib/motion/analysis";
 
 export default function SetResults() {
@@ -44,6 +45,7 @@ export default function SetResults() {
         <div><dt>Tracking coverage</dt><dd>{(session.summary.trackingCoverage * 100).toFixed(0)}%</dd></div>
       </dl>
       {!stats.count ? <p>No completed squats were recorded. Partial movements and unreliable tracking are excluded.</p> : null}
+      <SquatPosture session={session} />
       <div className="actions">
         {saved ? <a className="button" href={`/replay?id=${session.id}`}>Replay set</a> : <button className="secondary-button" disabled={saving} onClick={() => {
           setSaving(true);
