@@ -13,11 +13,8 @@ import {
 
 import GeminiProgress from "./GeminiProgress";
 import { samplePair } from "@/lib/motion/fixtures";
-import { cloudSyncEnabled } from "@/lib/motion/storage";
-import { useAccount } from "./AuthContext";
 import SessionStorageStatus from "./SessionStorageStatus";
 export default function History() {
-  const { userId } = useAccount();
   const [sessions, setSessions] = useState<Session[]>([]);
   const [drafts, setDrafts] = useState<{ id: string; createdAt: string }[]>([]);
   const [message, setMessage] = useState("Loading local history…");
@@ -34,14 +31,14 @@ export default function History() {
     );
   }
   async function refresh() {
-    const [s, d] = await Promise.all([listSessions(userId), listDrafts()]);
+    const [s, d] = await Promise.all([listSessions(), listDrafts()]);
     display(s, d);
   }
   useEffect(() => {
-    void Promise.all([listSessions(userId), listDrafts()])
+    void Promise.all([listSessions(), listDrafts()])
       .then(([s, d]) => display(s, d))
       .catch((e) => setMessage(`Local storage unavailable: ${e.message}`));
-  }, [userId]);
+  }, []);
   async function action(work: () => Promise<void>) {
     setBusy(true);
     try {
@@ -153,7 +150,7 @@ export default function History() {
                       "Delete this saved session? This cannot be undone.",
                     )
                   )
-                    void action(() => deleteSession(s.id, userId));
+                    void action(() => deleteSession(s.id));
                 }}
               >
                 Delete
@@ -177,7 +174,7 @@ export default function History() {
                 disabled={busy}
                 onClick={() =>
                   void action(async () => {
-                    await recoverDraft(d.id, userId, userId ? await cloudSyncEnabled(userId) : false);
+                    await recoverDraft(d.id);
                   })
                 }
               >

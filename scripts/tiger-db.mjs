@@ -24,9 +24,14 @@ try {
       EXISTS (SELECT 1 FROM timescaledb_information.continuous_aggregates WHERE view_name = 'daily_workout_stats') AS continuous_aggregate`);
     console.log(JSON.stringify({ database, timescaleVersion: version, ...result.rows[0] }));
   } else {
-    const sql = await readFile(new URL("../migrations/001_clerk_tiger_workouts.sql", import.meta.url), "utf8");
     await client.query("BEGIN");
-    try { await client.query(sql); await client.query("COMMIT"); }
+    try {
+      const existing = await client.query("SELECT to_regclass('public.workout_metrics') AS metrics");
+      const files = existing.rows[0].metrics ? ["002_phone_tiger_trends.sql"] : ["001_clerk_tiger_workouts.sql", "002_phone_tiger_trends.sql"];
+      for (const file of files)
+        await client.query(await readFile(new URL(`../migrations/${file}`, import.meta.url), "utf8"));
+      await client.query("COMMIT");
+    }
     catch (error) { await client.query("ROLLBACK"); throw error; }
     console.log(`Applied Tiger Data migration to ${database} with TimescaleDB ${version}`);
   }

@@ -22,7 +22,6 @@
     "prebuild": "npm run assets:prepare"
   },
   "dependencies": {
-    "@clerk/nextjs": "7.9.14",
     "@mediapipe/tasks-vision": "1.1.0",
     "@vercel/functions": "3.9.11",
     "idb": "8.0.4",
@@ -34,7 +33,6 @@
     "zod": "4.6.5"
   },
   "devDependencies": {
-    "@clerk/testing": "2.2.45",
     "@playwright/test": "1.64.0",
     "@tailwindcss/postcss": "4.3.3",
     "@types/node": "24.10.1",

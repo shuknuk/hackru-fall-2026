@@ -28,15 +28,11 @@ import {
 } from "@/lib/motion/schema";
 import { buildSession, prepareSample } from "@/lib/motion/session";
 import {
-  cloudSyncEnabled,
   checkpoint,
   getProfile,
-  releaseGuestReservation,
-  reserveGuestWorkout,
   saveSession,
 } from "@/lib/motion/storage";
 import { processSyncQueue } from "@/lib/cloud/sync";
-import { useAccount } from "./AuthContext";
 type Calibration = {
   start: number | null;
   baseline: number | null;
@@ -60,11 +56,9 @@ type Recording = {
   checkpointAt: number;
   queue: Promise<void>;
   storageError: string | null;
-  ownerId: string | null;
 };
 export default function CaptureSession() {
   const router = useRouter();
-  const { userId } = useAccount();
   const [side, setSide] = useState<Side>("left");
   const [confirmed, setConfirmed] = useState(false);
   const [stage, setStage] = useState("positioning");
@@ -126,10 +120,6 @@ export default function CaptureSession() {
       window.dispatchEvent(new Event("menhel-recording"));
     };
   }, [stage]);
-  useEffect(() => () => {
-    if (!userId && pendingSessionId.current && !recording.current)
-      void releaseGuestReservation(pendingSessionId.current);
-  }, [userId]);
   const finish = useCallback(async (status: Session["status"] = "complete") => {
     const r = recording.current;
     if (!r) return;
@@ -153,13 +143,9 @@ export default function CaptureSession() {
       );
       session.createdAt = r.createdAt;
       const saving = r.queue.then(async () => {
-        const queueCloudSync = r.ownerId ? await cloudSyncEnabled(r.ownerId).catch(() => false) : false;
-        await saveSession(session, { ownerId: r.ownerId, queueCloudSync });
-        if (queueCloudSync && r.ownerId) void processSyncQueue(r.ownerId);
-      }).then(() => null).catch(async (error: unknown) => {
-        if (!r.ownerId) await releaseGuestReservation(r.id).catch(() => {});
-        return error instanceof Error ? error.message : "Local storage error";
-      });
+        await saveSession(session);
+        void processSyncQueue();
+      }).then(() => null).catch((error: unknown) => error instanceof Error ? error.message : "Local storage error");
       handoffResult(session, saving);
       // Start saving immediately; allow the completion cue before navigating.
       if (voiceEnabled.current) await new Promise(resolve => setTimeout(resolve, 2500));
@@ -188,7 +174,6 @@ export default function CaptureSession() {
         `Set interrupted (${reason}). Only completed repetitions will be included.`,
       );
     } else {
-      if (!userId && pendingSessionId.current) void releaseGuestReservation(pendingSessionId.current);
       pendingSessionId.current = null;
       setStage("positioning");
       setNotice("Camera stopped. Restart and recheck setup before recording.");
@@ -486,7 +471,6 @@ export default function CaptureSession() {
       checkpointAt: 0,
       queue: Promise.resolve(),
       storageError: null,
-      ownerId: userId,
     };
     pendingSessionId.current = null;
     setStage("recording");
@@ -498,15 +482,6 @@ export default function CaptureSession() {
   async function requestStart() {
     if (pendingStart.current || recording.current) return;
     const id = crypto.randomUUID();
-    if (!userId) {
-      const access = await reserveGuestWorkout(id);
-      if (!access.allowed) {
-        setNotice(access.reason === "limit"
-          ? "Five free workouts have been used. Create a free account or sign in to record another set."
-          : "Another app tab is using the remaining free workout slot. Finish or cancel that recording, then retry.");
-        return;
-      }
-    }
     pendingSessionId.current = id;
     startSet();
   }
@@ -589,7 +564,6 @@ export default function CaptureSession() {
           {stage === "starting" ? (
             <button className="secondary-button" onClick={() => {
               pendingStart.current = false;
-              if (!userId && pendingSessionId.current) void releaseGuestReservation(pendingSessionId.current);
               pendingSessionId.current = null;
               standingSince.current = null;
               standingFrames.current = [];

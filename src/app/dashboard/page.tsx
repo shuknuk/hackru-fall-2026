@@ -2,5 +2,5 @@ import Dashboard from "@/components/Dashboard";
 import PageHeader from "@/components/PageHeader";
 
 export default function DashboardPage() {
-  return <main id="main" className="shell"><PageHeader title="My progress." description="Account workout summaries and time-series trends. Full movement replays stay on the device that recorded them." /><Dashboard /></main>;
+  return <main id="main" className="shell"><PageHeader title="Measurements over time." description="Tiger Data trends belong to this phone. Full movement replays stay here." /><Dashboard /></main>;
 }

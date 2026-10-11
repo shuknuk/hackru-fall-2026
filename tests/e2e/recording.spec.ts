@@ -186,7 +186,7 @@ test("simulated camera landmarks complete calibration, recording and local repla
       const drafts = await page.evaluate(
         () =>
           new Promise((resolve) => {
-            const r = indexedDB.open("menhel-motion", 2);
+            const r = indexedDB.open("menhel-motion");
             r.onsuccess = () => {
               const db = r.result;
               const get = db

@@ -1,15 +1,15 @@
 import "server-only";
 import { databasePool } from "./index";
 
-export async function dailyAnalytics(userId: string, days: number) {
+export async function dailyAnalytics(deviceId: string, days: number) {
   const result = await databasePool().query(
-    `SELECT bucket AS day, session_count AS "sessionCount", total_reps AS "totalReps",
-      average_tracking_coverage AS "averageTrackingCoverage",
-      average_duration_ms AS "averageDurationMs"
-     FROM daily_workout_stats
-     WHERE clerk_user_id = $1 AND bucket >= time_bucket('1 day', now()) - ($2::int - 1) * interval '1 day'
-     ORDER BY bucket ASC`,
-    [userId, days],
+    `SELECT time_bucket('1 day', recorded_at) AS day, count(*)::int AS "sessionCount",
+      sum(rep_count)::int AS "totalReps", avg(tracking_coverage) AS "averageTrackingCoverage",
+      avg(duration_ms) AS "averageDurationMs"
+     FROM workout_metrics
+     WHERE device_id = $1 AND recorded_at >= time_bucket('1 day', now()) - ($2::int - 1) * interval '1 day'
+     GROUP BY day ORDER BY day ASC`,
+    [deviceId, days],
   );
   return result.rows;
 }

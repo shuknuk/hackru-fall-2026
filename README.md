@@ -40,17 +40,15 @@ Compatible comparisons retain deterministic measurement observations. An optiona
 
 Optional ElevenLabs narration: on the capture page, select **Enable voice guidance** for framing, calibration and rep announcements; mute it at any time. The 30 River voice clips are checked in, so playback needs no API key or paid API request. Only deliberate regeneration with `node scripts/generate-narration.mjs` uses `ELEVENLABS_API_KEY` from your environment or ignored `.env.local` and spends provider credits. Camera images and pose data are never sent to ElevenLabs. Framing cues are heuristics awaiting real-phone testing.
 
-## Accounts, guest workouts and cloud summaries
+## Phone trends and Tiger Data
 
-Guests can save five real workouts. IndexedDB records a workout only after the local session transaction succeeds; repeated saves of the same session, previews, calibration, drafts, replay, comparison, history and synthetic samples do not consume another workout. Deleting sessions does not restore guest allowance. Active-start reservations and the final save transaction coordinate tabs so the fifth slot cannot be claimed twice. Signed-in users can record without a subscription limit.
+Every recording, replay, landmark and calibration value stays in the browser on the phone that captured it. There are no accounts, sign-ins, quotas, fingerprinting, or camera uploads.
 
-The guest allowance is browser-local, not a secure identity system. Clearing browser data, changing browser profiles/origins, or using another device resets it. Menhel does not use fingerprinting to prevent that. The five local sessions remain available after sign-up. `/dashboard` offers a separate, explicit **Import eligible guest summaries** action; sign-in alone never uploads them.
+Selecting **View measurements over time with Tiger Data** on `/dashboard` creates a random 256-bit credential in that phone's IndexedDB, then queues current and future completed/interrupted workout summaries. The server hashes the credential before using it as the device scope; Tiger Data receives no raw credential, email, name, camera image, video, landmarks, replay samples or calibration data. It stores only dated rep count, estimated knee bend, bend variation, estimated ascent time, tracking coverage, visible side and algorithm version.
 
-Clerk handles email and any enabled Google sign-in strategy. Configure the Clerk and Tiger variables shown in `.env.example`; all three core values (`DATABASE_URL`, `NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY`, and `CLERK_SECRET_KEY`) are required for cloud use. Clerk production domains and OAuth redirect URLs must be allowed in the Clerk Dashboard before deploying. Account APIs derive the owner from Clerk's verified server session and never accept a client owner ID.
+Cloud trouble never blocks local recording or replay. Queued uploads and deletions retry the next time this phone opens the trend view. Deleting a local workout queues deletion of its Tiger Data summary. **Delete Tiger Data history** removes this phone's cloud summaries and credential while retaining local recordings. Clearing browser data also loses access to this phone's Tiger Data history; it cannot be recovered or moved to another phone.
 
-The Clerk browser and UI bundles are pinned in `.env.example` to the versions verified with the installed SDK. Update those pins deliberately with `@clerk/nextjs`; an unconfigured or malformed key pair leaves the local guest experience available instead of mounting a broken account client.
-
-Workout capture remains local-first. Full landmarks, frames, images, video and calibration data never enter Tiger Data. If the account owner enables summary sync, completed/interrupted live workouts queue a bounded measurement summary after the local save. Failed uploads and deletes stay queued for retry; cloud outages do not block recording or local replay. Another device can show a cloud summary, but cannot reconstruct a skeleton replay.
+Use the same stable site URL and browser on the testing phone: preview hostnames, private browsing and other browsers have separate local histories. Daily counts query the Timescale hypertable directly so deletions are reflected immediately rather than waiting for the aggregate refresh.
 
 Tiger Data setup:
 
@@ -60,25 +58,17 @@ MIGRATION_CONFIRM_DB=tsdb npm run db:migrate
 npm run db:verify
 ```
 
-The migration checks the installed TimescaleDB version before using `by_range`, creates user/session-key tables, the `workout_metrics` hypertable, user/time indexes, the `daily_workout_stats` continuous aggregate, and its hourly refresh policy. `db:verify` is read-only. The live service has a restricted `menhel_app` runtime role; keep `tsdbadmin` migration-only. The free Tiger Cloud service has no managed pooler, so the server reuses a two-connection pool with short timeouts. The service's private CA is pinned with hostname verification; its current certificate expires October 20, 2027 and must be replaced before then or whenever Tiger rotates the service CA.
+The migration checks the installed TimescaleDB version before using `by_range`, creates phone/session-key tables, the `workout_metrics` hypertable, device/time indexes, the `daily_workout_stats` continuous aggregate, and its hourly refresh policy. It also migrates the earlier Clerk-named columns to phone-scoped names without changing measurements. `db:verify` is read-only. The live service has a restricted `menhel_app` runtime role; keep `tsdbadmin` migration-only. The free Tiger Cloud service has no managed pooler, so the server reuses a two-connection pool with short timeouts. The service's private CA is pinned with hostname verification; its current certificate expires October 20, 2027 and must be replaced before then or whenever Tiger rotates the service CA.
 
 ## Verification
 
 Browser tests run against the production build on a dedicated fresh port. Install the standard test browser with `npx playwright install chromium`. A nonstandard executable can be specified using `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH`. `PLAYWRIGHT_FAKE_VIDEO` enables explicit prerecorded webcam input for real SDK integration; it is test tooling only. The calibration/recording integration test replaces browser camera/worker APIs with explicitly simulated landmark sequences and a deterministic capture clock. Neither is physical-camera acceptance.
 
-When `.env.local` contains Clerk keys, build the deterministic guest matrix explicitly without them because Next.js embeds public environment values into the production bundle:
-
-```sh
-NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY=disabled CLERK_SECRET_KEY=disabled npm run build
-npm run test:e2e -- --grep-invert "a verified worker update"
-```
-
-The live account/database check is opt-in and creates then deletes a Clerk test user and Tiger workout summary:
+Run browser checks against the production build:
 
 ```sh
 npm run build
-PLAYWRIGHT_LIVE_AUTH=1 DATABASE_URL='restricted Tiger application-role URL' \
-  npx playwright test tests/e2e/auth-live.spec.ts --project=chromium
+npm run test:e2e -- --grep-invert "a verified worker update"
 ```
 
 See [the device checklist](docs/DEVICE_CHECKLIST.md) before claiming phone compatibility. Installation/offline readiness and movement heuristics require real-device checks. The five development-tool audit findings remain documented; the production-only audit returned zero findings.

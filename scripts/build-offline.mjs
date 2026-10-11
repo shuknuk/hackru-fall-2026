@@ -40,12 +40,9 @@ const server = spawn(
   ["node_modules/next/dist/bin/next", "start", "--hostname", "127.0.0.1", "--port", String(port)],
   {
     stdio: "ignore",
-    // Capture only the public guest shell; account responses must never enter the shared offline cache.
     env: {
       ...process.env,
       NEXT_TELEMETRY_DISABLED: "1",
-      CLERK_SECRET_KEY: "disabled",
-      NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: "disabled",
     },
   },
 );

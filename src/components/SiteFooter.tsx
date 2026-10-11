@@ -9,6 +9,7 @@ export default function SiteFooter() {
         <Link href="/session">Record</Link>
         <Link href="/history">History</Link>
         <Link href="/results/saved">Results</Link>
+        <Link href="/dashboard">Trends</Link>
       </nav>
     </footer>
   );

@@ -2,25 +2,23 @@
 import { useEffect, useState } from "react";
 import type { Session } from "@/lib/motion/schema";
 import { getSession } from "@/lib/motion/storage";
-import { useAccount } from "./AuthContext";
 import { summary } from "@/lib/motion/analysis";
 import ReplayPlayer from "./ReplayPlayer";
 export default function SessionReplay() {
-  const { userId } = useAccount();
   const [session, setSession] = useState<Session | null>(null);
   const [message, setMessage] = useState("Loading stored landmarks…");
   useEffect(() => {
     async function load() {
       const id = new URLSearchParams(location.search).get("id");
       if (!id) throw new Error("Choose a session from history.");
-      const s = await getSession(id, userId);
+      const s = await getSession(id);
       if (!s) throw new Error("This session was not found on this device.");
       return s;
     }
     void load()
       .then(setSession)
       .catch((e) => setMessage(e.message));
-  }, [userId]);
+  }, []);
   if (!session)
     return (
       <p role="status">

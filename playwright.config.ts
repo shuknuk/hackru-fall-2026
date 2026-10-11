@@ -1,6 +1,6 @@
 import { defineConfig, devices } from "@playwright/test";
 const port = process.env.PLAYWRIGHT_PORT ?? "3017";
-const baseURL = `http://${process.env.PLAYWRIGHT_LIVE_AUTH === "1" ? "localhost" : "127.0.0.1"}:${port}`;
+const baseURL = `http://127.0.0.1:${port}`;
 const fakeVideo = process.env.PLAYWRIGHT_FAKE_VIDEO;
 const executablePath = process.env.PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH;
 export default defineConfig({
@@ -39,7 +39,7 @@ export default defineConfig({
   ],
   webServer: {
     command: "node scripts/test-server.mjs",
-    url: process.env.PLAYWRIGHT_LIVE_AUTH === "1" ? baseURL : `${baseURL}/__test/ready`,
+    url: `${baseURL}/__test/ready`,
     reuseExistingServer: false,
   },
 });

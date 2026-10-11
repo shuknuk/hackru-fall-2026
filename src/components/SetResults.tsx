@@ -1,9 +1,8 @@
 "use client";
 import { useEffect, useState } from "react";
 import type { Session } from "@/lib/motion/schema";
-import { cloudSyncEnabled, getSession, saveSession } from "@/lib/motion/storage";
+import { getSession, saveSession } from "@/lib/motion/storage";
 import { processSyncQueue } from "@/lib/cloud/sync";
-import { useAccount } from "./AuthContext";
 import { pendingResult } from "@/lib/motion/result-handoff";
 import SquatPosture from "./SquatPosture";
 import GeminiHelp from "./GeminiHelp";
@@ -11,7 +10,6 @@ import { coachContext } from "@/lib/coach-context";
 import { summary } from "@/lib/motion/analysis";
 
 export default function SetResults() {
-  const { userId } = useAccount();
   const [session, setSession] = useState<Session | null>(null);
   const [message, setMessage] = useState("Loading your set…");
   const [saved, setSaved] = useState(false);
@@ -27,14 +25,14 @@ export default function SetResults() {
         const error = await pending.saving;
         if (active) { setSaving(false); setSaved(error === null); setMessage(error ? `Not saved: ${error}. Keep this page open and retry saving.` : "Saved on this device."); }
       } else {
-        const stored = await getSession(id, userId);
+        const stored = await getSession(id);
         if (!stored) throw new Error("This set was not found on this device.");
         if (active) { setSession(stored); setSaving(false); setSaved(true); setMessage("Saved on this device."); }
       }
     }
     void load().catch((error) => { if (active) setMessage(error.message); });
     return () => { active = false; };
-  }, [userId]);
+  }, []);
   if (!session) return <p role="status">{message} <a href="/history">Open history</a></p>;
   const stats = summary(session.reps);
   const duration = (session.samples.at(-1)?.t ?? 0) / 1000;
@@ -62,9 +60,8 @@ export default function SetResults() {
           setSaving(true);
           setMessage("Saving on this device…");
           void (async () => {
-            const queueCloudSync = userId ? await cloudSyncEnabled(userId).catch(() => false) : false;
-            await saveSession(session, { ownerId: userId, queueCloudSync });
-            if (queueCloudSync && userId) void processSyncQueue(userId);
+            await saveSession(session);
+            void processSyncQueue();
           })().then(() => { setSaved(true); setMessage("Saved on this device."); }).catch((error) => setMessage(`Not saved: ${error.message}`)).finally(() => setSaving(false));
         }}>Retry saving</button>}
         {saved ? <a className="secondary-button" href={`/session?profile=${session.profile.id}`}>Record another set</a> : null}

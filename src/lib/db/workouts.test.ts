@@ -26,7 +26,7 @@ describe("Tiger Data idempotency", () => {
       .mockResolvedValueOnce({})
       .mockResolvedValueOnce({ rowCount: 0 })
       .mockResolvedValueOnce({});
-    const result = await insertWorkoutWithClient({ query } as unknown as PoolClient, "user_A", summary);
+    const result = await insertWorkoutWithClient({ query } as unknown as PoolClient, "device_A", summary);
     expect(result).toEqual({ created: false });
     expect(query.mock.calls.some(([sql]) => String(sql).includes("INSERT INTO workout_metrics"))).toBe(false);
   });

@@ -6,7 +6,7 @@ import { getSessionMeta, type SyncState } from "@/lib/motion/storage";
 const labels: Record<SyncState, string> = {
   local: "Saved on this device",
   pending: "Waiting to sync",
-  synced: "Saved to your account",
+  synced: "Saved to Tiger Data",
   failed: "Cloud sync failed · saved on this device",
   "delete-pending": "Cloud deletion waiting to retry",
 };

@@ -256,7 +256,7 @@ footer {
 .auth-page { display: grid; justify-items: start; gap: 18px; padding-top: 96px; }
 .dashboard-summary {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(3, 1fr);
   margin: 32px 0;
   border-block: 1px solid var(--line);
 }

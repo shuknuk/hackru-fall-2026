@@ -3,8 +3,7 @@ import http from "node:http";
 import { spawn } from "node:child_process";
 import { readFile } from "node:fs/promises";
 const port = Number(process.env.PLAYWRIGHT_PORT ?? 3017),
-  backend = process.env.PLAYWRIGHT_LIVE_AUTH === "1" ? port : port + 1000;
-const liveAuth = process.env.PLAYWRIGHT_LIVE_AUTH === "1";
+  backend = port + 1000;
 let updateVersion = null;
 const next = spawn(
   process.execPath,
@@ -18,15 +17,7 @@ const next = spawn(
   ],
   {
     stdio: ["ignore", "pipe", "inherit"],
-    env: {
-      ...process.env,
-      ...(liveAuth
-        ? {}
-        : {
-            CLERK_SECRET_KEY: "disabled",
-            NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: "disabled",
-          }),
-    },
+    env: process.env,
   },
 );
 const server = http.createServer(async (req, res) => {
@@ -119,7 +110,7 @@ next.stdout.on("data", (chunk) => {
   process.stdout.write(chunk);
   if (!listening && chunk.toString().includes("Ready")) {
     listening = true;
-    if (!liveAuth) server.listen(port, "127.0.0.1");
+    server.listen(port, "127.0.0.1");
   }
 });
 next.on("exit", (code) => {
