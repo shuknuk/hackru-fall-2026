@@ -43,7 +43,7 @@ export default function GeminiHelp({ sets, progress = false, enabled = true }: {
         </select></label>
         <button className="secondary-button" disabled={disabled} onClick={() => void ask("feedback")}>Explain this feedback</button>
       </details>
-      <details><summary>Ask about your results</summary>
+      <details hidden><summary>Ask about your results</summary>
         <form onSubmit={(e) => { e.preventDefault(); if (question.trim()) void ask("question"); }}>
           <label htmlFor={`${id}-question`}>Your question</label>
           <input id={`${id}-question`} value={question} maxLength={400} disabled={busy} onChange={(e) => setQuestion(e.target.value)} placeholder="What do these results tell me?" />

@@ -366,3 +366,5 @@ Verification: 48 unit tests pass, including quota/retry diagnostics and credenti
 
 
 Deployed verification: staging dpl_GvNLbbXMgwUgWxSvHHyu6eJ6fk8M READY at https://menhel-motion-2y621ah03-kinshukgoels-projects.vercel.app (627b1ff). Real synthetic-pair comparison and set-summary requests succeeded through the UI; results were observed within 4.589s and 6.634s respectively including observation overhead, not exact API latency. Verified direct-action disclosure, absent consent checkbox, disabled analyzing state and blue-ring/star screenshot. Summary wording remains model-generated and fallible (its next-step section described visibility instead of a concrete tip); no broader response-quality guarantee. Counting/calibration logic unchanged; physical-camera acceptance not rerun. Screenshots saved in chat outputs.
+
+October 10: Removed the Measurement coach heading from the comparison opened through History and hid the extra question disclosure on results. Analyze with Gemini, feedback explanation, request APIs, recording, calibration and counting are unchanged. Targeted lint and typecheck accompany deployment verification.

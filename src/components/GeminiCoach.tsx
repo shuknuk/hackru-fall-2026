@@ -72,9 +72,8 @@ export default function GeminiCoach({
   }
 
   return (
-    <section className="coach" aria-labelledby="coach-title">
+    <section className="coach" aria-label="Gemini comparison">
       <p className="eyebrow">GEMINI</p>
-      <h3 id="coach-title">Measurement coach</h3>
       <p>
         Compare these squat sets with Gemini. Only the measurement summary shown above
         is sent to Google Gemini. Your video and body landmarks stay on this device.
