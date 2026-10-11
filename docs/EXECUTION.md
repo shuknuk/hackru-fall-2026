@@ -409,3 +409,5 @@ The two RepDB-derived setup illustrations now use transparent-background adaptat
 
 
 Publication reconciliation: PR #1 was opened, then main advanced to `47d7629` with transparent squat-guide artwork. Merged that main commit into the published branch without rewriting history; preserved both execution-log entries. Narration code is unchanged. Rebuild and focused shell/narration/capture production checks follow.
+
+Post-merge check: lint, strict typecheck and production build passed with main's `47d7629` artwork. All 12 focused production browser tests passed (shell navigation, generated audio delivery/real startup/mute/cancellation, full simulated calibration/three-rep capture/local replay) on both Chromium projects. The 28-pass applicable-suite result above remains the broader verification; the last main addition changed guide assets and their presentation only. Conflict resolved by preserving both execution histories.
