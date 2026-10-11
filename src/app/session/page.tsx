@@ -8,7 +8,7 @@ export default async function SessionSetup({ searchParams }: { searchParams: Pro
   return (
     <main id="main" className="shell session-shell">
       <Link className="back-link" href="/">
-        <ArrowLeft size={18} aria-hidden="true" /> Back to Menhel
+        <ArrowLeft size={18} aria-hidden="true" /> Back to SpotOn
       </Link>
       <p className="eyebrow">STEP 1 OF 2 - SQUAT GUIDE</p>
       <h1>Get ready for your squats.</h1>

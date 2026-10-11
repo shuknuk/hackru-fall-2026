@@ -304,7 +304,7 @@ export default function PwaControls() {
                 .then(() => setInstall(null))
             }
           >
-            Install Menhel Motion
+            Install SpotOn
           </button>
         ) : null}
       </div>

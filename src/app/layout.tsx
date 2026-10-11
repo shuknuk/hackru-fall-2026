@@ -10,11 +10,11 @@ const comfortaa = Comfortaa({
 });
 
 export const metadata: Metadata = {
-  title: "Menhel Motion",
+  title: "SpotOn",
   description:
     "Understand your movement through private, local pose comparisons.",
-  applicationName: "Menhel Motion",
-  appleWebApp: { capable: true, title: "Menhel", statusBarStyle: "default" },
+  applicationName: "SpotOn",
+  appleWebApp: { capable: true, title: "SpotOn", statusBarStyle: "default" },
   icons: { apple: "/icons/apple-touch-icon.png" },
 };
 export const viewport: Viewport = { themeColor: "#485b37" };

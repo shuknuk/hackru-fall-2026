@@ -1,14 +1,12 @@
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
+import Brand from "@/components/Brand";
 
 export default function Home() {
   return (
     <main id="main" className="shell">
       <header className="home-header">
-        <div className="brand">
-          <span className="brand-dot" aria-hidden="true" />
-          MENHEL <span className="brand-sub">MOTION</span>
-        </div>
+        <Brand />
         <Link className="header-link" href="/history">History</Link>
       </header>
       <section className="hero" aria-labelledby="title">

@@ -1,4 +1,4 @@
-# Menhel Motion
+# SpotOn
 
 A Next.js + MediaPipe application for short side-view bodyweight squat sets, local landmark recording, skeleton replay and phase-aligned attempt comparison. The implementation now includes the M3–M8 feature flow. Physical camera accuracy, iPhone installation and device performance remain unverified. This is an observation tool, not a medical assessment.
 

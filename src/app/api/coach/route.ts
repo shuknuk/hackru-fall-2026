@@ -116,5 +116,5 @@ export async function POST(request: Request) {
       : failure === "upstream-400" || failure === "upstream-401" || failure === "upstream-403" || failure === "upstream-404"
         ? "Gemini could not connect with the current app configuration. Please contact the app owner."
         : "Gemini could not complete this comparison. Please try again.";
-  return NextResponse.json({ error, diagnostics: diagnostics ?? { source: "Menhel", reason: failure, model, timeoutMs: 25000, attempts: 2 } }, { status: 502 });
+  return NextResponse.json({ error, diagnostics: diagnostics ?? { source: "SpotOn", reason: failure, model, timeoutMs: 25000, attempts: 2 } }, { status: 502 });
 }
