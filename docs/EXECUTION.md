@@ -256,6 +256,14 @@ The checklist implementation was published to `main` as commit `6b302b16563a2841
 
 Observed live camera processing around 12 fps while selected-leg measurements were unavailable. Clicking Start set after calibration returned a standing warning without recording (0.0 seconds elapsed). Start now enters a cancellable waiting state and begins recording only after 300 ms of consecutive valid standing samples; invalid landmarks or a gap over 400 ms reset the wait. Calibration/start warnings name missing selected-leg joints. Confidence thresholds remain unchanged. The simulated recording test covers lost tracking, cancellation, recovery, and three complete cycles. Typecheck and all 21 unit tests pass (workspace TEMP used to avoid sandbox temp errors). Local production build is blocked by Windows sandbox canonicalization access denial; production browser regression and live-device acceptance remain pending.
 
+## Gemini key rotation — October 11, 2026
+
+Both server-only Gemini routes now read `GEMINI_API_KEY`, `GEMINI_API_KEY_2` and `GEMINI_API_KEY_3` in order. A 400, 401, 403 or 429 provider response advances to the next configured key; temporary 5xx responses keep the existing single retry. The routes still expose no credential to the browser, and the deterministic comparison remains available if every key fails. Unit, lint, typecheck, build and live-provider evidence are recorded separately; this entry alone does not establish that any supplied key is accepted or has quota.
+
+Live provider verification: GitHub `main` commit `e4734ecb7aba949b6bb2910087e4d7ffc327da27` deployed to Vercel production. The first request reached Google but `gemini-2.5-flash` returned an authenticated 404 retirement notice, so the existing server-only `GEMINI_MODEL` setting was updated to `gemini-3.8-flash` and the same commit redeployed as `dpl_7tuCDpF1kyXuZbE9FotSa5gdPDE2`. The bounded aggregate-only `/api/gemini-help` request then returned HTTP 200 with evidence-linked JSON. This proves the primary key and current model work in production. Key rollover is unit-tested for a 429 response; keys 2 and 3 were not deliberately exhausted or invalidated for a destructive live rollover test.
+
+
+
 Staging deployment dpl_8CaQP1C4bJr8FssrvbzDAvLTE3gy reached READY at https://menhel-motion-j1qnaowdt-kinshukgoels-projects.vercel.app from commit 5c6711d1ef8137676b541feba978a3a1ca18a8f8. Full lint and targeted lint passed. The deployed session page loads. Production browser regression remains unexecuted: Playwright browser extraction also fails with sandbox realpath EPERM. Live camera acceptance remains pending; no live counted-rep success is claimed.
 
 

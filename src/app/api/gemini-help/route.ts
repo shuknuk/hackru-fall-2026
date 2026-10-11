@@ -1,4 +1,5 @@
 import { providerError } from "../../../lib/gemini-diagnostics";
+import { geminiApiKeys, shouldRotateGeminiKey } from "../../../lib/gemini-keys";
 import { NextResponse } from "next/server";
 import { helpFacts, helpPrompt, helpRequestSchema, parseHelpResponse, type HelpRequest } from "../../../lib/gemini-help";
 export const runtime = "nodejs";
@@ -12,8 +13,8 @@ export async function POST(request: Request) {
   finally { activeRequests--; }
 }
 async function respond(request: Request) {
-  const key = process.env.GEMINI_API_KEY;
-  if (!key) return NextResponse.json({ error: "Gemini is not configured. Please contact the app owner." }, { status: 503 });
+  const keys = geminiApiKeys();
+  if (!keys.length) return NextResponse.json({ error: "Gemini is not configured. Please contact the app owner." }, { status: 503 });
   let input: HelpRequest;
   try {
     const text = await request.text();
@@ -35,7 +36,7 @@ async function respond(request: Request) {
   const model = process.env.GEMINI_MODEL ?? "gemini-2.5-flash";
   let failure = "response";
   let diagnostics: unknown = null;
-  for (let attempt = 0; attempt < 2; attempt++) {
+  for (const key of keys) for (let attempt = 0; attempt < 2; attempt++) {
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), 25000);
     try {
@@ -50,8 +51,9 @@ async function respond(request: Request) {
       if (!response.ok) {
         failure = `upstream-${response.status}`;
         diagnostics = await providerError(response, model, key, attempt);
+        if (shouldRotateGeminiKey(response.status)) break;
         if (attempt === 0 && response.status >= 500) continue;
-        break;
+        return NextResponse.json({ error: "Gemini could not give a supported answer. Please try again. Your recorded results are still available.", diagnostics }, { status: 502 });
       }
       const result = await response.json();
       const parts = result?.candidates?.[0]?.content?.parts;

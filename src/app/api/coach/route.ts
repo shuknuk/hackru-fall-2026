@@ -1,4 +1,5 @@
 import { providerError } from "../../../lib/gemini-diagnostics";
+import { geminiApiKeys, shouldRotateGeminiKey } from "../../../lib/gemini-keys";
 import { NextResponse } from "next/server";
 import {
   coachPrompt,
@@ -42,8 +43,8 @@ const responseJsonSchema = {
 } as const;
 
 export async function POST(request: Request) {
-  const key = process.env.GEMINI_API_KEY;
-  if (!key)
+  const keys = geminiApiKeys();
+  if (!keys.length)
     return NextResponse.json(
       { error: "Gemini is not configured. Please contact the app owner." },
       { status: 503 },
@@ -63,7 +64,7 @@ export async function POST(request: Request) {
   let failure = "response";
   let diagnostics: unknown = null;
   // Retry one temporary upstream failure; never return a fabricated AI explanation.
-  for (let attempt = 0; attempt < 2; attempt++) {
+  for (const key of keys) for (let attempt = 0; attempt < 2; attempt++) {
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), 25000);
     try {
@@ -90,8 +91,9 @@ export async function POST(request: Request) {
         failure = `upstream-${response.status}`;
         diagnostics = await providerError(response, model, key, attempt);
         console.warn("Gemini comparison failed", { status: response.status, attempt });
+        if (shouldRotateGeminiKey(response.status)) break;
         if (attempt === 0 && response.status >= 500) continue;
-        break;
+        return NextResponse.json({ error: "Gemini could not complete this comparison. Please try again.", diagnostics }, { status: 502 });
       }
       const result = await response.json();
       const parts = result?.candidates?.[0]?.content?.parts;

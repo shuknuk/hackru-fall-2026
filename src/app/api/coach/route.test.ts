@@ -29,6 +29,13 @@ describe("Gemini comparison requests", () => {
     expect((await result.json()).error).toContain("request limit");
     expect(fetcher).toHaveBeenCalledTimes(1);
   });
+  it("rotates to the next configured key after a quota response", async () => {
+    vi.stubEnv("GEMINI_API_KEY_2", "backup-key");
+    const fetcher = vi.fn().mockResolvedValueOnce(new Response("", { status: 429 })).mockResolvedValueOnce(Response.json({ candidates: [{ content: { parts: [{ text: JSON.stringify(answer) }] } }] }));
+    vi.stubGlobal("fetch", fetcher);
+    expect((await POST(request())).status).toBe(200);
+    expect(fetcher.mock.calls.map((call) => call[1].headers["x-goog-api-key"])).toEqual(["test-key", "backup-key"]);
+  });
   it("rejects explanations referencing an unsubmitted measurement", async () => {
     vi.stubGlobal("fetch", vi.fn().mockResolvedValue(Response.json({ candidates: [{ content: { parts: [{ text: JSON.stringify({ ...answer, explanations: [{ metricId: "knee-peak-mad", text: "Invented evidence" }] }) }] } }] })));
     const result = await POST(request());
