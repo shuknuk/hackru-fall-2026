@@ -11,6 +11,7 @@ import {
   deleteDraft,
 } from "@/lib/motion/storage";
 
+import GeminiProgress from "./GeminiProgress";
 import { samplePair } from "@/lib/motion/fixtures";
 export default function History() {
   const [sessions, setSessions] = useState<Session[]>([]);
@@ -111,6 +112,7 @@ export default function History() {
           <p>Select two different sets.</p>
         )}
       </section>
+      <GeminiProgress sessions={sessions} />
       <section aria-labelledby="history-title">
         <h2 id="history-title">Saved on this device</h2>
         {sessions.map((s) => (

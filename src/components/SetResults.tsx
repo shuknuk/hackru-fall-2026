@@ -4,6 +4,8 @@ import type { Session } from "@/lib/motion/schema";
 import { getSession, saveSession } from "@/lib/motion/storage";
 import { pendingResult } from "@/lib/motion/result-handoff";
 import SquatPosture from "./SquatPosture";
+import GeminiHelp from "./GeminiHelp";
+import { coachContext } from "@/lib/coach-context";
 import { summary } from "@/lib/motion/analysis";
 
 export default function SetResults() {
@@ -47,6 +49,7 @@ export default function SetResults() {
       {session.summary.trackingCoverage < 0.75 ? <p role="alert"><strong>We had trouble seeing your movement.</strong> Move closer to the camera while keeping your hips, knees, legs and feet fully in view. Make sure they are clearly visible from the side, then try another set.</p> : null}
       {!stats.count ? <p>No completed squats were recorded. Partial movements and unreliable tracking are excluded.</p> : null}
       <SquatPosture session={session} />
+      <GeminiHelp key={session.id} sets={[coachContext(session)]} />
       <div className="actions">
         {saved ? <a className="button" href={`/replay?id=${session.id}`}>Replay set</a> : <button className="secondary-button" disabled={saving} onClick={() => {
           setSaving(true);
