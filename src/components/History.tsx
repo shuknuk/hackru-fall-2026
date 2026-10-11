@@ -59,12 +59,12 @@ export default function History() {
       </div>
       <section className="panel">
         <h2>Try two demo squat sets</h2>
-        <p>
+        <p className="sample-pair-description">
           See two demo sets of three bodyweight squats. Explore their skeleton replays
           and compare squat depth and timing. These artificial examples are not recordings of a person.
         </p>
         <button
-          className="secondary-button"
+          className="button sample-pair-button"
           disabled={busy}
           onClick={() =>
             void action(async () => {
