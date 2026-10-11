@@ -13,3 +13,4 @@ public/mediapipe/
 public/sw.js
 public/offline-inventory.json
 public/offline-shell/
+.vercel
