@@ -54,6 +54,9 @@ export default function History() {
   return (
     <>
       <p role="status">{message}</p>
+      <div className="actions">
+        <a className="button" href="/results/saved">View all saved results</a>
+      </div>
       <section className="panel">
         <h2>Try two demo squat sets</h2>
         <p>
@@ -131,6 +134,9 @@ export default function History() {
               {new Date(s.createdAt).toLocaleString()} · {s.status}
             </p>
             <div className="actions">
+              <a className="secondary-button" href={`/results?id=${s.id}`}>
+                View results
+              </a>
               <a className="secondary-button" href={`/replay?id=${s.id}`}>
                 Replay
               </a>

@@ -11,8 +11,7 @@ export default function Home() {
         </div>
         <Link className="header-link" href="/history">History</Link>
       </header>
-      <section className="hero hero-layout" aria-labelledby="title">
-        <div>
+      <section className="hero" aria-labelledby="title">
           <p className="eyebrow">PRIVATE SQUAT REVIEW</p>
           <h1 id="title">See how your squat moves.</h1>
           <p className="lede">
@@ -26,13 +25,6 @@ export default function Home() {
             <Link className="text-link" href="/history">Open saved sets</Link>
           </div>
           <p className="status">No account · No video upload · Local pose data</p>
-        </div>
-        <div className="motion-mark" aria-hidden="true">
-          <span className="motion-mark__line" />
-          <span className="motion-mark__joint motion-mark__joint--one" />
-          <span className="motion-mark__joint motion-mark__joint--two" />
-          <span className="motion-mark__joint motion-mark__joint--three" />
-        </div>
       </section>
       <section className="features" aria-labelledby="flow-title">
         <div className="feature-intro">

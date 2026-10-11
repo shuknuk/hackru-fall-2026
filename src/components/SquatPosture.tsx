@@ -17,25 +17,27 @@ export default function SquatPosture({ session }: { session: Session }) {
   return (
     <section className={`posture-feedback posture-feedback--${feedback.state}`} aria-labelledby="posture-title">
       <h3 id="posture-title">Squat posture feedback</h3>
-      <p><strong>{feedback.state === "pass" ? "Your squats looked consistent with these movement cues" : feedback.state === "review" ? "Here is what to work on next time" : "We could not see enough of your movement to give complete feedback"}</strong></p>
-      <p>We look at how you lower and stand back up from the side. One camera cannot show everything about your posture or tell you whether an exercise is safe for you.</p>
-      {!feedback.reps.length ? <p>Record a completed squat with your shoulders, hips, knees, heels and toes visible to receive feedback.</p> : null}
+      <ul className="feedback-summary">
+        <li><strong>{feedback.state === "pass" ? "Your squats matched the visible movement cues." : feedback.state === "review" ? "There are a few things to try next time." : "We could not see enough movement for complete feedback."}</strong></li>
+        <li>Feedback uses the side view of your lowering and return to standing.</li>
+        <li>One camera cannot confirm safety or show every part of your posture.</li>
+        {!feedback.reps.length ? <li>Record a completed squat with your shoulders, hips, knees, heels and toes visible.</li> : null}
+      </ul>
       {feedback.reps.map((rep) => {
         const repState = rep.checks.some((check) => check.state === "review") ? "review" : rep.checks.some((check) => check.state === "unknown") ? "unknown" : "pass";
         return (
         <details key={rep.id} data-feedback={repState} open={repState === "review"}>
           <summary>Rep {rep.id}: {rep.checks.some((check) => check.state === "review") ? "Needs attention" : rep.checks.some((check) => check.state === "unknown") ? "We could not see everything clearly" : "Looked good in this view"}</summary>
-          <ul>{rep.checks.map((check) => <li key={check.name}>
+          <ul className="feedback-checks">{rep.checks.map((check) => <li key={check.name}>
             <strong>{check.name}: {check.state === "pass" ? "Looked good" : check.state === "review" ? "Try this next time" : "Could not see clearly"}</strong>
-            <p>{check.detail}</p>
-            {check.state === "review" ? <p>{check.cue}</p> : null}
+            <span>{check.detail}</span>
+            {check.state === "review" ? <span>{check.cue}</span> : null}
           </li>)}</ul>
         </details>
       );})}
       <details open={feedback.state === "review"}>
         <summary>See an example squat</summary>
-        <p>Press Play to watch a slow example: bend your hips and knees, keep your feet on the floor, then stand back up.</p>
-        <p>This is a demonstration, not a recording of you. Squat only as low as feels comfortable; you do not need to match the example exactly.</p>
+        <ul><li>Press Play to watch a slow example.</li><li>Bend your hips and knees, keep your feet down, then stand back up.</li><li>This demonstration is not a recording of you.</li><li>Move only as low as feels comfortable.</li></ul>
         <ReplayPlayer session={example} showMeasurements={false} />
       </details>
       <details>

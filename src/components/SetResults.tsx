@@ -38,7 +38,11 @@ export default function SetResults() {
   return (
     <section className="panel">
       <h2>{stats.count} completed reps</h2>
-      <p>{session.status === "complete" ? "Set complete" : "Set interrupted"} · Anatomical {session.capture.side}</p>
+      <ul className="result-summary">
+        <li><strong>Status:</strong> {session.status === "complete" ? "Set complete" : "Set interrupted"}</li>
+        <li><strong>Visible side:</strong> {session.capture.side}</li>
+        <li><strong>Saved:</strong> {new Date(session.createdAt).toLocaleString()}</li>
+      </ul>
       <p role="status">{message}</p>
       <dl className="metric-grid">
         <div><dt>Set duration</dt><dd>{duration.toFixed(1)} s</dd></div>
@@ -46,7 +50,7 @@ export default function SetResults() {
         <div><dt>Median ascent time</dt><dd>{stats.ascent === null ? "Unavailable" : `${(stats.ascent / 1000).toFixed(1)} s`}</dd></div>
         <div><dt>Tracking coverage</dt><dd>{(session.summary.trackingCoverage * 100).toFixed(0)}%</dd></div>
       </dl>
-      {session.summary.trackingCoverage < 0.75 ? <p role="alert"><strong>We had trouble seeing your movement.</strong> Move closer to the camera while keeping your hips, knees, legs and feet fully in view. Make sure they are clearly visible from the side, then try another set.</p> : null}
+      {session.summary.trackingCoverage < 0.75 ? <div className="result-alert" role="alert"><strong>We had trouble seeing your movement.</strong><ul><li>Move closer to the camera.</li><li>Keep your hips, knees, legs and feet fully visible.</li><li>Stay side-on, then record another set.</li></ul></div> : null}
       {!stats.count ? <p>No completed squats were recorded. Partial movements and unreliable tracking are excluded.</p> : null}
       <SquatPosture session={session} />
       <GeminiHelp key={session.id} sets={[coachContext(session)]} />
@@ -57,6 +61,7 @@ export default function SetResults() {
           void saveSession(session).then(() => { setSaved(true); setMessage("Saved on this device."); }).catch((error) => setMessage(`Not saved: ${error.message}`)).finally(() => setSaving(false));
         }}>Retry saving</button>}
         {saved ? <a className="secondary-button" href={`/session?profile=${session.profile.id}`}>Record another set</a> : null}
+        <a className="secondary-button" href="/results/saved">All saved results</a>
         <a className="secondary-button" href="/history">History and comparison</a>
       </div>
     </section>

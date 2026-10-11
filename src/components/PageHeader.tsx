@@ -11,6 +11,7 @@ export default function PageHeader({
       <nav className="top-nav" aria-label="Main navigation">
         <Link href="/">Menhel Motion</Link>
         <Link href="/session">Record</Link>
+        <Link href="/results/saved">Results</Link>
         <Link href="/history">History</Link>
       </nav>
       <header className="page-heading">
