@@ -6,7 +6,7 @@ export const maxDuration = 60;
 // Best-effort per-instance concurrency cap; provider budgets remain authoritative.
 let activeRequests = 0;
 export async function POST(request: Request) {
-  if (activeRequests >= 3) return NextResponse.json({ error: "Three analyses are already running on this server. Wait for one to finish, then retry.", diagnostics: { source: "Menhel", reason: "local-concurrency-limit", limit: 3 } }, { status: 429 });
+  if (activeRequests >= 3) return NextResponse.json({ error: "Three analyses are already running on this server. Wait for one to finish, then retry.", diagnostics: { source: "SpotOn", reason: "local-concurrency-limit", limit: 3 } }, { status: 429 });
   activeRequests++;
   try { return await respond(request); }
   finally { activeRequests--; }
@@ -66,5 +66,5 @@ async function respond(request: Request) {
     : failure === "timeout" ? "Gemini took too long. Please try again."
     : ["upstream-400", "upstream-401", "upstream-403", "upstream-404"].includes(failure) ? "Gemini could not connect. Please contact the app owner."
     : "Gemini could not give a supported answer. Please try again. Your recorded results are still available.";
-  return NextResponse.json({ error, diagnostics: diagnostics ?? { source: "Menhel", reason: failure, model, timeoutMs: 25000, attempts: 2 } }, { status: 502 });
+  return NextResponse.json({ error, diagnostics: diagnostics ?? { source: "SpotOn", reason: failure, model, timeoutMs: 25000, attempts: 2 } }, { status: 502 });
 }
