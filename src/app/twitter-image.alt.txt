@@ -1,0 +1,1 @@
+SpotOn — browser-based squat analysis that records, replays and compares your movement
