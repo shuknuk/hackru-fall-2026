@@ -10,10 +10,24 @@ const comfortaa = Comfortaa({
   display: "swap",
 });
 
+const siteDescription =
+  "Understand your movement through private, local pose comparisons.";
+
 export const metadata: Metadata = {
+  metadataBase: new URL("https://spot-on-motion.vercel.app"),
   title: "SpotOn",
-  description:
-    "Understand your movement through private, local pose comparisons.",
+  description: siteDescription,
+  openGraph: {
+    type: "website",
+    siteName: "SpotOn",
+    title: "SpotOn — See how your squat moves",
+    description: siteDescription,
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "SpotOn — See how your squat moves",
+    description: siteDescription,
+  },
   applicationName: "SpotOn",
   appleWebApp: { capable: true, title: "SpotOn", statusBarStyle: "default" },
   icons: { apple: "/icons/apple-touch-icon.png" },
