@@ -86,8 +86,6 @@ Playwright starts its own production test server. The excluded worker-update cas
 
 Physical-camera accuracy, iPhone/Safari performance, installation, and offline behavior on real devices still need the [device checks](docs/DEVICE_CHECKLIST.md). Movement estimates are not a medical assessment. HackRU code-reuse eligibility remains unresolved; see [execution evidence](docs/EXECUTION.md) for recorded results and outstanding checks.
 
-The active application is the Next.js project at the repository root. An earlier React Native/Expo import is documented in the [provenance manifest](docs/import-provenance.json). The referenced `legacy/menhel/` archive is absent from current `main`, so `npm run verify:provenance` cannot pass until it is restored.
-
 Session setup illustrations are from [RepDB](https://repdb.co), under the included [license](docs/LICENSE-repdb.md).
 
 For the full design and development history, see the [MVP and roadmap](MENHEL_MOTION_MASTER_MVP.md).
