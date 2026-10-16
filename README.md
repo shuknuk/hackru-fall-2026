@@ -1,80 +1,93 @@
-# SpotOn! 
+# SpotOn
 
-A Next.js + MediaPipe application for short side-view bodyweight squat sets, local landmark recording, skeleton replay and phase-aligned attempt comparison. The implementation now includes the M3–M8 feature flow. Physical camera accuracy, iPhone installation and device performance remain unverified. This is an observation tool, not a medical assessment.
+Browser-based squat analysis built by a three-person HackRU team. Record a side-view set, replay your movement, and compare attempts using pose data saved on your device.
 
-## Build contract
+[Live demo](https://spot-on-motion.vercel.app/) · [Device testing checklist](docs/DEVICE_CHECKLIST.md)
 
-Read [the master MVP and roadmap](MENHEL_MOTION_MASTER_MVP.md), [execution evidence](docs/EXECUTION.md), and [agent instructions](AGENTS.md). The user authorized continuing implementation before phone testing; deferred acceptance checks remain open.
+## What it does
 
-## Run
+- **Record:** MediaPipe tracks pose landmarks during short squat sets, with calibration and repetition detection.
+- **Review:** Replay the skeleton, scrub through a set, and inspect joint-angle measurements.
+- **Compare:** Align compatible attempts by movement phase while preserving their actual timing.
+- **Keep data local:** Store recordings and replay data in IndexedDB, without uploading camera images or video.
+- **Optional extras:** Gemini explanations, prerecorded voice guidance, and opt-in workout-summary trends with Tiger Data.
 
-Use Node 24.19.0 and npm 11.9.0.
+**Stack:** Next.js, React, TypeScript, Tailwind CSS, MediaPipe, IndexedDB, and PostgreSQL/TimescaleDB for optional cloud summaries.
+
+## Try it
+
+1. Open the [demo](https://spot-on-motion.vercel.app/) and start a squat session.
+2. Choose the visible side, keep your full body in frame, and complete calibration.
+3. Record a set, then finish to review the results. Sets are limited to 10 completed reps or 90 seconds.
+4. Open saved history to replay a set or compare two compatible attempts.
+
+History also includes clearly labelled synthetic samples, so you can explore replay and comparison without a camera. Those samples demonstrate the software, not real movement accuracy.
+
+## Run locally
+
+Use **Node.js 24.19.0** (see [.nvmrc](.nvmrc)) and **npm 11.9.0**.
 
 ```sh
 npm ci
 npm run dev
 ```
 
-For a production/PWA check:
+Open [localhost:3000](http://localhost:3000). Camera access requires permission and a secure context: localhost works locally; use HTTPS for a hosted or phone-accessible deployment.
+
+The core recording, replay, and comparison flow needs no API keys or database. Development and build commands prepare the pinned MediaPipe assets automatically; the first run needs network access to download the pose model.
+
+### Optional services
+
+Copy [.env.example](.env.example) to `.env.local` and configure only the features you need. Keep all keys and database URLs server-side.
+
+| Feature | Configuration |
+| --- | --- |
+| Gemini explanations | `GEMINI_API_KEY`; optional `GEMINI_MODEL`. The example file also supports two additional keys. Local measurements and comparisons remain available without Gemini. |
+| Tiger Data trends | `DATABASE_URL` for the restricted application role. Requires TimescaleDB 2.13+ and the migrations below. |
+| Voice guidance | Checked-in ElevenLabs audio clips play without a key. `ELEVENLABS_API_KEY` is needed only to deliberately regenerate narration with `node scripts/generate-narration.mjs`, which uses provider credits. |
+
+For Tiger Data, configure the service's trusted CA in [the database configuration](src/lib/db/tiger-cloud-ca.json); the checked-in CA is pinned to the existing service. Use an administrative database URL only for migration, and set `MIGRATION_CONFIRM_DB` to the intended database name in `.env.local`:
+
+```sh
+npm run db:migrate
+npm run db:verify
+```
+
+Switch `DATABASE_URL` to the restricted application-role URL before running the app. Migration changes the target database; verification is read-only. See the [migrations](migrations/) and [implementation notes](docs/EXECUTION.md) for the existing service setup.
+
+## Privacy and storage
+
+No sign-in is required. Full pose recordings, calibration data, and replay samples stay in the browser. The local history holds up to 20 recordings; browser storage can be cleared or evicted.
+
+- **Gemini:** Explicitly requested help sends measurement summaries and any question you enter to the server for explanation, not camera images, video, or pose landmarks.
+- **Tiger Data:** Opting in uploads workout summaries, scoped by a random credential stored in that browser. It does not upload raw recordings. You can delete the cloud history while keeping local recordings.
+- **Same browser, same URL:** Local recordings and the cloud-history credential do not transfer between browsers, devices, or deployment URLs. Clearing site data loses access to that browser's cloud history; delete cloud history first if you want it removed.
+
+In a production build, explicit offline preparation lets you reopen saved history, replay, and comparison. Offline live pose tracking is not promised.
+
+## Development checks
 
 ```sh
 npm run lint
 npm run typecheck
 npm test
 npm run build
-npm run start
-npm run test:e2e
 ```
 
-The initial build needs access to Google's pinned model download. Prebuild verifies exact model/SDK/WASM hashes. The production build creates versioned static offline shells, an asset inventory and a service worker. Offline preparation is explicitly user-triggered. Use production mode for offline tests.
-
-## Use
-
-Start at `/session`, choose the visible anatomical side and confirm a stable side view. Calibrate standing and one comfortable setup cycle, then record a set. Finish stops the camera and saves body landmarks locally. Record Another Set reuses calibration after a standing recheck. Sets are limited to ten completed reps or 90 seconds.
-
-`/history` provides labelled synthetic samples, local history, draft recovery, per-set deletion and set selection. `/replay?id=...` provides play/pause, scrubbing, rep selection, angle traces and gap-aware skeletons. `/compare?a=...&b=...` checks source/setup compatibility before numerical observations and aligns start, bottom and end while retaining real durations.
-
-Synthetic samples demonstrate software behavior, not a recorded person or pose accuracy. Imported sources are declared provenance; imports are labelled and metrics are recomputed. Twenty local session slots apply. Local storage can fail or be evicted. Full replays belong to the browser origin and do not automatically move between deployment URLs, devices, accounts, or installed-app storage contexts.
-
-Compatible comparisons retain deterministic measurement observations. An optional Gemini explanation appears only after a separate opt-in and sends bounded aggregate measurements and their evidence IDs through the server; it never sends video, images, landmarks, session IDs or saved set records. Configure `GEMINI_API_KEY` server-side and optionally set `GEMINI_MODEL` (default `gemini-2.5-flash`). Without a key or a successful response, the deterministic comparison remains available.
-
-Optional ElevenLabs narration: on the capture page, select **Enable voice guidance** for framing, calibration and rep announcements; mute it at any time. The 30 River voice clips are checked in, so playback needs no API key or paid API request. Only deliberate regeneration with `node scripts/generate-narration.mjs` uses `ELEVENLABS_API_KEY` from your environment or ignored `.env.local` and spends provider credits. Camera images and pose data are never sent to ElevenLabs. Framing cues are heuristics awaiting real-phone testing.
-
-## Phone trends and Tiger Data
-
-Every recording, replay, landmark and calibration value stays in the browser on the phone that captured it. There are no accounts, sign-ins, quotas, fingerprinting, or camera uploads.
-
-Selecting **View measurements over time with Tiger Data** on `/dashboard` creates a random 256-bit credential in that phone's IndexedDB, then queues current and future completed/interrupted workout summaries. The server hashes the credential before using it as the device scope; Tiger Data receives no raw credential, email, name, camera image, video, landmarks, replay samples or calibration data. It stores only dated rep count, estimated knee bend, bend variation, estimated ascent time, tracking coverage, visible side and algorithm version.
-
-Cloud trouble never blocks local recording or replay. Queued uploads and deletions retry the next time this phone opens the trend view. Deleting a local workout queues deletion of its Tiger Data summary. **Delete Tiger Data history** removes this phone's cloud summaries and credential while retaining local recordings. Clearing browser data also loses access to this phone's Tiger Data history; it cannot be recovered or moved to another phone.
-
-Use the same stable site URL and browser on the testing phone: preview hostnames, private browsing and other browsers have separate local histories. Daily counts query the Timescale hypertable directly so deletions are reflected immediately rather than waiting for the aggregate refresh.
-
-Tiger Data setup:
+To preview the production build, run `npm run start`. For browser tests, install Chromium with `npx playwright install chromium`, then run:
 
 ```sh
-# Use the administrative URL for migrations, then the restricted app-role URL at runtime.
-MIGRATION_CONFIRM_DB=tsdb npm run db:migrate
-npm run db:verify
-```
-
-The migration checks the installed TimescaleDB version before using `by_range`, creates phone/session-key tables, the `workout_metrics` hypertable, device/time indexes, the `daily_workout_stats` continuous aggregate, and its hourly refresh policy. It also migrates the earlier Clerk-named columns to phone-scoped names without changing measurements. `db:verify` is read-only. The live service has a restricted `menhel_app` runtime role; keep `tsdbadmin` migration-only. The free Tiger Cloud service has no managed pooler, so the server reuses a two-connection pool with short timeouts. The service's private CA is pinned with hostname verification; its current certificate expires October 20, 2027 and must be replaced before then or whenever Tiger rotates the service CA.
-
-## Verification
-
-Browser tests run against the production build on a dedicated fresh port. Install the standard test browser with `npx playwright install chromium`. A nonstandard executable can be specified using `PLAYWRIGHT_CHROMIUM_EXECUTABLE_PATH`. `PLAYWRIGHT_FAKE_VIDEO` enables explicit prerecorded webcam input for real SDK integration; it is test tooling only. The calibration/recording integration test replaces browser camera/worker APIs with explicitly simulated landmark sequences and a deterministic capture clock. Neither is physical-camera acceptance.
-
-Run browser checks against the production build:
-
-```sh
-npm run build
 npm run test:e2e -- --grep-invert "a verified worker update"
 ```
 
-See [the device checklist](docs/DEVICE_CHECKLIST.md) before claiming phone compatibility. Installation/offline readiness and movement heuristics require real-device checks. The five development-tool audit findings remain documented; the production-only audit returned zero findings.
+Playwright starts its own production test server. The excluded worker-update case is documented as obsolete in [execution evidence](docs/EXECUTION.md). Synthetic fixtures and prerecorded-camera integration tests do not establish physical-device accuracy.
 
-## Provenance
+## Status and credits
 
-The original 47-file Menhel import is preserved under `legacy/menhel/`. The original repository remains unchanged. [Hash manifest](docs/import-provenance.json). Event code-reuse eligibility remains unresolved.
+Physical-camera accuracy, iPhone/Safari performance, installation, and offline behavior on real devices still need the [device checks](docs/DEVICE_CHECKLIST.md). Movement estimates are not a medical assessment. HackRU code-reuse eligibility remains unresolved; see [execution evidence](docs/EXECUTION.md) for recorded results and outstanding checks.
 
-The session setup guide uses the free-tier Bodyweight Squat illustrations from [RepDB](https://repdb.co), under the included [RepDB free-tier license](docs/LICENSE-repdb.md). The app displays the required attribution beside the images.
+The active application is the Next.js project at the repository root. An earlier React Native/Expo import is documented in the [provenance manifest](docs/import-provenance.json). The referenced `legacy/menhel/` archive is absent from current `main`, so `npm run verify:provenance` cannot pass until it is restored.
+
+Session setup illustrations are from [RepDB](https://repdb.co), under the included [license](docs/LICENSE-repdb.md).
+
+For the full design and development history, see the [MVP and roadmap](MENHEL_MOTION_MASTER_MVP.md).
